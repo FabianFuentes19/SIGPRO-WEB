@@ -1,0 +1,34 @@
+# Maven
+target/
+pom.xml.tag
+pom.releaseBackup
+pom.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# Wallet (no subir credenciales)
+# Descomenta si no quieres versionar los .ora de ejemplo:
+# src/main/resources/wallet/*.ora
+src/main/resources/wallet/*.sso
+src/main/resources/wallet/*.p12
+src/main/resources/wallet/*.pem
+src/main/resources/wallet/
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
