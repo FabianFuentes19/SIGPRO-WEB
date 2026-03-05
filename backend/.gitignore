@@ -26,6 +26,7 @@ src/main/resources/wallet/*.sso
 src/main/resources/wallet/*.p12
 src/main/resources/wallet/*.pem
 src/main/resources/wallet/
+src/main/resources/application.properties
 # Logs
 *.log
 
