@@ -11,10 +11,10 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch("http://localhost:8082/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user, password: password }),
+        body: JSON.stringify({ matricula: user, contrasena: password }),
       });
 
       if (response.ok) {
