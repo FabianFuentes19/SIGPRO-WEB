@@ -24,5 +24,26 @@ public class UsuarioMapper {
 
         return usuario;
     }
+
+    public static UsuarioDTO toDto(Usuario usuario) {
+        if (usuario == null) {
+            return null;
+        }
+
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setNombreCompleto(usuario.getNombreCompleto());
+        dto.setGrupo(usuario.getGrupo());
+        dto.setMatricula(usuario.getMatricula());
+        dto.setCarrera(usuario.getCarrera());
+        dto.setCuatrimestre(usuario.getCuatrimestre());
+        dto.setPuesto(usuario.getPuesto());
+        dto.setSalarioQuincenal(usuario.getSalarioQuincenal());
+        dto.setEstado(usuario.getEstado());
+        dto.setRolId(usuario.getRol() != null ? usuario.getRol().getId() : null);
+
+        // Por seguridad: nunca exponer el hash/contraseña en respuestas
+        dto.setContrasena(null);
+        return dto;
+    }
 }
 

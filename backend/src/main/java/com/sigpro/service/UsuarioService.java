@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 
 @Service
@@ -90,7 +91,7 @@ public class UsuarioService {
         }
     }
 
-    public void bajaLogica(String matricula) {
+    public UsuarioDTO bajaLogica(String matricula) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
@@ -100,23 +101,27 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         usuario.setEstado(ESTADO_INACTIVO);
-        usuarioRepository.save(usuario);
+        Usuario actualizado = usuarioRepository.save(usuario);
+        return UsuarioMapper.toDto(actualizado);
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> listarUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(UsuarioMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public Usuario obtenerDetallePorMatricula(String matricula) {
+    public UsuarioDTO obtenerDetallePorMatricula(String matricula) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
         }
-        return usuarioRepository.findByMatricula(m)
+        Usuario usuario = usuarioRepository.findByMatricula(m)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return UsuarioMapper.toDto(usuario);
     }
 
-    public Usuario modificarUsuario(String matricula, UsuarioDTO dto) {
+    public UsuarioDTO modificarUsuario(String matricula, UsuarioDTO dto) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
@@ -143,7 +148,8 @@ public class UsuarioService {
         }
 
         // No se permite modificar: matricula, puesto, salarioQuincenal, fechaIngreso, contrasena, rol
-        return usuarioRepository.save(usuario);
+        Usuario actualizado = usuarioRepository.save(usuario);
+        return UsuarioMapper.toDto(actualizado);
     }
 
     private static String safeTrim(String v) {
