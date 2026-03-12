@@ -27,7 +27,7 @@ public class AuthService {
                 .orElseThrow(() -> new Exception("Credenciales incorrectas"));
 
         // Verificar estado
-        if (!"Activo".equalsIgnoreCase(usuario.getEstado())) {
+        if (!"ACTIVO".equalsIgnoreCase(usuario.getEstado())) {
             throw new Exception("Cuenta inactiva");
         }
 
