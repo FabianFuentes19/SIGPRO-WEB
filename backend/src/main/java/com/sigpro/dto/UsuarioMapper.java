@@ -40,10 +40,8 @@ public class UsuarioMapper {
         dto.setSalarioQuincenal(usuario.getSalarioQuincenal());
         dto.setEstado(usuario.getEstado());
         dto.setRolId(usuario.getRol() != null ? usuario.getRol().getId() : null);
-
-        // Por seguridad: nunca exponer el hash/contraseña en respuestas
+        dto.setRolNombre(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
         dto.setContrasena(null);
         return dto;
     }
 }
-
