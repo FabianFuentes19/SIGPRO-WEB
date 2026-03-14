@@ -27,7 +27,7 @@ public class EmailService {
         mensaje.setSubject("SIGPRO - Recuperación de Contraseña");
 
         // creación del cuerpo del correo
-        mensaje.setText("Hola " + matricula + ",\n\n"
+        mensaje.setText("Hola"
                 + "Se ha solicitado un restablecimiento de contraseña para tu cuenta en SIGPRO.\n\n"
                 + "Tu código temporal de 6 dígitos es: " + otpToken + "\n\n"
                 + "Este código expirará en 5 minutos.\n"
