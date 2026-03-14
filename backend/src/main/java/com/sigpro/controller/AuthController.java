@@ -1,6 +1,6 @@
 package com.sigpro.controller;
 
-import com.sigpro.model.Usuario;
+import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.security.JwtUtil;
 import com.sigpro.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +10,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*") // Para interoperatividad Web/Móvil
 public class AuthController {
+
+    // Mínimo 8, 1 mayúscula, 1 minúscula, 1 número, 1 especial
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$"
+    );
+
     @Autowired
     private AuthService authService;
 
@@ -24,7 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
         try {
-            Usuario usuario = authService.validarLogin(
+            UsuarioDTO usuario = authService.validarLogin(
                     credenciales.get("matricula"),
                     credenciales.get("contrasena")
             );
@@ -33,7 +40,7 @@ public class AuthController {
 
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("token", token);
-            respuesta.put("rol", usuario.getRol().getNombre());
+            respuesta.put("rol", usuario.getRolNombre());
 
             return ResponseEntity.ok(respuesta);
 
@@ -43,5 +50,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
+
 }
 

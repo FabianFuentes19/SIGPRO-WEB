@@ -1,9 +1,10 @@
 package com.sigpro.security;
 
-import com.sigpro.model.Usuario;
+import com.sigpro.dto.UsuarioDTO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.Key;
 
@@ -13,7 +14,9 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private String SECRET_KEY = "MoEXOzssquFrngC6Nt4Y3/deOu4WP5VkwnfLRLVfXkI=";
+    //no se expone la llave para mayor seguridad
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     private Key getSigningKey() {
         byte[] keyBytes = java.util.Base64.getDecoder().decode(SECRET_KEY);
@@ -21,9 +24,9 @@ public class JwtUtil {
     }
 
     // genera el token, el cual incluye rol y nombre
-    public String generateToken(Usuario usuario) {
+    public String generateToken(UsuarioDTO usuario) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", usuario.getRol().getNombre());
+        claims.put("rol", usuario.getRolNombre());
         claims.put("nombre", usuario.getNombreCompleto());
 
         return Jwts.builder()
