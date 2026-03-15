@@ -1,0 +1,167 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.modal-container {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 8px;
+  width: 600px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #3b4256;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row-2-col {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row-2-col .form-group {
+  flex: 1;
+}
+
+.modal-form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.modal-form input[type="text"],
+.modal-form input[type="number"],
+.modal-form input[type="date"],
+.modal-form select,
+.modal-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #374151;
+  box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-form input::placeholder {
+  color: #9ca3af;
+}
+
+.modal-form input:focus:not(:disabled),
+.modal-form select:focus:not(:disabled),
+.modal-form textarea:focus:not(:disabled) {
+  border-color: #0c9d72;
+  box-shadow: 0 0 0 3px rgba(12, 157, 114, 0.1);
+}
+
+.modal-form input:disabled,
+.modal-form select:disabled,
+.modal-form textarea:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.input-money-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 14px;
+  color: #374151;
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.input-money-wrapper input {
+  padding-left: 30px !important;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar {
+  background-color: white;
+  color: #0c9d72;
+  border: 1px solid #0c9d72;
+}
+
+.btn-cancelar:hover {
+  background-color: #ebf8f4;
+}
+
+.btn-registrar {
+  background-color: #0c9d72;
+  color: white;
+  border: 1px solid #0c9d72;
+}
+
+.btn-registrar:hover {
+  background-color: #0a8661;
+}
+
+/* Hide spin buttons for number input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 40px;
+}
