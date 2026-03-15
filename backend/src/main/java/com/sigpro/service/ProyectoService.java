@@ -2,13 +2,18 @@ package com.sigpro.service;
 
 import com.sigpro.dto.ProyectoDTO;
 import com.sigpro.dto.ProyectoMapper;
+import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
+import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
 import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
+import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 
@@ -26,8 +31,15 @@ public class ProyectoService {
 
     @Autowired
     private ProyectoUsuarioRepository proyectoUsuarioRepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     public List<ProyectoDTO> consultarTodos(Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
@@ -120,6 +132,35 @@ public class ProyectoService {
 
         return ProyectoMapper.toDto(pu.getProyecto());
     }
+
+    public ProyectoUsuario registrarMiembro(Long proyectoId, UsuarioDTO dto, Authentication auth) {
+        validarRol(auth, "ROLE_LIDER");
+
+        // valida que el líder sea dueño del proyecto
+        Usuario lider = usuarioRepository.findByMatricula((String) auth.getPrincipal())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Proyecto proyecto = proyectoRepository.findById(proyectoId)
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        if (!proyecto.getLider().getId().equals(lider.getId())) {
+            throw new SecurityException("No autorizado: solo el líder del proyecto puede agregar miembros");
+        }
+
+        Long rolMiembroId = rolRepository.findByNombreIgnoreCase("Miembro")
+                .orElseThrow(() -> new IllegalArgumentException("Rol 'Miembro' no encontrado"))
+                .getId();
+        dto.setRolId(rolMiembroId);
+
+        Usuario nuevoMiembro = usuarioService.registrarUsuario(dto);
+
+        ProyectoUsuario pu = new ProyectoUsuario();
+        pu.setProyecto(proyecto);
+        pu.setUsuario(nuevoMiembro);
+
+        return proyectoUsuarioRepository.save(pu);
+    }
+
 
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
