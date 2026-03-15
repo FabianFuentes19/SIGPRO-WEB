@@ -2,9 +2,11 @@ import React from 'react';
 import './ModalConsultarProyecto.css';
 
 const ModalConsultarProyecto = ({ proyecto, onClose }) => {
+  // si no hay un proyecto seleccionado el modal no se renderiza y retorna null
   if (!proyecto) return null;
 
   return (
+    // estilos de boostrap
     <div className="modal-overlay">
       <div className="modal-container">
         <h3>Consultar Proyecto</h3>
