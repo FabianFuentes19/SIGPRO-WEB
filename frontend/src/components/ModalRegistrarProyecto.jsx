@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './ModalRegistrarProyecto.css';
 
+// recibe 2 props al cerrar y al registra , que son funciones
 const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
+  //hook useState, 
   const [datosFormulario, setDatosFormulario] = useState({
     nombre: '',
     objetivo: '',
@@ -19,7 +21,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
 
   const guardarProyecto = (e) => {
     e.preventDefault();
-    alRegistrar(datosFormulario); // Pasamos los datos del formulario (de momento solo en el front)
+    alRegistrar(datosFormulario); 
     alCerrar();
   };
 
