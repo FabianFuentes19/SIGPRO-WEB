@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import "./Login.css";
 
+
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -11,7 +12,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8082/auth/login", {
+      const response = await fetch("http://localhost:8085/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user, contrasena: password }),
@@ -19,10 +20,30 @@ function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage("Login exitoso ");
+        setMessage("Login exitoso");
         console.log("Token recibido:", data.token);
       } else {
-        setMessage("Credenciales inválidas ");
+        setMessage("Credenciales inválidas");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("Error de conexión con el servidor");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      const response = await fetch("http://localhost:8085/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matricula: user }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(data.mensaje || "Se envió un correo para restablecer tu contraseña");
+      } else {
+        setMessage("No se pudo procesar la solicitud");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -35,8 +56,6 @@ function Login() {
       {/* Columna izquierda */}
       <div className="login-left">
         <img src={logoUtez} alt="Logo UTEZ" />
-        
-        
         <p>Territorio de calidad</p>
       </div>
 
@@ -67,7 +86,7 @@ function Login() {
           </div>
 
           <div className="forgot-password">
-            <a href="#">¿Olvidaste tu contraseña?</a>
+            <a href="#" onClick={handleForgotPassword}>¿Olvidaste tu contraseña?</a>
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
