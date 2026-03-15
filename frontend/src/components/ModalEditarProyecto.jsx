@@ -12,24 +12,27 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
     presupuesto: ''
   });
 
-  // Cargar los datos del proyecto al abrir el modal
+  // Cargar los datos del proyecto al abrir el modal, use useEffect, para cargar los datos
   useEffect(() => {
     if (proyecto) {
       setDatosFormulario(proyecto);
     }
   }, [proyecto]);
 
+  // Esto lo puse para actualizar los valores de los imputs
   const cambiarValor = (e) => {
     const { name, value } = e.target;
     setDatosFormulario({ ...datosFormulario, [name]: value });
   };
 
+  // Al enviar el formulario, llama a alActualizar pasando los datos del proyecto editado
   const guardarProyecto = (e) => {
     e.preventDefault();
-    alActualizar(datosFormulario); // Pasamos los datos del formulario (sólo front-end por ahora)
+    alActualizar(datosFormulario); 
     alCerrar();
   };
 
+  // Aqui renderiza el modal
   return (
     <div className="modal-overlay">
       <div className="modal-container">
