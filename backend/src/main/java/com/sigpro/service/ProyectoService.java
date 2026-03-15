@@ -82,6 +82,21 @@ public class ProyectoService {
         return ProyectoMapper.toDto(proyectoGuardado);
     }
 
+    public ProyectoDTO editarProyecto(Long id, ProyectoDTO dto, Authentication auth){
+        validarRol(auth, "ROLE_ADMINISTRADOR");
+
+        Proyecto proyecto = proyectoRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        // solo se pueden editar nombre, descripción, objetivo general y presupuesto
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) proyecto.setNombre(dto.getNombre());
+        if (dto.getDescripcion() != null && !dto.getDescripcion().isBlank()) proyecto.setDescripcion(dto.getDescripcion());
+        if (dto.getObjetivoGeneral() != null && !dto.getObjetivoGeneral().isBlank()) proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
+        if (dto.getPresupuesto() != null && dto.getPresupuesto().compareTo(BigDecimal.ZERO) > 0) proyecto.setPresupuesto(dto.getPresupuesto());
+
+        return ProyectoMapper.toDto(proyectoRepository.save(proyecto));
+    }
+
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
             throw new SecurityException("No autorizado para esta operación");
