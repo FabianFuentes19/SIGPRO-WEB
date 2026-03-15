@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Data
 public class ProyectoDTO {
+    private Long id;
     private String nombre;
     private String descripcion;
     private String objetivoGeneral;
@@ -15,4 +16,5 @@ public class ProyectoDTO {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String estado;
+    private java.util.List<UsuarioDTO> miembros;
 }

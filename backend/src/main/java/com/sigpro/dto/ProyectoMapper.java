@@ -31,6 +31,7 @@ public class ProyectoMapper {
         }
 
         ProyectoDTO dto = new ProyectoDTO();
+        dto.setId(proyecto.getId());
         dto.setNombre(proyecto.getNombre());
         dto.setDescripcion(proyecto.getDescripcion());
         dto.setObjetivoGeneral(proyecto.getObjetivoGeneral());
@@ -38,8 +39,18 @@ public class ProyectoMapper {
         dto.setPresupuesto(proyecto.getPresupuesto());
         dto.setFechaInicio(proyecto.getFechaInicio());
         dto.setFechaFin(proyecto.getFechaFin());
-        dto.setEstado(proyecto.getEstado());
+        dto.setEstado(proyecto.getEstado()); // Usamos el campo normal
 
+        return dto;
+    }
+
+    public static ProyectoDTO toDetailedDto(Proyecto proyecto, java.util.List<Usuario> miembros) {
+        ProyectoDTO dto = toDto(proyecto);
+        if (miembros != null) {
+            dto.setMiembros(miembros.stream()
+                    .map(UsuarioMapper::toDto)
+                    .toList());
+        }
         return dto;
     }
 }

@@ -8,8 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
-    //Buscar proyectos por nombre
-    List<Proyecto> findByNombre(String nombre);
+    //Buscar proyectos por coincidencia de nombre (ignora mayúsculas/minúsculas)
+    List<Proyecto> findByNombreContainingIgnoreCase(String nombre);
 
     // proyecto por líder
     Proyecto findByLiderId(Long liderId);

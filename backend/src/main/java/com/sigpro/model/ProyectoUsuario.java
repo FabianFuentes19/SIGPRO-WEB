@@ -1,12 +1,15 @@
 package com.sigpro.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "PROYECTO_USUARIO")
+@Data
 public class ProyectoUsuario {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_PK")
     private Long id;
 
     @ManyToOne
@@ -16,28 +19,4 @@ public class ProyectoUsuario {
     @ManyToOne
     @JoinColumn(name = "USUARIO_ID_FK", nullable = false)
     private Usuario usuario;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Proyecto getProyecto() {
-        return proyecto;
-    }
-
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
 }

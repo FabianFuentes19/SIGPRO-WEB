@@ -3,19 +3,17 @@ package com.sigpro.service;
 import com.sigpro.dto.ProyectoDTO;
 import com.sigpro.dto.ProyectoMapper;
 import com.sigpro.dto.UsuarioDTO;
-import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
-import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
 import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.math.BigDecimal;
@@ -53,7 +51,7 @@ public class ProyectoService {
             throw new IllegalArgumentException("El criterio de búsqueda no puede estar vacío");
         }
 
-        List<Proyecto> proyectos = proyectoRepository.findByNombre(nombre);
+        List<Proyecto> proyectos = proyectoRepository.findByNombreContainingIgnoreCase(nombre);
         if(proyectos.isEmpty()){
             throw new IllegalArgumentException("No se encontraron resultados");
         }
@@ -61,6 +59,7 @@ public class ProyectoService {
         return proyectos.stream().map(ProyectoMapper::toDto).toList();
     }
 
+    @Transactional
     public ProyectoDTO crearProyecto(ProyectoDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
@@ -94,6 +93,7 @@ public class ProyectoService {
         return ProyectoMapper.toDto(proyectoGuardado);
     }
 
+    @Transactional
     public ProyectoDTO editarProyecto(Long id, ProyectoDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
@@ -133,6 +133,7 @@ public class ProyectoService {
         return ProyectoMapper.toDto(pu.getProyecto());
     }
 
+    @Transactional
     public ProyectoUsuario registrarMiembro(Long proyectoId, UsuarioDTO dto, Authentication auth) {
         validarRol(auth, "ROLE_LIDER");
 
@@ -161,6 +162,20 @@ public class ProyectoService {
         return proyectoUsuarioRepository.save(pu);
     }
 
+
+    public ProyectoDTO obtenerDetalleProyecto(Long id, Authentication auth) {
+        validarRol(auth, "ROLE_ADMINISTRADOR");
+
+        Proyecto proyecto = proyectoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        // Buscamos los miembros asociados en la tabla intermedia
+        List<Usuario> miembros = proyectoUsuarioRepository.findByProyectoId(id).stream()
+                .map(ProyectoUsuario::getUsuario)
+                .toList();
+
+        return ProyectoMapper.toDetailedDto(proyecto, miembros);
+    }
 
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
