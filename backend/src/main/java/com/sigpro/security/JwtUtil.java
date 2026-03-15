@@ -26,7 +26,7 @@ public class JwtUtil {
     // genera el token, el cual incluye rol y nombre
     public String generateToken(UsuarioDTO usuario) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", usuario.getRolNombre());
+        claims.put("rol", "ROLE_" + usuario.getRolNombre().toUpperCase());
         claims.put("nombre", usuario.getNombreCompleto());
 
         return Jwts.builder()
@@ -36,6 +36,16 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // extrae el rol
+    public String extractRol(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("rol", String.class);
     }
 
     //extracción de la matricula
