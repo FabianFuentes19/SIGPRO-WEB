@@ -7,11 +7,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch("http://localhost:8085/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user, password: password }),
@@ -44,7 +44,7 @@ function Login() {
       <div className="login-right">
         <h2>Bienvenido</h2>
         <p>Inicia sesión para acceder a tu cuenta.</p>
-        <form className="form-box" onSubmit={handleSubmit}>
+        <form className="form-box" onSubmit={submit}>
           <div className="mb-3">
             <label className="form-label">Matrícula *</label>
             <input
@@ -65,6 +65,11 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
+          <div className="forgot-password">
+            <a href="#">¿Olvidaste tu contraseña?</a>
+          </div>
+
           <button type="submit" className="btn btn-primary w-100">
             Iniciar Sesión
           </button>
