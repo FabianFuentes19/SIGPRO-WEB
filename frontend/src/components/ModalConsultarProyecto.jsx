@@ -6,21 +6,45 @@ const ModalConsultarProyecto = ({ proyecto, onClose }) => {
   if (!proyecto) return null;
 
   return (
-    // estilos de boostrap
+    // estilos de bootstrap
     <div className="modal-overlay">
       <div className="modal-container">
-        <h3>Consultar Proyecto</h3>
-        <div className="modal-content">
-          <p><strong>Nombre proyecto:</strong> {proyecto.nombre}</p>
-          <p><strong>Objetivo:</strong> {proyecto.objetivo}</p>
-          <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
-          <p><strong>Fecha Inicio:</strong> {proyecto.fechaInicio}</p>
-          <p><strong>Fecha Fin:</strong> {proyecto.fechaFin}</p>
-          <p><strong>Líder:</strong> {proyecto.lider}</p>
-          <p><strong>Presupuesto:</strong> {proyecto.presupuesto}</p>
-        </div>
+        <h3 className="modal-title">Consultar Proyecto</h3>
+        <form className="modal-form">
+          <div className="form-group">
+            <label>Nombre proyecto:</label>
+            <input type="text" value={proyecto.nombre} disabled />
+          </div>
+          <div className="form-group">
+            <label>Objetivo:</label>
+            <input type="text" value={proyecto.objetivo} disabled />
+          </div>
+          <div className="form-group">
+            <label>Descripción:</label>
+            <textarea value={proyecto.descripcion} disabled />
+          </div>
+          <div className="form-row-2-col">
+            <div className="form-group">
+              <label>Fecha Inicio:</label>
+              <input type="date" value={proyecto.fechaInicio} disabled />
+            </div>
+            <div className="form-group">
+              <label>Fecha Fin:</label>
+              <input type="date" value={proyecto.fechaFin} disabled />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Líder:</label>
+            <input type="text" value={proyecto.lider} disabled />
+          </div>
+          <div className="form-group input-money-wrapper">
+            <label>Presupuesto:</label>
+            <span className="currency-symbol">$</span>
+            <input type="number" value={proyecto.presupuesto} disabled />
+          </div>
+        </form>
         <div className="modal-actions">
-          <button onClick={onClose} className="btn-cerrar">Cerrar</button>
+          <button onClick={onClose} className="btn-cancelar">Cerrar</button>
         </div>
       </div>
     </div>
