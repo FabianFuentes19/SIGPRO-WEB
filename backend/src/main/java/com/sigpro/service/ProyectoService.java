@@ -97,6 +97,30 @@ public class ProyectoService {
         return ProyectoMapper.toDto(proyectoRepository.save(proyecto));
     }
 
+    public ProyectoDTO consultarProyectoLider(Authentication auth) {
+        validarRol(auth, "ROLE_LIDER");
+
+        Usuario lider = usuarioRepository.findByMatricula((String) auth.getPrincipal())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
+        if (proyecto == null) throw new IllegalArgumentException("No tiene proyecto asignado");
+
+        return ProyectoMapper.toDto(proyecto);
+    }
+
+    public ProyectoDTO consultarProyectoMiembro(Authentication auth) {
+        validarRol(auth, "ROLE_MIEMBRO");
+
+        Usuario usuario = usuarioRepository.findByMatricula((String) auth.getPrincipal())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        ProyectoUsuario pu = proyectoUsuarioRepository.findByUsuarioId(usuario.getId());
+        if (pu == null) throw new IllegalArgumentException("No pertenece a ningún proyecto");
+
+        return ProyectoMapper.toDto(pu.getProyecto());
+    }
+
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
             throw new SecurityException("No autorizado para esta operación");
