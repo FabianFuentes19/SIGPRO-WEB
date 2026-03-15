@@ -10,8 +10,9 @@ function App() {
   return (
     <>
       <div>
+        {/* Comento las rutas para probarlas */}
       {/*<Login/>*/}
-       <DashProyectos/>
+      <DashProyectos/>
       </div>
     </>
   )
