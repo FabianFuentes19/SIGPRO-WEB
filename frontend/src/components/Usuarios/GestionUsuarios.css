@@ -1,0 +1,558 @@
+/* Editar usuario -> Linea 109*/
+/* Eliminar usuario -> Linea 166*/
+/* Ver detalles usuario -> Linea 247*/
+/* Ver historial usuario -> Linea 415*/
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 1000;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    overflow-y: auto;
+    padding: 40px 0;
+}
+
+.modal-container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 550px;
+    max-width: 95%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #3b4256;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+/* Estilo base para todos los inputs y selects */
+.modal-form input,
+.modal-form select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+    border-color: #0c9d72;
+    box-shadow: 0 0 0 3px rgba(12, 157, 114, 0.1);
+}
+
+/* Personalización del Select */
+.modal-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+.form-row-2-col {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row-2-col .form-group {
+    flex: 1;
+}
+
+.form-row-3-col {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row-3-col .form-group:nth-child(1) { flex: 2; }
+.form-row-3-col .form-group:nth-child(2) { flex: 1; }
+.form-row-3-col .form-group:nth-child(3) { flex: 1; }
+
+/* Editar usuario */
+
+/* Estilo para campos que no se pueden editar*/
+.input-readonly {
+    background-color: #f0f4f8 !important;
+    color: #1a1a1a !important;
+    border-color: #d1d5db !important;
+    cursor: not-allowed;
+}
+
+.input-readonly:focus {
+    box-shadow: none !important;
+    border-color: #d1d5db !important;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar {
+    background-color: white;
+    color: #0c9d72;
+    border: 1px solid #0c9d72;
+}
+
+.btn-cancelar:hover {
+    background-color: #ebf8f4;
+}
+
+.btn-registrar {
+    background-color: #0c9d72;
+    color: white;
+    border: 1px solid #0c9d72;
+}
+
+.btn-registrar:hover {
+    background-color: #0a8661;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Eliminar */
+.modal-delete {
+    width: 400px;
+    padding: 40px 30px;
+    text-align: center;
+    border-radius: 20px;
+}
+
+/* Icono circular */
+.delete-icon-container {
+    background-color: #fee2e2;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+}
+
+.delete-title {
+    color: #111827;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.delete-subtitle {
+    color: #6b7280;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+/* Recuadro de información */
+.delete-data-box {
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e5e7eb;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.data-row:last-child { margin-bottom: 0; }
+
+.data-row span {
+    color: #6b7280;
+}
+.data-row strong {
+    color: #111827;
+    font-weight: 700; }
+
+.delete-actions {
+    gap: 15px;
+}
+
+.btn-cancel-outline {
+    background: white;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+    border-radius: 12px !important;
+}
+
+.btn-delete-confirm {
+    background-color: #dc2626 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+}
+
+.btn-delete-confirm:hover {
+    background-color: #b91c1c !important;
+}
+
+/* Ver detalles */
+.ux-identity-container{
+    border: 1px solid #bbd5ce;
+}
+.ux-card-wide {
+    background: #ffffff;
+    width: 720px;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+}
+
+.ux-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ux-field-card {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #bbd5ce;
+}
+
+.ux-field-icon-bg {
+    background: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+
+}
+
+.ux-field-content label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.ux-field-content strong {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.ux-salary-card-custom {
+    margin-top: 20px;
+    background: #f8fafc;
+    border: 1px solid #bbd5ce;
+    padding: 20px 30px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.ux-salary-icon-main {
+    background: #0c9d72;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 15px rgba(12, 157, 114, 0.2);
+}
+
+.ux-salary-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+}
+
+.ux-salary-info label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #a5a5a5;
+    letter-spacing: 0.5px;
+}
+
+.ux-salary-info span {
+    font-size: 10px;
+    color: #94a3b8;
+
+}
+
+.ux-salary-value {
+    margin-left: auto;
+    font-size: 28px;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.ux-currency {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-left: 8px;
+}
+
+.ux-btn-cerrar {
+    background: #002855;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.ux-btn-cerrar:hover {
+    background: #001a38;
+    transform: translateY(-2px);
+}
+
+.ux-identity-container{
+    background: #f8fafc;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    gap: 8px !important;
+}
+.ux-tag {
+    color: #0c9d72;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 0 !important;
+    display: block;
+}
+
+.ux-name {
+    font-size: 24px;
+    color: #1e293b;
+    font-weight: 800;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.1;
+}
+
+.ux-badge-puesto {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 0 !important;
+}
+
+/* Ver historial */
+.ux-identity-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.ux-identity-container-history {
+    background: #f8fafc;
+    padding: 25px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #bbd5ce;
+}
+
+.ux-avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: #e0f7f1;
+    color: #00796b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.ux-name-history {
+    font-size: 22px;
+    color: #002855;
+    margin: 0;
+    font-weight: 800;
+}
+
+.ux-puesto-history {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+    display: block;
+    margin: 2px 0 0 0;
+}
+
+.ux-total-accumulated {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.ux-total-accumulated label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.ux-total-accumulated strong {
+    font-size: 20px;
+    color: #0c9d72;
+    font-weight: 900;
+}
+
+.ux-section-title {
+    font-size: 18px;
+    color: #002855;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.ux-body-scrollable {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.ux-payment-item-card {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    padding: 15px 20px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease;
+}
+
+.ux-payment-item-card:hover {
+    transform: translateX(5px);
+    border-color: #0c9d72;
+}
+
+.ux-payment-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.ux-payment-icon {
+    background: #f0fdf4;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.ux-payment-text label, .ux-payment-monto label {
+    display: block;
+    font-size: 10px;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+.ux-payment-text strong, .ux-payment-monto strong {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.ux-footer-history {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.ux-btn-cerrar-outline {
+    background: transparent;
+    border: 2px solid #0c9d72;
+    color: #0c9d72;
+    padding: 12px 60px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ux-btn-cerrar-outline:hover {
+    background: #0c9d72;
+    color: white;
+}
