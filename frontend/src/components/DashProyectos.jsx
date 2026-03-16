@@ -154,16 +154,18 @@ const DashProyectos = () => {
                     </tr>
                   ) : (
                     proyectos
-                      .filter((p) =>
-                        p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        p.lider.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        p.descripcion.toLowerCase().includes(busqueda.toLowerCase())
-                      )
+  .filter((p) =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.liderNombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.liderId.toString().includes(busqueda) ||
+    p.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+  )
+
                       .map((p, index) => (
                         <tr key={p.id}>
                           <td>{index + 1}</td>
                           <td>{p.nombre}</td>
-                          <td>{p.lider}</td>
+                          <td>{p.liderNombre}</td>
                           <td>{p.descripcion}</td>
                           <td>{p.presupuesto}</td>
                           <td>
