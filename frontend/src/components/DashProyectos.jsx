@@ -4,16 +4,16 @@ import ModalRegistrarProyecto from './ModalRegistrarProyecto';
 import ModalConsultarProyecto from './ModalConsultarProyecto';
 import ModalEditarProyecto from './ModalEditarProyecto';
 
-
-
 const DashProyectos = () => {
-  // Estado para controlar los momdales modales
+  // Estado para controlar los modales
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
 
   // Estado para guardar la lista de proyectos
   const [proyectos, setProyectos] = useState([]);
+  // Estado para búsqueda
+  const [busqueda, setBusqueda] = useState("");
 
   // Estado para proyecto seleccionado
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
@@ -58,7 +58,7 @@ const DashProyectos = () => {
         const data = await response.json();
         console.log("Proyecto registrado en backend:", data);
         alert("Proyecto agregado correctamente");
-        fetchProjects(); // este es para que se recargue la liste de proyectos
+        fetchProjects(); // recargar lista
       } else {
         alert("Error al agregar proyecto");
       }
@@ -121,8 +121,14 @@ const DashProyectos = () => {
 
         <main className="main-content">
           <div className="content-actions">
-            <input type="text" className="form-control search-input" placeholder="Buscar" />
-            {/* Este es el boton para que abra el modal de registro*/}
+            <input
+              type="text"
+              className="form-control search-input"
+              placeholder="Buscar"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+            {/* Botón para abrir modal de registro */}
             <button className="btn add-btn" onClick={() => setMostrarModal(true)}>Agregar</button>
           </div>
 
@@ -147,29 +153,35 @@ const DashProyectos = () => {
                       </td>
                     </tr>
                   ) : (
-                    proyectos.map((p, index) => (
-                      <tr key={p.id}>
-                        <td>{index + 1}</td>
-                        <td>{p.nombre}</td>
-                        <td>{p.lider}</td>
-                        <td>{p.descripcion}</td>
-                        <td>{p.presupuesto}</td>
-                        <td>
-                          <button
-                            className="btn btn-sm"
-                            onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}
-                          >
-                            Consultar
-                          </button>
-                          <button
-                            className="btn btn-sm"
-                            onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}
-                          >
-                            Editar
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                    proyectos
+                      .filter((p) =>
+                        p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+                        p.lider.toLowerCase().includes(busqueda.toLowerCase()) ||
+                        p.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+                      )
+                      .map((p, index) => (
+                        <tr key={p.id}>
+                          <td>{index + 1}</td>
+                          <td>{p.nombre}</td>
+                          <td>{p.lider}</td>
+                          <td>{p.descripcion}</td>
+                          <td>{p.presupuesto}</td>
+                          <td>
+                            <button
+                              className="btn btn-sm"
+                              onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}
+                            >
+                              Consultar
+                            </button>
+                            <button
+                              className="btn btn-sm"
+                              onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}
+                            >
+                              Editar
+                            </button>
+                          </td>
+                        </tr>
+                      ))
                   )}
                 </tbody>
               </table>
