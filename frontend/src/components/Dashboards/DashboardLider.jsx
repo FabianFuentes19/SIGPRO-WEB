@@ -73,9 +73,10 @@ const DashboardLider = () => {
             <header className="dashboard-header">
                 <div className="header-brand">Panel Líder</div>
                 <div className="header-title">{vistaActual === 'proyecto' ? 'Proyecto' : 'Materiales'}</div>
-                <div className="header-user">
+                <div className="header-user" onClick={() => setVistaActual('perfil')}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
+
             </header>
 
             <div className="dashboard-body">
@@ -109,7 +110,7 @@ const DashboardLider = () => {
                 </aside>
 
                 <main className="main-content">
-                    {vistaActual === 'proyecto' ? (
+                    {vistaActual === 'proyecto' && (
                         <>
                             <div className="project-card">
                                 <div className="project-header-section">
@@ -195,9 +196,14 @@ const DashboardLider = () => {
                                 </div>
                             </div>
                         </>
-                    ) : (
-                        <Materiales />
                     )}
+
+  {vistaActual === 'materiales' && <Materiales />}
+
+  {vistaActual === 'perfil' && (
+    <PerfilLider matricula="20243ds026" token={token} />
+  )}
+                    
                 </main>
             </div>
 
