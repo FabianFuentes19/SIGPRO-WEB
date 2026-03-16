@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
 
   const submit = async (e) => {
     e.preventDefault();
@@ -22,6 +25,15 @@ function Login() {
         const data = await response.json();
         setMessage("Login exitoso");
         console.log("Token recibido:", data.token);
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("rol", data.rol);
+
+        if (data.rol === "ADMINISTRADOR") {
+          navigate("/proyectos");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         setMessage("Credenciales inválidas");
       }
