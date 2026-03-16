@@ -1,62 +1,109 @@
-.perfil-container {
-  padding: 20px;
-  background: #f5f5f5; 
-  border-radius: 8px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.perfil-container h2 {
-  color: #003366; 
-  margin-bottom: 20px;
+html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; 
+  background-color: #f4f7f6;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.perfil-section {
-  margin-bottom: 30px;
-  background: #ffffff; 
-  padding: 15px;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.contenedor-perfil {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
 }
 
-.perfil-section h3 {
-  color: #003366; 
-  margin-bottom: 10px;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 5px;
+
+.barra-superior {
+  background-color: #003354;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  height: 60px;
+  flex-shrink: 0;
 }
 
-.perfil-info p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #333; 
+.marca-panel { width: 230px; font-weight: bold; font-size: 1.2rem; }
+.titulo-seccion { flex-grow: 1; text-align: center; font-size: 1.3rem; font-weight: bold; }
+
+.cuerpo-principal {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
-.perfil-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+
+.navegacion-lateral {
+  width: 230px;
+  background-color: #003354;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
-.perfil-table th,
-.perfil-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
+.menu-opciones { flex: 1; padding-top: 20px; }
+.opcion { display: flex; align-items: center; gap: 15px; padding: 15px 25px; color: #a0aec0; }
+.opcion.activa { background-color: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid #59bba9; }
+.icono-salir { padding: 30px; cursor: pointer; }
+
+
+.area-contenido {
+  flex: 1; 
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+  gap: 30px; 
+  overflow-y: auto; 
 }
 
-.perfil-table th {
-  background-color: #003366; 
-  color: #fff; 
+.seccion-info { width: 100%; }
+.encabezado-bloque { display: flex; align-items: center; gap: 10px; font-weight: bold; margin-bottom: 15px; color: #2d3748; }
+.color-teal { color: #59bba9; }
+
+
+.tarjeta-datos {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+  width: 100%; 
 }
 
-.perfil-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+
+.cuadricula-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 20px 40px;
 }
 
-.perfil-table tr:hover {
-  background-color: #e6f2ff; 
+.ancho-completo { grid-column: 1 / span 2; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 10px; }
+.dato-item label { display: block; color: #59bba9; font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; }
+.texto-resaltado { font-weight: bold; font-size: 1.3rem; color: #1a202c; }
+
+.etiqueta-puesto {
+  background: #edf2f7;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
 }
 
-.perfil-table td:last-child {
-  font-weight: bold;
-  color: #2e7d32; 
-}
+
+.tabla-historial { width: 100%; border-collapse: collapse; }
+.tabla-historial th { text-align: left; color: #a0aec0; font-size: 0.8rem; padding: 15px; border-bottom: 2px solid #f7fafc; }
+.tabla-historial td { padding: 20px 15px; font-size: 0.95rem; }
+.celda-concepto { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+.texto-gris { color: #a0aec0; }
+.texto-negrita { font-weight: bold; }
+.estado-pagado { background-color: #e6fcf5; color: #20c997; padding: 5px 15px; border-radius: 8px; font-weight: bold; font-size: 0.75rem; }
