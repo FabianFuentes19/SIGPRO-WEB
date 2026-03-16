@@ -1,22 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Login from './components/Login'
-import DashProyectos from './components/DashProyectos'
-function App() {
-  const [count, setCount] = useState(0)
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./components/Login";
+import AdminRoute from "./components/AdminRoute";
+import DashProyectos from "./components/DashProyectos";
 
+function App() {
   return (
-    <>
-      <div>
-        {/* Comento las rutas para probarlas */}
-      {/*<Login/>*/}
-      <DashProyectos/>
-      </div>
-    </>
-  )
+    <Router>
+      <Routes>
+        {/* Redirigir la raíz a login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        
+        <Route path="/login" element={<Login />} />
+
+        {/* Ruta protegida */}
+        <Route path="/proyectos" element={
+          <AdminRoute>
+            <DashProyectos />
+          </AdminRoute>
+        } />
+
+        <Route path="/dashboard" element={<DashProyectos />} />
+      </Routes>
+    </Router>
+  );
 }
 
-
-export default App
+export default App;

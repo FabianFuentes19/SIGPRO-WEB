@@ -45,7 +45,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
 
           <div className="form-group">
             <label>Objetivo *</label>
-            <input type="text" name="objetivo" value={datosFormulario.objetivo || ''} onChange={cambiarValor} required />
+            <input type="text" name="objetivo" value={datosFormulario.objetivoGeneral || ''} onChange={cambiarValor} required />
           </div>
 
           <div className="form-group">
@@ -66,7 +66,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
 
           <div className="form-group">
             <label>Líder *</label>
-            <input type="text" name="lider" value={datosFormulario.lider || ''} onChange={cambiarValor} disabled required />
+            <input type="text" name="lider" value={datosFormulario.liderId || ''} onChange={cambiarValor} disabled required />
           </div>
 
           <div className="form-group">

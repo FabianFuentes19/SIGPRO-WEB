@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
 
   const submit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8085/auth/login", {
+      const response = await fetch("http://localhost:8082/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user, contrasena: password }),
@@ -22,6 +25,15 @@ function Login() {
         const data = await response.json();
         setMessage("Login exitoso");
         console.log("Token recibido:", data.token);
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("rol", data.rol);
+
+        if (data.rol === "ADMINISTRADOR") {
+          navigate("/proyectos");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         setMessage("Credenciales inválidas");
       }
@@ -33,7 +45,7 @@ function Login() {
 
   const handleForgotPassword = async () => {
     try {
-      const response = await fetch("http://localhost:8085/auth/forgot-password", {
+      const response = await fetch("http://localhost:8082/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user }),

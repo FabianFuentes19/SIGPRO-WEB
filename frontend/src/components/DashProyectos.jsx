@@ -6,7 +6,7 @@ import ModalEditarProyecto from './ModalEditarProyecto';
 
 
 
-const DashProyectos = () => {  
+const DashProyectos = () => {
   // Estado para controlar los momdales modales
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
@@ -21,7 +21,12 @@ const DashProyectos = () => {
   // Función para traer proyectos desde el backend
   const fetchProjects = async () => {
     try {
-      const response = await fetch("http://localhost:8085/proyectos");
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8082/proyectos", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setProyectos(data);
@@ -39,11 +44,12 @@ const DashProyectos = () => {
   // Función que se ejecuta cuando se registra un nuevo proyecto
   const registrarProyecto = async (nuevoProyecto) => {
     try {
-      const response = await fetch("http://localhost:8085/proyectos", {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8082/proyectos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(nuevoProyecto),
       });
@@ -65,9 +71,13 @@ const DashProyectos = () => {
   // Función para actualizar proyecto
   const actualizarProyecto = async (proyectoActualizado) => {
     try {
-      const response = await fetch(`http://localhost:8085/proyectos/${proyectoActualizado.id}`, {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8082/proyectos/${proyectoActualizado.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(proyectoActualizado),
       });
 
@@ -145,14 +155,14 @@ const DashProyectos = () => {
                         <td>{p.descripcion}</td>
                         <td>{p.presupuesto}</td>
                         <td>
-                          <button 
-                            className="btn btn-sm" 
+                          <button
+                            className="btn btn-sm"
                             onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}
                           >
                             Consultar
                           </button>
-                          <button 
-                            className="btn btn-sm" 
+                          <button
+                            className="btn btn-sm"
                             onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}
                           >
                             Editar
@@ -178,18 +188,18 @@ const DashProyectos = () => {
 
       {/* Modal Consultar */}
       {mostrarModalConsultar && (
-        <ModalConsultarProyecto 
-          proyecto={proyectoSeleccionado} 
-          onClose={() => setMostrarModalConsultar(false)} 
+        <ModalConsultarProyecto
+          proyecto={proyectoSeleccionado}
+          onClose={() => setMostrarModalConsultar(false)}
         />
       )}
 
       {/* Modal Editar */}
       {mostrarModalEditar && (
-        <ModalEditarProyecto 
-          proyecto={proyectoSeleccionado} 
-          alCerrar={() => setMostrarModalEditar(false)} 
-          alActualizar={actualizarProyecto} 
+        <ModalEditarProyecto
+          proyecto={proyectoSeleccionado}
+          alCerrar={() => setMostrarModalEditar(false)}
+          alActualizar={actualizarProyecto}
         />
       )}
     </div>
