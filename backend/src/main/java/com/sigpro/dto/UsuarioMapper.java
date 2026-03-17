@@ -31,6 +31,7 @@ public class UsuarioMapper {
         }
 
         UsuarioDTO dto = new UsuarioDTO();
+        dto.setId(usuario.getId());
         dto.setNombreCompleto(usuario.getNombreCompleto());
         dto.setGrupo(usuario.getGrupo());
         dto.setMatricula(usuario.getMatricula());

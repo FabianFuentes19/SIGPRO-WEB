@@ -12,6 +12,7 @@ public class ProyectoDTO {
     private String descripcion;
     private String objetivoGeneral;
     private Long liderId;
+    private String liderMatricula;
     private String liderNombre;
     private BigDecimal presupuesto;
     private LocalDate fechaInicio;

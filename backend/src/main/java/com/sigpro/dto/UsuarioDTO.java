@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 @Data
 public class UsuarioDTO {
+    private Long id;
     private String nombreCompleto;
     private String contrasena;
     private String grupo;

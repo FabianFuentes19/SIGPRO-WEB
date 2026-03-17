@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/ModalRegistrarProyecto.css';
+import { obtenerUsuarios } from '../services/api';
 
 // recibe 2 props al cerrar y al registra , que son funciones
 const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
   //hook useState, 
   const [datosFormulario, setDatosFormulario] = useState({
     nombre: '',
-    objetivo: '',
+    objetivoGeneral: '',
     descripcion: '',
     fechaInicio: '',
     fechaFin: '',
-    lider: '',
+    liderId: '',
     presupuesto: ''
   });
+
+  const [lideres, setLideres] = useState([]);
+
+  useEffect(() => {
+    const cargarLideres = async () => {
+      try {
+        const data = await obtenerUsuarios("LIDER");
+        const activos = (Array.isArray(data) ? data : []).filter((u) => (u?.estado || "").toUpperCase() === "ACTIVO");
+        setLideres(activos);
+      } catch (error) {
+        console.error("Error al cargar líderes:", error);
+        setLideres([]);
+      }
+    };
+    cargarLideres();
+  }, []);
 
   const cambiarValor = (e) => {
     const { name, value } = e.target;
@@ -21,7 +38,12 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
 
   const guardarProyecto = (e) => {
     e.preventDefault();
-    alRegistrar(datosFormulario); 
+    const payload = {
+      ...datosFormulario,
+      liderId: datosFormulario.liderId ? Number(datosFormulario.liderId) : null,
+      presupuesto: datosFormulario.presupuesto ? Number(datosFormulario.presupuesto) : null,
+    };
+    alRegistrar(payload); 
     alCerrar();
   };
 
@@ -37,7 +59,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
 
           <div className="form-group">
             <label>Objetivo*</label>
-            <input type="text" name="objetivo" placeholder="Ej. El objetivo de este proyecto es . . ." value={datosFormulario.objetivo} onChange={cambiarValor} required />
+            <input type="text" name="objetivoGeneral" placeholder="Ej. El objetivo de este proyecto es . . ." value={datosFormulario.objetivoGeneral} onChange={cambiarValor} required />
           </div>
 
           <div className="form-group">
@@ -58,11 +80,13 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
 
           <div className="form-group">
             <label>Líder*</label>
-            <select name="lider" value={datosFormulario.lider} onChange={cambiarValor} required>
-              <option value="" disabled>Selecciona al lider</option>
-              <option value="Lider 1">Líder 1</option>
-              <option value="Lider 2">Líder 2</option>
-              {/* Añade más opciones según sea necesario */}
+            <select name="liderId" value={datosFormulario.liderId} onChange={cambiarValor} required>
+              <option value="" disabled>Selecciona al líder</option>
+              {lideres.map((l) => (
+                <option key={l.id || l.matricula} value={l.id}>
+                  {l.nombreCompleto} ({l.matricula})
+                </option>
+              ))}
             </select>
           </div>
 

@@ -73,8 +73,22 @@ public class ProyectoService {
             throw new IllegalArgumentException("Campos obligatorios inválidos o reglas de negocio incumplidas");
         }
 
-        Usuario lider = usuarioRepository.findById(dto.getLiderId())
-                .orElseThrow(() -> new IllegalArgumentException("Líder no válido"));
+        Usuario lider;
+        if (dto.getLiderMatricula() != null && !dto.getLiderMatricula().isBlank()) {
+            lider = usuarioRepository.findByMatricula(dto.getLiderMatricula().trim())
+                    .orElseThrow(() -> new IllegalArgumentException("Líder no válido"));
+        } else if (dto.getLiderId() != null) {
+            lider = usuarioRepository.findById(dto.getLiderId())
+                    .orElseThrow(() -> new IllegalArgumentException("Líder no válido"));
+        } else {
+            throw new IllegalArgumentException("Debe seleccionar un líder");
+        }
+
+        String rolLider = lider.getRol() != null ? lider.getRol().getNombre() : null;
+        String rolUpper = rolLider == null ? "" : rolLider.toUpperCase();
+        if (!(rolUpper.equals("LIDER") || rolUpper.equals("LIDER_PROYECTO") || rolUpper.equals("ROLE_LIDER"))) {
+            throw new IllegalArgumentException("El usuario seleccionado no tiene rol de LÍDER");
+        }
 
         if(proyectoRepository.findByLiderId(lider.getId()) != null){
             throw new IllegalArgumentException("El líder ya tiene un proyecto asignado");
