@@ -4,6 +4,9 @@ import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
+import com.sigpro.model.ProyectoUsuario;
+import com.sigpro.repository.ProyectoRepository;
+import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,12 @@ public class UsuarioService {
 
     @Autowired
     private RolRepository rolRepository;
+
+    @Autowired
+    private ProyectoRepository proyectoRepository;
+
+    @Autowired
+    private ProyectoUsuarioRepository proyectoUsuarioRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -155,6 +164,27 @@ public class UsuarioService {
     public Usuario registrarUsuarioConRol(UsuarioDTO dto, String nombreRol) {
         dto.setRolNombre(nombreRol);
         return registrarUsuario(dto);
+    }
+
+    /**
+     * Lista los miembros del proyecto del líder dado por matrícula (excluye al líder).
+     */
+    public List<UsuarioDTO> listarMiembrosPorLider(String matriculaLider) {
+        String m = safeTrim(matriculaLider);
+        if (m == null || m.isEmpty()) {
+            return List.of();
+        }
+        Usuario lider = usuarioRepository.findByMatricula(m)
+                .orElseThrow(() -> new IllegalArgumentException("Líder no encontrado"));
+        var proyecto = proyectoRepository.findByLiderId(lider.getId());
+        if (proyecto == null) {
+            return List.of();
+        }
+        List<Usuario> usuarios = proyectoUsuarioRepository.findByProyectoId(proyecto.getId()).stream()
+                .map(ProyectoUsuario::getUsuario)
+                .filter(u -> !u.getId().equals(lider.getId()))
+                .collect(Collectors.toList());
+        return usuarios.stream().map(UsuarioMapper::toDto).collect(Collectors.toList());
     }
 
     private static String safeTrim(String v) {

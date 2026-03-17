@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import '../css/Login.css';
 import { useNavigate } from "react-router-dom";
-
+import { login, forgotPassword } from "../services/api";
 
 function Login() {
   const [user, setUser] = useState("");
@@ -10,59 +10,38 @@ function Login() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-
   const submit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matricula: user, contrasena: password }),
-      });
+      const data = await login(user, password);
+      setMessage("Login exitoso");
+      const rolRecibido = (data.rol || "").toUpperCase();
+      console.log("Rol estandarizado:", rolRecibido);
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessage("Login exitoso");
-        const rolRecibido = (data.rol || "").toUpperCase();
-        console.log("Rol estandarizado:", rolRecibido);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("rol", rolRecibido);
+      if (data.matricula) localStorage.setItem("matricula", data.matricula);
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("rol", rolRecibido);
-
-        if (rolRecibido === "ADMINISTRADOR" || rolRecibido === "ADMIN") {
-          navigate("/lideres");
-        } else if (rolRecibido === "LIDER") {
-          navigate("/dashboard-lider");
-        } else {
-          navigate("/dashboard");
-        }
+      if (rolRecibido === "ADMINISTRADOR" || rolRecibido === "ADMIN") {
+        navigate("/lideres");
+      } else if (rolRecibido === "LIDER") {
+        navigate("/dashboard-lider");
       } else {
-        setMessage("Credenciales inválidas");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Error:", error);
-      setMessage("Error de conexión con el servidor");
+      setMessage(error.message || "Error de conexión con el servidor");
     }
   };
 
   const handleForgotPassword = async () => {
     try {
-      const response = await fetch("http://localhost:8080/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matricula: user }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(data.mensaje || "Se envió un correo para restablecer tu contraseña");
-      } else {
-        setMessage("No se pudo procesar la solicitud");
-      }
+      const data = await forgotPassword(user);
+      setMessage(data.mensaje || "Se envió un correo para restablecer tu contraseña");
     } catch (error) {
       console.error("Error:", error);
-      setMessage("Error de conexión con el servidor");
+      setMessage(error.message || "Error de conexión con el servidor");
     }
   };
 

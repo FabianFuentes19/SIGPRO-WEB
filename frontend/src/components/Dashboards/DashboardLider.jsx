@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './DashLider.css';
-
+import { registrarMiembro, obtenerMiembrosPorLider } from '../../services/api';
 import AgregarUsuario from '../AgregarUsuario.jsx';
 import Materiales from '../Materiales/Materiales.jsx';
 import EditarUsuario from '../EditarUsuario.jsx';
@@ -32,6 +32,7 @@ const DashboardLider = () => {
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [modalActivo, setModalActivo] = useState(null);
+    const [miembros, setMiembros] = useState([]);
 
     const proyecto = {
         nombre: "Sistema gestión de productos",
@@ -42,11 +43,26 @@ const DashboardLider = () => {
         progreso: 65
     };
 
-    const miembros = [
-        { id: 1, nombreCompleto: "Marcos Ríos", rol: "Diseñador", iniciales: "MR", matricula: "20243DS001" },
-        { id: 2, nombreCompleto: "Juan López", rol: "Coordinador", iniciales: "JL", matricula: "20243DS002" },
-        { id: 3, nombreCompleto: "Tania Sánchez", rol: "Programadora", iniciales: "TS", matricula: "20243DS003" }
-    ];
+    const cargarMiembros = async () => {
+        const matriculaLider = localStorage.getItem("matricula");
+        if (!matriculaLider) return;
+        try {
+            const data = await obtenerMiembrosPorLider(matriculaLider);
+            setMiembros((data || []).map((m) => ({
+                ...m,
+                id: m.matricula,
+                iniciales: (m.nombreCompleto || '').trim().split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() || '??',
+                rol: m.rolNombre || m.puesto || ''
+            })));
+        } catch (error) {
+            console.error("Error al cargar miembros:", error);
+            setMiembros([]);
+        }
+    };
+
+    useEffect(() => {
+        cargarMiembros();
+    }, []);
 
     // Cerrar el menú desplegable si se hace clic fuera
     useEffect(() => {
@@ -214,7 +230,17 @@ const DashboardLider = () => {
                 <AgregarUsuario
                     tipo="Miembro"
                     alCerrar={() => setMostrarModal(false)}
-                    alRegistrar={(datos) => console.log("Registrando miembro", datos)}
+                    alRegistrar={async (datos) => {
+                        try {
+                            await registrarMiembro(datos);
+                            setMostrarModal(false);
+                            alert("Miembro registrado correctamente");
+                            cargarMiembros();
+                        } catch (error) {
+                            console.error("Error al registrar miembro:", error);
+                            alert(error.message || "Error al registrar miembro");
+                        }
+                    }}
                 />
             )}
 

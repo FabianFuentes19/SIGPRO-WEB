@@ -31,6 +31,22 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping("/lider/{matriculaLider}")
+    public ResponseEntity<?> listarMiembrosPorLider(@PathVariable String matriculaLider) {
+        try {
+            List<UsuarioDTO> miembros = usuarioService.listarMiembrosPorLider(matriculaLider);
+            return ResponseEntity.ok(miembros);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "No fue posible consultar los miembros");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     @GetMapping("/{matricula}")
     public ResponseEntity<?> buscarPorMatricula(@PathVariable String matricula) {
         try {
