@@ -1,0 +1,138 @@
+.materiales-container-web {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Card del Total */
+.total-material-card-full {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border-top: 8px solid #009688; /* Color teal-green */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Buscador */
+.search-bar-materials {
+    position: relative;
+    width: 100%;
+}
+
+.input-search-styled {
+    width: 100%;
+    padding: 15px 15px 15px 50px;
+    border-radius: 12px;
+    border: 1px solid #e0e6ed;
+    background: white;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: border-color 0.2s;
+}
+
+.input-search-styled:focus {
+    border-color: #009688;
+}
+
+.search-icon-inner {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #99abb4;
+}
+
+/* Botón Agregar */
+.material-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 5px;
+}
+
+/* Lista de Materiales */
+.materials-stack-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Estilo de fila de material */
+.member-card-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
+}
+
+.member-card-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Texto del material */
+.member-data strong {
+    display: block;
+    color: #0b3d60;
+    font-size: 1.1rem;
+}
+
+.member-data span {
+    color: #99abb4;
+    font-size: 0.9rem;
+}
+
+.mat-price-tag {
+    margin-left: auto;
+    font-weight: 800;
+    color: #0b3d60;
+    font-size: 1.1rem;
+}
+
+.modal-overlay {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Estilos de agregar materiales */
+.modal-small {
+    background: white;
+    width: 100%;
+    max-width: 500px !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: 90vh;
+    border-radius: 15px;
+    padding: 30px;
+    position: relative;
+    margin: auto !important;
+    overflow-y: visible !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-title {
+    text-align: center;
+    color: #0b3d60;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}

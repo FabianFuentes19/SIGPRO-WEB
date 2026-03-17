@@ -1,29 +1,30 @@
 import React from 'react';
-import './GestionUsuarios.css';
+import '../css/GestionUsuario.css';
 import { AlertTriangle } from 'lucide-react';
 
-const BorrarUsuario = ({ usuario, alCerrar, alConfirmar }) => {
+const BorrarUsuario = ({ usuario, alCerrar, alConfirmar, tipo = "Usuario" }) => {
+    if (!usuario) return null;
+
     return (
         <div className="modal-overlay">
             <div className="modal-container modal-delete">
                 <div className="delete-icon-container">
-                    <AlertTriangle size={32} color="#d9534f" />
+                    <AlertTriangle size={32} color="#dc2626" />
                 </div>
 
-                <h2 className="delete-title">Eliminar miembro</h2>
+                <h2 className="delete-title">Eliminar {tipo}</h2>
                 <p className="delete-subtitle">
-                    ¿Estás seguro de que deseas eliminar a este miembro?
+                    ¿Estás seguro de que deseas eliminar a este {tipo.toLowerCase()}?
                 </p>
 
-                {/* Contenedor gris de datos clave */}
                 <div className="delete-data-box">
                     <div className="data-row">
                         <span>Nombre</span>
-                        <strong>{usuario?.nombreCompleto || "Juan Pérez García"}</strong>
+                        <strong>{usuario.nombreCompleto}</strong>
                     </div>
                     <div className="data-row">
-                        <span>Matrícula:</span>
-                        <strong>{usuario?.matricula || "20213UT0045"}</strong>
+                        <span>Matrícula</span>
+                        <strong>{usuario.matricula}</strong>
                     </div>
                 </div>
 
@@ -35,7 +36,8 @@ const BorrarUsuario = ({ usuario, alCerrar, alConfirmar }) => {
                         type="button"
                         className="btn-delete-confirm"
                         onClick={() => {
-                            alConfirmar(usuario.id);
+                            // Usamos matricula para el backend
+                            alConfirmar(usuario.matricula);
                             alCerrar();
                         }}
                     >

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../css/DashProyecto.css';
-import ModalRegistrarLider from '../components/ModalRegistrarLider';
+import AgregarUsuario from '../components/AgregarUsuario';
+import EditarUsuario from '../components/EditarUsuario';
+import VerDetallesUsuario from '../components/VerDetallesUsuario';
 
 const DashLideres = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
+
   const [lideres, setLideres] = useState([]);
+  const [liderSeleccionado, setLiderSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
 
   const fetchLideres = async () => {
@@ -32,13 +38,13 @@ const DashLideres = () => {
   const registrarLider = async (nuevoLider) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/auth/register", {
+      const response = await fetch("http://localhost:8082/auth/register/lider", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ ...nuevoLider, rol: "LIDER" }),
+        body: JSON.stringify(nuevoLider),
       });
 
       if (response.ok) {
@@ -46,7 +52,8 @@ const DashLideres = () => {
         setMostrarModal(false);
         fetchLideres();
       } else {
-        alert("Error al agregar líder");
+        const errorData = await response.json();
+        alert(errorData.error || "Error al agregar líder");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -54,22 +61,50 @@ const DashLideres = () => {
     }
   };
 
-  const eliminarLider = async (id) => {
-    if (!window.confirm("¿Estás seguro de eliminar a este líder?")) return;
+  const actualizarLider = async (datosActualizados) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8082/usuarios/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`http://localhost:8082/usuarios/${liderSeleccionado.matricula}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(datosActualizados),
+      });
+
+      if (response.ok) {
+        alert("Líder actualizado correctamente");
+        setMostrarModalEditar(false);
+        fetchLideres();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Error al actualizar líder");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error de conexión con el servidor");
+    }
+  };
+
+  const eliminarLider = async (matricula) => {
+    if (!window.confirm(`¿Estás seguro de desactivar al líder con matrícula ${matricula}?`)) return;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8082/usuarios/${matricula}/desactivar`, {
+        method: "PATCH",
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
       if (response.ok) {
-        alert("Líder eliminado");
+        alert("Líder desactivado correctamente");
         fetchLideres();
+      } else {
+        alert("No se pudo desactivar el líder");
       }
     } catch (error) {
-      console.error("Error al eliminar:", error);
+      console.error("Error al desactivar:", error);
     }
   };
 
@@ -104,7 +139,7 @@ const DashLideres = () => {
             <input
               type="text"
               className="form-control search-input"
-              placeholder="Buscar líder"
+              placeholder="Buscar por matrícula o nombre"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
@@ -117,9 +152,9 @@ const DashLideres = () => {
                 <thead>
                   <tr>
                     <th>NO.</th>
-                    <th>NOMBRE</th>
+                    <th>NOMBRE COMPLETO</th>
                     <th>MATRÍCULA</th>
-                    <th>CORREO</th>
+                    <th>ESTADO</th>
                     <th>ACCIONES</th>
                   </tr>
                 </thead>
@@ -133,17 +168,38 @@ const DashLideres = () => {
                   ) : (
                     lideres
                       .filter((l) =>
-                        (l.nombre + " " + l.apellidoPaterno + " " + l.apellidoMaterno).toLowerCase().includes(busqueda.toLowerCase()) ||
+                        l.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase()) ||
                         l.matricula.toLowerCase().includes(busqueda.toLowerCase())
                       )
                       .map((l, index) => (
-                        <tr key={l.id}>
+                        <tr key={l.matricula}>
                           <td>{index + 1}</td>
-                          <td>{`${l.nombre} ${l.apellidoPaterno} ${l.apellidoMaterno}`}</td>
+                          <td>{l.nombreCompleto}</td>
                           <td>{l.matricula}</td>
-                          <td>{l.correo}</td>
                           <td>
-                            <button className="btn btn-sm btn-danger" onClick={() => eliminarLider(l.id)}>Eliminar</button>
+                            <span className={`badge ${l.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}`}>
+                              {l.estado}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-sm btn-info me-2"
+                              onClick={() => { setLiderSeleccionado(l); setMostrarModalConsultar(true); }}
+                            >
+                              Consultar
+                            </button>
+                            <button
+                              className="btn btn-sm btn-warning me-2"
+                              onClick={() => { setLiderSeleccionado(l); setMostrarModalEditar(true); }}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn btn-sm btn-danger"
+                              onClick={() => eliminarLider(l.matricula)}
+                            >
+                              Desactivar
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -155,10 +211,29 @@ const DashLideres = () => {
         </main>
       </div>
 
+      {/* MODALES REUTILIZABLES */}
       {mostrarModal && (
-        <ModalRegistrarLider
+        <AgregarUsuario
+          tipo="Líder"
           alCerrar={() => setMostrarModal(false)}
           alRegistrar={registrarLider}
+        />
+      )}
+
+      {mostrarModalEditar && (
+        <EditarUsuario
+          tipo="Líder"
+          usuario={liderSeleccionado}
+          alCerrar={() => setMostrarModalEditar(false)}
+          alGuardar={actualizarLider}
+        />
+      )}
+
+      {mostrarModalConsultar && (
+        <VerDetallesUsuario
+          tipo="Líder"
+          usuario={liderSeleccionado}
+          alCerrar={() => setMostrarModalConsultar(false)}
         />
       )}
     </div>

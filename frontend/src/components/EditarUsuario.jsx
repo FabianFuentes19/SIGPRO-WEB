@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import './GestionUsuarios.css';
+import '../css/GestionUsuario.css';
 
-const EditarUsuario = ({alCerrar, alGuardar }) => {
+const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario" }) => {
     const [datosFormulario, setDatosFormulario] = useState({
         nombreCompleto: '',
         matricula: '',
         cuatrimestre: '',
         grupo: '',
         carrera: '',
-        contrasenia: '',
         puesto: '',
-        salarioQuincenal: '',
-        fechaIngreso: ''
+        salarioQuincenal: ''
     });
 
+    useEffect(() => {
+        if (usuario) {
+            setDatosFormulario({
+                nombreCompleto: usuario.nombreCompleto || '',
+                matricula: usuario.matricula || '',
+                cuatrimestre: usuario.cuatrimestre || '',
+                grupo: usuario.grupo || '',
+                carrera: usuario.carrera || '',
+                puesto: usuario.puesto || '',
+                salarioQuincenal: usuario.salarioQuincenal || ''
+            });
+        }
+    }, [usuario]);
 
     const cambiarValor = (e) => {
         const { name, value } = e.target;
@@ -22,14 +33,18 @@ const EditarUsuario = ({alCerrar, alGuardar }) => {
 
     const enviarEdicion = (e) => {
         e.preventDefault();
-        alGuardar(datosFormulario);
-        alCerrar();
+        const payload = {
+            ...datosFormulario,
+            cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),
+            salarioQuincenal: datosFormulario.salarioQuincenal ? parseFloat(datosFormulario.salarioQuincenal) : null
+        };
+        alGuardar(payload);
     };
 
     return (
         <div className="modal-overlay">
             <div className="modal-container">
-                <h2 className="modal-title">Editar Miembro</h2>
+                <h2 className="modal-title">Editar {tipo}</h2>
                 <form onSubmit={enviarEdicion} className="modal-form">
 
                     <div className="form-group">
@@ -43,23 +58,20 @@ const EditarUsuario = ({alCerrar, alGuardar }) => {
                         />
                     </div>
 
-
                     <div className="form-group">
-                        <label>Matrícula</label>
+                        <label>Matrícula (No editable)</label>
                         <input
                             type="text"
                             name="matricula"
                             className="input-readonly"
                             value={datosFormulario.matricula}
                             readOnly
-                            />
+                        />
                     </div>
-
 
                     <div className="form-group">
                         <label>Carrera*</label>
                         <select name="carrera" value={datosFormulario.carrera} onChange={cambiarValor} required>
-                            <option value="" disabled hidden>Seleccionar</option>
                             <option value="DS">Desarrollo de software</option>
                             <option value="DD">Diseño digital</option>
                         </select>
@@ -69,14 +81,12 @@ const EditarUsuario = ({alCerrar, alGuardar }) => {
                         <div className="form-group">
                             <label>Cuatrimestre*</label>
                             <select name="cuatrimestre" value={datosFormulario.cuatrimestre} onChange={cambiarValor} required>
-                                <option value="" disabled hidden>Seleccionar</option>
-                                {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}°</option>)}
+                                {[1,2,3,4,5,6,7,8,9,10,11].map(n => <option key={n} value={n}>{n}°</option>)}
                             </select>
                         </div>
                         <div className="form-group">
                             <label>Grupo*</label>
                             <select name="grupo" value={datosFormulario.grupo} onChange={cambiarValor} required>
-                                <option value="" disabled hidden>Seleccionar</option>
                                 {['A','B','C','D','E','F'].map(g => <option key={g} value={g}>{g}</option>)}
                             </select>
                         </div>
@@ -84,36 +94,23 @@ const EditarUsuario = ({alCerrar, alGuardar }) => {
 
                     <div className="form-row-2-col">
                         <div className="form-group">
-                            <label>Puesto*</label>
+                            <label>Puesto</label>
                             <input
                                 type="text"
                                 name="puesto"
                                 value={datosFormulario.puesto}
                                 onChange={cambiarValor}
-                                required
                             />
                         </div>
                         <div className="form-group">
-                            <label>Salario quincenal*</label>
+                            <label>Salario quincenal</label>
                             <input
                                 type="number"
                                 name="salarioQuincenal"
                                 value={datosFormulario.salarioQuincenal}
                                 onChange={cambiarValor}
-                                required
                             />
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Fecha ingreso*</label>
-                        <input
-                            type="date"
-                            name="fechaIngreso"
-                            value={datosFormulario.fechaIngreso}
-                            onChange={cambiarValor}
-                            required
-                        />
                     </div>
 
                     <div className="modal-actions">

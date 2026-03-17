@@ -24,13 +24,16 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         setMessage("Login exitoso");
-        console.log("Token recibido:", data.token);
+        const rolRecibido = (data.rol || "").toUpperCase();
+        console.log("Rol estandarizado:", rolRecibido);
 
         localStorage.setItem("token", data.token);
-        localStorage.setItem("rol", data.rol);
+        localStorage.setItem("rol", rolRecibido);
 
-        if (data.rol === "ADMINISTRADOR") {
-          navigate("/proyectos");
+        if (rolRecibido === "ADMINISTRADOR" || rolRecibido === "ADMIN") {
+          navigate("/lideres");
+        } else if (rolRecibido === "LIDER") {
+          navigate("/dashboard-lider");
         } else {
           navigate("/dashboard");
         }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {Pencil, Trash2, Eye, History, MoreVertical} from 'lucide-react';
+import './MenuOpcionesUsuario.css';
 
 const MenuOpcionesUsuario = ({ usuario, onAction }) => {
     const [abierto, setAbierto] = useState(false);

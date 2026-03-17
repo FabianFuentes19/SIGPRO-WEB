@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import './GestionUsuarios.css';
+import '../css/GestionUsuario.css';
 
-const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
+const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
 
     const [datosFormulario, setDatosFormulario] = useState({
         nombreCompleto: '',
@@ -9,7 +9,7 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
         cuatrimestre: '',
         grupo: '',
         carrera: '',
-        contrasenia: '',
+        contrasena: '', // Mantenemos 'contrasena' para el backend
         puesto: '',
         salarioQuincenal: '',
         fechaIngreso: ''
@@ -22,8 +22,12 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
 
     const guardarUsuario = (e) => {
         e.preventDefault();
-        alRegistrar(datosFormulario);
-        alCerrar();
+        const payload = {
+            ...datosFormulario,
+            cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),
+            salarioQuincenal: datosFormulario.salarioQuincenal ? parseFloat(datosFormulario.salarioQuincenal) : null
+        };
+        alRegistrar(payload);
     };
 
     return (
@@ -59,10 +63,10 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
                         <div className="form-group">
                             <label>Contraseña*</label>
                             <input
-                                type="text"
-                                name="contrasenia"
-                                placeholder="J$P0520"
-                                value={datosFormulario.contrasenia}
+                                type="password"
+                                name="contrasena"
+                                placeholder="Mín. 8 caracteres"
+                                value={datosFormulario.contrasena}
                                 onChange={cambiarValor}
                                 required
                             />
@@ -83,7 +87,7 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
                             <label>Cuatrimestre*</label>
                             <select name="cuatrimestre" value={datosFormulario.cuatrimestre} onChange={cambiarValor} required>
                                 <option value="" disabled hidden>Seleccionar</option>
-                                {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}°</option>)}
+                                {[1,2,3,4,5,6,7,8,9,10,11].map(n => <option key={n} value={n}>{n}°</option>)}
                             </select>
                         </div>
                         <div className="form-group">
@@ -97,38 +101,25 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Miembro" }) => {
 
                     <div className="form-row-2-col">
                         <div className="form-group">
-                            <label>Puesto*</label>
+                            <label>Puesto</label>
                             <input
                                 type="text"
                                 name="puesto"
-                                placeholder="Ej. Diseñador gráfico"
+                                placeholder="Ej. Programador"
                                 value={datosFormulario.puesto}
                                 onChange={cambiarValor}
-                                required
                             />
                         </div>
                         <div className="form-group">
-                            <label>Salario quincenal*</label>
+                            <label>Salario quincenal</label>
                             <input
                                 type="number"
                                 name="salarioQuincenal"
                                 placeholder="Ej. 5000"
                                 value={datosFormulario.salarioQuincenal}
                                 onChange={cambiarValor}
-                                required
                             />
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Fecha ingreso*</label>
-                        <input
-                            type="date"
-                            name="fechaIngreso"
-                            value={datosFormulario.fechaIngreso}
-                            onChange={cambiarValor}
-                            required
-                        />
                     </div>
 
                     <div className="modal-actions">
