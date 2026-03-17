@@ -148,12 +148,7 @@ public class ProyectoService {
             throw new SecurityException("No autorizado: solo el líder del proyecto puede agregar miembros");
         }
 
-        Long rolMiembroId = rolRepository.findByNombreIgnoreCase("Miembro")
-                .orElseThrow(() -> new IllegalArgumentException("Rol 'Miembro' no encontrado"))
-                .getId();
-        dto.setRolId(rolMiembroId);
-
-        Usuario nuevoMiembro = usuarioService.registrarUsuario(dto);
+        Usuario nuevoMiembro = usuarioService.registrarUsuarioConRol(dto, "Miembro");
 
         ProyectoUsuario pu = new ProyectoUsuario();
         pu.setProyecto(proyecto);

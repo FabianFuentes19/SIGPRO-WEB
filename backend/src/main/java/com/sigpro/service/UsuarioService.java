@@ -152,6 +152,11 @@ public class UsuarioService {
         return UsuarioMapper.toDto(actualizado);
     }
 
+    public Usuario registrarUsuarioConRol(UsuarioDTO dto, String nombreRol) {
+        dto.setRolNombre(nombreRol);
+        return registrarUsuario(dto);
+    }
+
     private static String safeTrim(String v) {
         return v == null ? null : v.trim();
     }

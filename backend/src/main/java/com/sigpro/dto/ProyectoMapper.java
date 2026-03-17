@@ -36,6 +36,7 @@ public class ProyectoMapper {
         dto.setDescripcion(proyecto.getDescripcion());
         dto.setObjetivoGeneral(proyecto.getObjetivoGeneral());
         dto.setLiderId(proyecto.getLider() != null ? proyecto.getLider().getId() : null);
+        dto.setLiderNombre(proyecto.getLider() != null ? proyecto.getLider().getNombreCompleto() : null);
         dto.setPresupuesto(proyecto.getPresupuesto());
         dto.setFechaInicio(proyecto.getFechaInicio());
         dto.setFechaFin(proyecto.getFechaFin());
