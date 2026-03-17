@@ -15,7 +15,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8082/auth/login", {
+      const response = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user, contrasena: password }),
@@ -48,7 +48,7 @@ function Login() {
 
   const handleForgotPassword = async () => {
     try {
-      const response = await fetch("http://localhost:8082/auth/forgot-password", {
+      const response = await fetch("http://localhost:8080/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user }),

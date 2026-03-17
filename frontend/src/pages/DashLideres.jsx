@@ -17,7 +17,7 @@ const DashLideres = () => {
   const fetchLideres = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/usuarios", {
+      const response = await fetch("http://localhost:8080/usuarios", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -38,7 +38,7 @@ const DashLideres = () => {
   const registrarLider = async (nuevoLider) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/auth/register/lider", {
+      const response = await fetch("http://localhost:8080/auth/register/lider", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,7 @@ const DashLideres = () => {
   const actualizarLider = async (datosActualizados) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8082/usuarios/${liderSeleccionado.matricula}`, {
+      const response = await fetch(`http://localhost:8080/usuarios/${liderSeleccionado.matricula}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const DashLideres = () => {
     if (!window.confirm(`¿Estás seguro de desactivar al líder con matrícula ${matricula}?`)) return;
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8082/usuarios/${matricula}/desactivar`, {
+      const response = await fetch(`http://localhost:8080/usuarios/${matricula}/desactivar`, {
         method: "PATCH",
         headers: {
           "Authorization": `Bearer ${token}`

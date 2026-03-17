@@ -7,7 +7,7 @@ const PerfilLider = ({ matricula, token }) => {
 
   useEffect(() => {
     // Información personal del líder
-    fetch(`http://localhost:8082/usuarios/${matricula}`, {
+    fetch(`http://localhost:8080/usuarios/${matricula}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

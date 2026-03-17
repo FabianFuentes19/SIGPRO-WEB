@@ -23,7 +23,7 @@ const DashProyectos = () => {
   const fetchProjects = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/proyectos", {
+      const response = await fetch("http://localhost:8080/proyectos", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -46,7 +46,7 @@ const DashProyectos = () => {
   const registrarProyecto = async (nuevoProyecto) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/proyectos", {
+      const response = await fetch("http://localhost:8080/proyectos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const DashProyectos = () => {
   const actualizarProyecto = async (proyectoActualizado) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8082/proyectos/${proyectoActualizado.id}`, {
+      const response = await fetch(`http://localhost:8080/proyectos/${proyectoActualizado.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
