@@ -1,0 +1,101 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.modal-container {
+  background: white;
+  padding: 20px 30px;   
+  border-radius: 8px;
+  width: 450px;         
+  max-width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #3b4256;
+  font-size: 20px;      
+  font-weight: 700;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row-2-col {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row-2-col .form-group {
+  flex: 1;
+}
+
+.modal-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.modal-form input,
+.modal-form select,
+.modal-form textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
+  text-align: left;
+  background-color: #f3f4f6; 
+  color: #6b7280;            
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+
+.btn-cancelar {
+  background-color: #0c9d72;
+  color: white;
+  border: 1px solid #0c9d72;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+  background-color: #0a8661;
+}

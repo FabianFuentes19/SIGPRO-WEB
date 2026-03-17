@@ -1,0 +1,142 @@
+.nomina-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.nomina-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+.nomina-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.employee-name {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.employee-role {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.voucher-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.voucher-label {
+  font-size: 0.65rem;
+  color: #adb5bd;
+  font-weight: 600;
+}
+
+.voucher-number {
+  font-size: 0.85rem;
+  color: #003366;
+  font-weight: 700;
+}
+
+.nomina-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.amount-label {
+  font-size: 0.7rem;
+  color: #adb5bd;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.amount-value {
+  margin: 4px 0 0 0;
+  font-size: 1.8rem;
+  color: #003366;
+  font-weight: 800;
+}
+
+.status-badge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.pendiente {
+  background-color: #fff9db;
+  color: #f08c00;
+}
+
+.status-badge.pagado {
+  background-color: #e7f5ff;
+  color: #228be6;
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #adb5bd;
+}
+
+.btn-pay-nomina {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background-color: #10b981;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-pay-nomina:hover {
+  background-color: #059669;
+}
+
+.btn-paid-status {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: default;
+}
