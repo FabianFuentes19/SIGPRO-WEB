@@ -49,9 +49,29 @@ public class AuthController {
         }
     }
 
+    /** Registro genérico: el cliente puede enviar rolId. */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UsuarioDTO dto) {
+        return registrar(dto, null);
+    }
+
+    /** Registro de Líder: se ignora el rol del cliente y se fuerza ROL_ID_FK = 2 (Líder). */
+    @PostMapping("/register/lider")
+    public ResponseEntity<?> registerLider(@RequestBody UsuarioDTO dto) {
+        return registrar(dto, 2L);
+    }
+
+    /** Registro de Miembro: se ignora el rol del cliente y se fuerza ROL_ID_FK = 3 (Miembro). */
+    @PostMapping("/register/miembro")
+    public ResponseEntity<?> registerMiembro(@RequestBody UsuarioDTO dto) {
+        return registrar(dto, 3L);
+    }
+
+    private ResponseEntity<?> registrar(UsuarioDTO dto, Long rolIdForzado) {
         try {
+            if (rolIdForzado != null) {
+                dto.setRolId(rolIdForzado);
+            }
             Usuario usuario = usuarioService.registrarUsuario(dto);
 
             Map<String, Object> respuesta = new HashMap<>();
