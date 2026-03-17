@@ -31,6 +31,18 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping("/rol/{rolNombre}")
+    public ResponseEntity<?> listarPorRol(@PathVariable String rolNombre) {
+        try {
+            List<UsuarioDTO> usuarios = usuarioService.obtenerUsuariosPorRol(rolNombre);
+            return ResponseEntity.ok(usuarios);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "No fue posible consultar los usuarios por rol");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     @GetMapping("/lider/{matriculaLider}")
     public ResponseEntity<?> listarMiembrosPorLider(@PathVariable String matriculaLider) {
         try {

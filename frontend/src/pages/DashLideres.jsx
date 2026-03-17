@@ -4,6 +4,7 @@ import '../css/DashProyecto.css';
 import AgregarUsuario from '../components/AgregarUsuario';
 import EditarUsuario from '../components/EditarUsuario';
 import VerDetallesUsuario from '../components/VerDetallesUsuario';
+import { obtenerUsuarios } from '../services/api';
 
 const DashLideres = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -14,26 +15,27 @@ const DashLideres = () => {
   const [liderSeleccionado, setLiderSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
 
+  useEffect(() => {
+    const fetchLideres = async () => {
+      try {
+        const data = await obtenerUsuarios("LIDER");
+        setLideres(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error al cargar líderes:", error);
+      }
+    };
+
+    fetchLideres();
+  }, []);
+
   const fetchLideres = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/usuarios", {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setLideres(data);
-      }
+      const data = await obtenerUsuarios("LIDER");
+      setLideres(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error al cargar líderes:", error);
     }
   };
-
-  useEffect(() => {
-    fetchLideres();
-  }, []);
 
   const registrarLider = async (nuevoLider) => {
     try {

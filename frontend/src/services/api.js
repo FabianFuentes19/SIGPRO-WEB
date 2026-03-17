@@ -77,8 +77,9 @@ export async function registrarMiembro(datos) {
  * Obtiene la lista de usuarios (requiere token).
  * @returns {Promise<Array>}
  */
-export async function obtenerUsuarios() {
-  const response = await apiFetch("/usuarios");
+export async function obtenerUsuarios(rol) {
+  const endpoint = rol ? `/usuarios/rol/${encodeURIComponent(rol)}` : "/usuarios";
+  const response = await apiFetch(endpoint);
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.error || "Error al obtener usuarios");

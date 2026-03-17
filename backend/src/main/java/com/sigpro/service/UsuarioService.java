@@ -120,6 +120,15 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
+    public List<UsuarioDTO> obtenerUsuariosPorRol(String rolNombre) {
+        if (rolNombre == null || rolNombre.isBlank()) {
+            return List.of();
+        }
+        return usuarioRepository.findByRolNombre(rolNombre).stream()
+                .map(UsuarioMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     public UsuarioDTO obtenerDetallePorMatricula(String matricula) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
