@@ -35,7 +35,7 @@ const ModalConsultarProyecto = ({ proyecto, onClose }) => {
           </div>
           <div className="form-group">
             <label>Líder:</label>
-            <input type="text" value={proyecto.liderId} disabled />
+            <input type="text" value={proyecto.liderNombre} disabled />
           </div>
           <div className="form-group input-money-wrapper">
             <label>Presupuesto:</label>

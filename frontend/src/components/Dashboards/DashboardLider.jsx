@@ -7,11 +7,12 @@ import EditarUsuario from '../EditarUsuario.jsx';
 import BorrarUsuario from '../BorrarUsuario.jsx';
 import VerDetallesUsuario from '../VerDetallesUsuario.jsx';
 import VerHistorialPagosUsuario from '../VerHistorialPagosUsuario.jsx';
+import Nominas from '../../pages/Nominas.jsx';
 
 import {
     LayoutDashboard,
     Box,
-    BadgeDollarSign,
+    Wallet,
     LogOut,
     Calendar,
     UserPlus,
@@ -71,7 +72,10 @@ const DashboardLider = () => {
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <div className="header-brand">Panel Líder</div>
-                <div className="header-title">{vistaActual === 'proyecto' ? 'Proyecto' : 'Materiales'}</div>
+                <div className="header-title">
+                    {vistaActual === 'proyecto' ? 'Proyecto' :
+                        vistaActual === 'materiales' ? 'Materiales' : 'Nóminas'}
+                </div>
                 <div className="header-user" onClick={() => setVistaActual('perfil')}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
@@ -95,8 +99,11 @@ const DashboardLider = () => {
                             <Box size={20} />
                             <span>Materiales</span>
                         </div>
-                        <div className="nav-item">
-                            <BadgeDollarSign size={20} />
+                        <div
+                            className={`nav-item ${vistaActual === 'nominas' ? 'active' : ''}`}
+                            onClick={() => setVistaActual('nominas')}
+                        >
+                            <Wallet size={20} />
                             <span>Nóminas</span>
                         </div>
                     </nav>
@@ -198,6 +205,7 @@ const DashboardLider = () => {
                     )}
 
                     {vistaActual === 'materiales' && <Materiales />}
+                    {vistaActual === 'nominas' && <Nominas />}
 
                 </main>
             </div>

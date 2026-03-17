@@ -164,7 +164,7 @@ const DashProyectos = () => {
                         <tr key={p.id}>
                           <td>{index + 1}</td>
                           <td>{p.nombre}</td>
-                          <td>{p.lider}</td>
+                          <td>{p.liderNombre}</td>
                           <td>{p.descripcion}</td>
                           <td>{p.presupuesto}</td>
                           <td>
