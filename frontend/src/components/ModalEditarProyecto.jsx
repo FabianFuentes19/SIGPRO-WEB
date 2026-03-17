@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './ModalEditarProyecto.css';
+import '../css/ModalEditarProyecto.css';
 
 const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
   const [datosFormulario, setDatosFormulario] = useState({

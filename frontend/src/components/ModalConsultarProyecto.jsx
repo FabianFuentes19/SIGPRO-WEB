@@ -1,5 +1,5 @@
 import React from 'react';
-import './ModalConsultarProyecto.css';
+import '../css/ModalConsultarProyecto.css';
 
 const ModalConsultarProyecto = ({ proyecto, onClose }) => {
   // si no hay un proyecto seleccionado el modal no se renderiza y retorna null

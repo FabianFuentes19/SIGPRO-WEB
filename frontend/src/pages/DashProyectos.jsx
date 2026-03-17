@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './DashProyecto.css';
-import ModalRegistrarProyecto from './ModalRegistrarProyecto';
-import ModalConsultarProyecto from './ModalConsultarProyecto';
-import ModalEditarProyecto from './ModalEditarProyecto';
+import { Link } from 'react-router-dom';
+import '../css/DashProyecto.css';
+import ModalRegistrarProyecto from '../components/ModalRegistrarProyecto';
+import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
+import ModalEditarProyecto from '../components/ModalEditarProyecto';
 
 const DashProyectos = () => {
   // Estado para controlar los modales
@@ -107,15 +108,15 @@ const DashProyectos = () => {
       <div className="dashboard-body">
         <aside className="sidebar">
           <nav className="sidebar-nav">
-            <a href="#" className="nav-item">
+            <Link to="/lideres" className="nav-item">
               <span>Líderes</span>
-            </a>
-            <a href="#" className="nav-item active">
+            </Link>
+            <Link to="/proyectos" className="nav-item active">
               <span>Proyectos</span>
-            </a>
+            </Link>
           </nav>
           <div className="sidebar-footer">
-            <a href="#" className="logout-btn">Salir</a>
+            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>Salir</Link>
           </div>
         </aside>
 
@@ -156,7 +157,7 @@ const DashProyectos = () => {
                     proyectos
                       .filter((p) =>
                         p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        p.lider.toLowerCase().includes(busqueda.toLowerCase()) ||
+                        p.liderNombre.toLowerCase().includes(busqueda.toLowerCase()) ||
                         p.descripcion.toLowerCase().includes(busqueda.toLowerCase())
                       )
                       .map((p, index) => (

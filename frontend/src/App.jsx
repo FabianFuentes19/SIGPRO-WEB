@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import AdminRoute from "./components/AdminRoute";
-import DashProyectos from "./components/DashProyectos";
+import DashProyectos from "./pages/DashProyectos";
+import DashLideres from "./pages/DashLideres";
 
 function App() {
   return (
@@ -16,6 +17,12 @@ function App() {
         <Route path="/proyectos" element={
           <AdminRoute>
             <DashProyectos />
+          </AdminRoute>
+        } />
+
+        <Route path="/lideres" element={
+          <AdminRoute>
+            <DashLideres />
           </AdminRoute>
         } />
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ModalRegistrarProyecto.css';
+import '../css/ModalRegistrarProyecto.css';
 
 // recibe 2 props al cerrar y al registra , que son funciones
 const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
