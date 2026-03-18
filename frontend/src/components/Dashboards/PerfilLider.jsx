@@ -26,7 +26,7 @@ const PerfilLider = () => {
 
   return (
     <div className="contenedor-perfil">
-      
+      {/*
       <header className="barra-superior">
         <div className="marca-panel">Panel Líder</div>
         <div className="titulo-seccion">Perfil</div>
@@ -34,25 +34,10 @@ const PerfilLider = () => {
           <UserCircle size={32} strokeWidth={1.5} />
         </div>
       </header>
+      */}
 
       <div className="cuerpo-principal">
-        
-        <aside className="navegacion-lateral">
-          <nav className="menu-opciones">
-            <div className="opcion">
-              <LayoutGrid size={20} /> <span>Proyecto</span>
-            </div>
-            <div className="opcion">
-              <Users size={20} /> <span>Miembros</span>
-            </div>
-            <div className="opcion activa">
-              <Wallet size={20} /> <span>Nóminas</span>
-            </div>
-          </nav>
-          <div className="icono-salir">
-            <LogOut size={28} />
-          </div>
-        </aside>
+       
 
         {}
         <main className="area-contenido">
