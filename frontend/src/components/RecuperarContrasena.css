@@ -1,0 +1,118 @@
+
+.recover-page {
+  background-color: #e9ecef; 
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.recover-header {
+  background-color: #003d63; 
+  color: white;
+  padding: 15px 30px;
+}
+
+.brand-text {
+  font-size: 1.1rem;
+}
+
+
+.recover-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.recover-box {
+  background-color: white;
+  width: 100%;
+  max-width: 550px; 
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+
+.recover-box-header {
+  background-color: #003d63;
+  color: white;
+  padding: 12px 20px;
+}
+
+.recover-box-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+
+.recover-box-body {
+  padding: 40px 50px;
+}
+
+.instruction-text {
+  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+.input-group-custom {
+  margin-bottom: 25px;
+}
+
+.input-group-custom label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon-input {
+  position: absolute;
+  left: 12px;
+  color: #adb5bd;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  outline: none;
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; 
+}
+
+.btn-recover {
+  background-color: #009473; 
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.btn-recover:hover {
+  background-color: #007a5e;
+}
+
+.status-message {
+  margin-top: 15px;
+  text-align: center;
+  color: #003d63;
+  font-size: 0.9rem;
+}
