@@ -1,0 +1,46 @@
+.restablecer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.restablecer-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.restablecer-box h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.restablecer-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.restablecer-box input {
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.restablecer-box button {
+  padding: 0.7rem;
+  background-color: #007bff; /* azul para diferenciar */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.restablecer-box button:hover {
+  background-color: #0056b3;
+}
