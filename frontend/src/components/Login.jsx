@@ -43,25 +43,11 @@ function Login() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    try {
-      const response = await fetch("http://localhost:8082/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matricula: user }),
-      });
+ const handleForgotPassword = (e) => {
+  e.preventDefault();
+  navigate("/recuperar-contraseña"); 
+};
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(data.mensaje || "Se envió un correo para restablecer tu contraseña");
-      } else {
-        setMessage("No se pudo procesar la solicitud");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setMessage("Error de conexión con el servidor");
-    }
-  };
 
   return (
     <div className="login-container">
@@ -98,8 +84,9 @@ function Login() {
           </div>
 
           <div className="forgot-password">
-            <a href="#" onClick={handleForgotPassword}>¿Olvidaste tu contraseña?</a>
-          </div>
+  <a href="#" onClick={handleForgotPassword}>¿Olvidaste tu contraseña?</a>
+</div>
+
 
           <button type="submit" className="btn btn-primary w-100">
             Iniciar Sesión
