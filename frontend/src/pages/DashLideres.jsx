@@ -5,11 +5,14 @@ import AgregarUsuario from '../components/AgregarUsuario';
 import EditarUsuario from '../components/EditarUsuario';
 import VerDetallesUsuario from '../components/VerDetallesUsuario';
 import { obtenerUsuarios } from '../services/api';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
+import BorrarUsuario from '../components/BorrarUsuario';
 
 const DashLideres = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
 
   const [lideres, setLideres] = useState([]);
   const [liderSeleccionado, setLiderSeleccionado] = useState(null);
@@ -90,7 +93,6 @@ const DashLideres = () => {
   };
 
   const eliminarLider = async (matricula) => {
-    if (!window.confirm(`¿Estás seguro de desactivar al líder con matrícula ${matricula}?`)) return;
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:8080/usuarios/${matricula}/desactivar`, {
@@ -100,6 +102,7 @@ const DashLideres = () => {
         }
       });
       if (response.ok) {
+        setMostrarModalEliminar(false);
         alert("Líder desactivado correctamente");
         fetchLideres();
       } else {
@@ -184,24 +187,19 @@ const DashLideres = () => {
                             </span>
                           </td>
                           <td>
-                            <button
-                              className="btn btn-sm btn-info me-2"
-                              onClick={() => { setLiderSeleccionado(l); setMostrarModalConsultar(true); }}
-                            >
-                              Consultar
-                            </button>
-                            <button
-                              className="btn btn-sm btn-warning me-2"
-                              onClick={() => { setLiderSeleccionado(l); setMostrarModalEditar(true); }}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              className="btn btn-sm btn-danger"
-                              onClick={() => eliminarLider(l.matricula)}
-                            >
-                              Desactivar
-                            </button>
+                            <div className="dropdown-container">
+                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEditar(true); }}>
+                                <Pencil size={14} />
+                              </div>
+
+                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalConsultar(true); }}>
+                                <Eye size={14} />
+                              </div>
+
+                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEliminar(true); }}>
+                                <Trash2 size={14} />
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -236,6 +234,15 @@ const DashLideres = () => {
           tipo="Líder"
           usuario={liderSeleccionado}
           alCerrar={() => setMostrarModalConsultar(false)}
+        />
+      )}
+
+      {mostrarModalEliminar && (
+        <BorrarUsuario
+          tipo="Líder"
+          usuario={liderSeleccionado}
+          alCerrar={() => setModalActivo(null)}
+          alConfirmar={() => setMostrarModalEliminar(false)}
         />
       )}
     </div>

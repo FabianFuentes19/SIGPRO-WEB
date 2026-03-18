@@ -237,6 +237,16 @@ body {
   opacity: 1;
 }
 
+.dropdown-container {
+  display: flex;          /* coloca los hijos en fila */
+  gap: 8px;               /* espacio entre íconos */
+}
+
+.dropdown-item {
+  cursor: pointer;
+  padding: 4px;
+}
+
 /* --- Esto es para que se aga responsiva --- */
 
 /* Tablets and smaller screens */

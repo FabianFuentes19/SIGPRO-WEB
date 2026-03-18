@@ -59,7 +59,7 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario" }) => {
                     </div>
 
                     <div className="form-group">
-                        <label>Matrícula (No editable)</label>
+                        <label>Matrícula</label>
                         <input
                             type="text"
                             name="matricula"

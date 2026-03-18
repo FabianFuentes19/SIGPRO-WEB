@@ -4,6 +4,7 @@ import '../css/DashProyecto.css';
 import ModalRegistrarProyecto from '../components/ModalRegistrarProyecto';
 import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
 import ModalEditarProyecto from '../components/ModalEditarProyecto';
+import { Eye, Pencil } from 'lucide-react';
 
 const DashProyectos = () => {
   // Estado para controlar los modales
@@ -168,18 +169,15 @@ const DashProyectos = () => {
                           <td>{p.descripcion}</td>
                           <td>{p.presupuesto}</td>
                           <td>
-                            <button
-                              className="btn btn-sm"
-                              onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}
-                            >
-                              Consultar
-                            </button>
-                            <button
-                              className="btn btn-sm"
-                              onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}
-                            >
-                              Editar
-                            </button>
+                            <div className="dropdown-container">
+                              <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
+                                <Pencil size={14} />
+                              </div>
+
+                              <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}>
+                                <Eye size={14} />
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       ))
