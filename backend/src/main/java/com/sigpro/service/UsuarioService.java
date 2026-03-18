@@ -171,7 +171,10 @@ public class UsuarioService {
     }
 
     public Usuario registrarUsuarioConRol(UsuarioDTO dto, String nombreRol) {
-        dto.setRolNombre(nombreRol);
+        Rol rol = rolRepository.findByNombreIgnoreCase(nombreRol)
+                .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+        dto.setRolId(rol.getId());
+        dto.setRolNombre(rol.getNombre());
         return registrarUsuario(dto);
     }
 

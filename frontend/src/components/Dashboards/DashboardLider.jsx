@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './DashLider.css';
-import { registrarMiembro, obtenerMiembrosPorLider } from '../../services/api';
 import AgregarUsuario from '../AgregarUsuario.jsx';
 import Materiales from '../Materiales/Materiales.jsx';
 import EditarUsuario from '../EditarUsuario.jsx';
@@ -24,6 +23,8 @@ import {
     History
 } from 'lucide-react';
 
+const BASE_URL = "http://localhost:8080";
+
 const DashboardLider = () => {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [vistaActual, setVistaActual] = useState('proyecto');
@@ -33,34 +34,92 @@ const DashboardLider = () => {
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [modalActivo, setModalActivo] = useState(null);
     const [miembros, setMiembros] = useState([]);
+    const [proyecto, setProyecto] = useState(null);
+    const [proyectoId, setProyectoId] = useState(null);
 
-    const proyecto = {
-        nombre: "Sistema gestión de productos",
-        descripcion: "Se trata de un modelo de suscripción mensual que entrega productos orgánicos directamente de productores locales a los hogares. El proyecto integra un sistema de gestión de inventarios y una pasarela de pagos segura, buscando eliminar a los intermediarios y asegurar precios justos para los agricultores mediante una arquitectura de microservicios.",
-        presupuesto: "$400,000",
-        fechaInicio: "21/02/2026",
-        fechaFin: "29/04/2026",
-        progreso: 65
+    // Cargar el proyecto del líder
+    const cargarProyecto = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try {
+            const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error("No se pudo obtener el proyecto");
+            const data = await response.json();
+            console.log("Proyecto del líder:", data);
+            setProyecto(data);
+            setProyectoId(data.id);
+        } catch (error) {
+            console.error("Error al cargar proyecto:", error);
+        }
     };
 
+    // Cargar miembros del líder
     const cargarMiembros = async () => {
         const matriculaLider = localStorage.getItem("matricula");
-        if (!matriculaLider) return;
+        const token = localStorage.getItem("token");
+        console.log("Cargando miembros para líder:", matriculaLider);
+        if (!matriculaLider || !token) {
+            console.warn("No se encontró la matrícula o token del líder en localStorage");
+            return;
+        }
         try {
-            const data = await obtenerMiembrosPorLider(matriculaLider);
-            setMiembros((data || []).map((m) => ({
-                ...m,
-                id: m.matricula,
-                iniciales: (m.nombreCompleto || '').trim().split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() || '??',
-                rol: m.rolNombre || m.puesto || ''
-            })));
+            const response = await fetch(`${BASE_URL}/usuarios/lider/${encodeURIComponent(matriculaLider)}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error("Error al obtener miembros");
+            const data = await response.json();
+            console.log("Miembros recibidos:", data);
+            const lista = Array.isArray(data) ? data : [];
+            setMiembros(lista
+                .filter((m) => m.estado !== 'INACTIVO')
+                .map((m, index) => ({
+                    ...m,
+                    id: m.matricula || `temp-${index}`,
+                    iniciales: (m.nombreCompleto || '').trim().split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() || '??',
+                    rol: m.rolNombre || m.puesto || ''
+                })));
         } catch (error) {
             console.error("Error al cargar miembros:", error);
             setMiembros([]);
         }
     };
 
+    const actualizarLider = async (datosActualizados) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${BASE_URL}/usuarios/${usuarioSeleccionado.matricula}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(datosActualizados),
+            });
+
+            if (response.ok) {
+                alert("Miembro actualizado correctamente");
+                setModalActivo(null);
+                await cargarMiembros();
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Error al actualizar miembro");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión con el servidor");
+        }
+    };
+
     useEffect(() => {
+        cargarProyecto();
         cargarMiembros();
     }, []);
 
@@ -134,44 +193,48 @@ const DashboardLider = () => {
                 <main className="main-content">
                     {vistaActual === 'proyecto' && (
                         <>
-                            <div className="project-card">
-                                <div className="project-header-section">
-                                    <h2>{proyecto.nombre}</h2>
-                                    <p className="description-text">{proyecto.descripcion}</p>
-                                </div>
+                            {proyecto ? (
+                                <div className="project-card">
+                                    <div className="project-header-section">
+                                        <h2>{proyecto.nombre}</h2>
+                                        <p className="description-text">{proyecto.descripcion}</p>
+                                    </div>
 
-                                <div className="dates-row-container">
-                                    <div className="date-inner-box">
-                                        <div className="calendar-icon-styled"><Calendar size={20} /></div>
-                                        <div className="date-text-group">
-                                            <small className="date-label-style">FECHA INICIO</small>
-                                            <p className="date-range-style">{proyecto.fechaInicio}</p>
+                                    <div className="dates-row-container">
+                                        <div className="date-inner-box">
+                                            <div className="calendar-icon-styled"><Calendar size={20} /></div>
+                                            <div className="date-text-group">
+                                                <small className="date-label-style">FECHA INICIO</small>
+                                                <p className="date-range-style">{proyecto.fechaInicio}</p>
+                                            </div>
+                                        </div>
+                                        <div className="date-inner-box">
+                                            <div className="calendar-icon-styled"><Calendar size={20} /></div>
+                                            <div className="date-text-group">
+                                                <small className="date-label-style">FECHA FIN</small>
+                                                <p className="date-range-style">{proyecto.fechaFin}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="date-inner-box">
-                                        <div className="calendar-icon-styled"><Calendar size={20} /></div>
-                                        <div className="date-text-group">
-                                            <small className="date-label-style">FECHA FIN</small>
-                                            <p className="date-range-style">{proyecto.fechaFin}</p>
+
+                                    <div className="budget-section-left">
+                                        <span className="budget-label">Presupuesto Total</span>
+                                        <h3 className="budget-value">${proyecto.presupuesto}</h3>
+                                    </div>
+
+                                    <div className="progress-section-bottom">
+                                        <div className="progress-info-row">
+                                            <span>Progreso Del Proyecto</span>
+                                            <span className="progress-perc">0%</span>
+                                        </div>
+                                        <div className="progress-bar-outer">
+                                            <div className="progress-bar-inner-fill" style={{ width: '0%' }}></div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="budget-section-left">
-                                    <span className="budget-label">Presupuesto Total</span>
-                                    <h3 className="budget-value">{proyecto.presupuesto}</h3>
-                                </div>
-
-                                <div className="progress-section-bottom">
-                                    <div className="progress-info-row">
-                                        <span>Progreso Del Proyecto</span>
-                                        <span className="progress-perc">{proyecto.progreso}%</span>
-                                    </div>
-                                    <div className="progress-bar-outer">
-                                        <div className="progress-bar-inner-fill" style={{ width: `${proyecto.progreso}%` }}></div>
-                                    </div>
-                                </div>
-                            </div>
+                            ) : (
+                                <p>Cargando proyecto...</p>
+                            )}
 
                             <div className="members-section">
                                 <div className="members-top-row">
@@ -232,10 +295,26 @@ const DashboardLider = () => {
                     alCerrar={() => setMostrarModal(false)}
                     alRegistrar={async (datos) => {
                         try {
-                            await registrarMiembro(datos);
+                            if (!proyectoId) {
+                                alert("No se encontró el proyecto del líder. Recarga la página.");
+                                return;
+                            }
+                            const token = localStorage.getItem("token");
+                            const response = await fetch(`${BASE_URL}/proyectos/${proyectoId}/miembros`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                },
+                                body: JSON.stringify(datos)
+                            });
+                            const data = await response.json();
+                            if (!response.ok) {
+                                throw new Error(data.error || "Error al registrar miembro");
+                            }
                             setMostrarModal(false);
                             alert("Miembro registrado correctamente");
-                            cargarMiembros();
+                            await cargarMiembros();
                         } catch (error) {
                             console.error("Error al registrar miembro:", error);
                             alert(error.message || "Error al registrar miembro");
@@ -249,7 +328,7 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
-                    alGuardar={(datos) => console.log("Editando miembro", datos)}
+                    alGuardar={actualizarLider}
                 />
             )}
 
@@ -258,7 +337,28 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
-                    alConfirmar={(mat) => console.log("Borrando miembro", mat)}
+                    alConfirmar={async (mat) => {
+                        try {
+                            const token = localStorage.getItem("token");
+                            const response = await fetch(`${BASE_URL}/usuarios/${encodeURIComponent(mat)}/desactivar`, {
+                                method: "PATCH",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                }
+                            });
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.error || "Error al desactivar miembro");
+                            }
+                            alert("Miembro eliminado correctamente");
+                            setModalActivo(null);
+                            await cargarMiembros();
+                        } catch (error) {
+                            console.error("Error al desactivar miembro:", error);
+                            alert(error.message || "Error al desactivar miembro");
+                        }
+                    }}
                 />
             )}
 
