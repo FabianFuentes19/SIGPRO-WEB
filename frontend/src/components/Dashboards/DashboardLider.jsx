@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './DashLider.css';
+import PerfilLider from "./PerfilLider.jsx";
+
+
 
 import AgregarUsuario from '../Usuarios/AgregarUsuario.jsx';
 import Materiales from '../Materiales/Materiales.jsx';
@@ -72,7 +75,11 @@ const DashboardLider = () => {
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <div className="header-brand">Panel Líder</div>
-                <div className="header-title">{vistaActual === 'proyecto' ? 'Proyecto' : 'Materiales'}</div>
+                <div className="header-title">
+                    {vistaActual === "proyecto" && "Proyecto"}
+          {vistaActual === "materiales" && "Materiales"}
+          {vistaActual === "perfil" && "Perfil"}
+                    </div>
                 <div className="header-user" onClick={() => setVistaActual('perfil')}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
@@ -198,13 +205,16 @@ const DashboardLider = () => {
                         </>
                     )}
 
-  {vistaActual === 'materiales' && <Materiales />}
+  {/*vistaActual === 'materiales' && <Materiales />*/}
+
+    {vistaActual === 'materiales' && (
+    <Materiales />
+  )}
 
   {vistaActual === 'perfil' && (
-    <PerfilLider matricula="20243ds026" token={token} />
+    <PerfilLider matricula="20243ds026" />
   )}
-                    
-                </main>
+</main>
             </div>
 
             {mostrarModal && <AgregarUsuario alCerrar={() => setMostrarModal(false)} />}
