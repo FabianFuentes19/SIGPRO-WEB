@@ -4,7 +4,7 @@ import '../css/DashProyecto.css';
 import ModalRegistrarProyecto from '../components/ModalRegistrarProyecto';
 import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
 import ModalEditarProyecto from '../components/ModalEditarProyecto';
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, LogOut, Pencil } from 'lucide-react';
 
 const DashProyectos = () => {
   // Estado para controlar los modales
@@ -116,8 +116,11 @@ const DashProyectos = () => {
               <span>Proyectos</span>
             </Link>
           </nav>
-          <div className="sidebar-footer">
-            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>Salir</Link>
+            <div className="sidebar-footer">
+            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+            <LogOut size={20} />
+            <span>Salir</span>
+            </Link>
           </div>
         </aside>
 
@@ -167,7 +170,7 @@ const DashProyectos = () => {
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
                           <td>{p.descripcion}</td>
-                          <td>{p.presupuesto}</td>
+                          <td>{"$" + p.presupuesto}</td>
                           <td>
                             <div className="dropdown-container">
                               <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>

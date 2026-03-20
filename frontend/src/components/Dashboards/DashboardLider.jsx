@@ -22,6 +22,8 @@ import {
     Eye,
     History
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { registrarMiembro } from '../../services/api.js';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -92,7 +94,35 @@ const DashboardLider = () => {
         }
     };
 
-    const actualizarLider = async (datosActualizados) => {
+    const registrarMiembro = async (datos) => {
+        try {
+            if (!proyectoId) {
+                alert("No se encontró el proyecto del líder. Recarga la página.");
+                return;
+            }
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${BASE_URL}/proyectos/${proyectoId}/miembros`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(datos)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || "Error al registrar miembro");
+            }
+            setMostrarModal(false);
+            alert("Miembro registrado correctamente");
+            await cargarMiembros();
+            } catch (error) {
+                console.error("Error al registrar miembro:", error);
+                alert(error.message || "Error al registrar miembro");
+            }
+    }
+
+    const actualizarMiembro = async (datosActualizados) => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(`${BASE_URL}/usuarios/${usuarioSeleccionado.matricula}`, {
@@ -117,6 +147,29 @@ const DashboardLider = () => {
             alert("Error de conexión con el servidor");
         }
     };
+
+    const eliminarMiembro = async (mat) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${BASE_URL}/usuarios/${encodeURIComponent(mat)}/desactivar`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Error al desactivar miembro");
+            }
+            alert("Miembro eliminado correctamente");
+            setModalActivo(null);
+            await cargarMiembros();
+            } catch (error) {
+                console.error("Error al desactivar miembro:", error);
+                alert(error.message || "Error al desactivar miembro");
+            }
+    }
 
     useEffect(() => {
         cargarProyecto();
@@ -183,10 +236,10 @@ const DashboardLider = () => {
                         </div>
                     </nav>
                     <div className="sidebar-footer">
-                        <button className="logout-btn">
-                            <LogOut size={20} />
-                            <span>Salir</span>
-                        </button>
+                        <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+                        <LogOut size={20} />
+                        <span>Salir</span>
+                        </Link>
                     </div>
                 </aside>
 
@@ -293,33 +346,7 @@ const DashboardLider = () => {
                 <AgregarUsuario
                     tipo="Miembro"
                     alCerrar={() => setMostrarModal(false)}
-                    alRegistrar={async (datos) => {
-                        try {
-                            if (!proyectoId) {
-                                alert("No se encontró el proyecto del líder. Recarga la página.");
-                                return;
-                            }
-                            const token = localStorage.getItem("token");
-                            const response = await fetch(`${BASE_URL}/proyectos/${proyectoId}/miembros`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token}`
-                                },
-                                body: JSON.stringify(datos)
-                            });
-                            const data = await response.json();
-                            if (!response.ok) {
-                                throw new Error(data.error || "Error al registrar miembro");
-                            }
-                            setMostrarModal(false);
-                            alert("Miembro registrado correctamente");
-                            await cargarMiembros();
-                        } catch (error) {
-                            console.error("Error al registrar miembro:", error);
-                            alert(error.message || "Error al registrar miembro");
-                        }
-                    }}
+                    alRegistrar={registrarMiembro}
                 />
             )}
 
@@ -328,7 +355,7 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
-                    alGuardar={actualizarLider}
+                    alGuardar={actualizarMiembro}
                 />
             )}
 
@@ -337,28 +364,7 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
-                    alConfirmar={async (mat) => {
-                        try {
-                            const token = localStorage.getItem("token");
-                            const response = await fetch(`${BASE_URL}/usuarios/${encodeURIComponent(mat)}/desactivar`, {
-                                method: "PATCH",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token}`
-                                }
-                            });
-                            if (!response.ok) {
-                                const errorData = await response.json();
-                                throw new Error(errorData.error || "Error al desactivar miembro");
-                            }
-                            alert("Miembro eliminado correctamente");
-                            setModalActivo(null);
-                            await cargarMiembros();
-                        } catch (error) {
-                            console.error("Error al desactivar miembro:", error);
-                            alert(error.message || "Error al desactivar miembro");
-                        }
-                    }}
+                    alConfirmar={eliminarMiembro}
                 />
             )}
 

@@ -9,7 +9,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
         cuatrimestre: '',
         grupo: '',
         carrera: '',
-        contrasena: '', // Mantenemos 'contrasena' para el backend
         puesto: '',
         salarioQuincenal: '',
         fechaIngreso: ''
@@ -108,6 +107,7 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 placeholder="Ej. Programador"
                                 value={datosFormulario.puesto}
                                 onChange={cambiarValor}
+                                required
                             />
                         </div>
                         <div className="form-group">
@@ -118,6 +118,7 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 placeholder="Ej. 5000"
                                 value={datosFormulario.salarioQuincenal}
                                 onChange={cambiarValor}
+                                required
                             />
                         </div>
                     </div>

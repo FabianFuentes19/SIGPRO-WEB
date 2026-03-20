@@ -5,7 +5,7 @@ import AgregarUsuario from '../components/AgregarUsuario';
 import EditarUsuario from '../components/EditarUsuario';
 import VerDetallesUsuario from '../components/VerDetallesUsuario';
 import { obtenerUsuarios } from '../services/api';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, LogOut, Pencil, Trash2 } from 'lucide-react';
 import BorrarUsuario from '../components/BorrarUsuario';
 
 const DashLideres = () => {
@@ -19,22 +19,15 @@ const DashLideres = () => {
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    const fetchLideres = async () => {
-      try {
-        const data = await obtenerUsuarios("LIDER");
-        setLideres(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Error al cargar líderes:", error);
-      }
-    };
-
     fetchLideres();
   }, []);
 
   const fetchLideres = async () => {
     try {
       const data = await obtenerUsuarios("LIDER");
-      setLideres(Array.isArray(data) ? data : []);
+      const activos = Array.isArray(data) ? data.filter(l => l.estado === "ACTIVO") : [];
+      setLideres(activos);
+      //setLideres(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error al cargar líderes:", error);
     }
@@ -135,7 +128,10 @@ const DashLideres = () => {
             </Link>
           </nav>
           <div className="sidebar-footer">
-            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>Salir</Link>
+            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+            <LogOut size={20} />
+            <span>Salir</span>
+            </Link>
           </div>
         </aside>
 
@@ -167,7 +163,7 @@ const DashLideres = () => {
                   {lideres.length === 0 ? (
                     <tr>
                       <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
-                        No hay líderes registrados aún.
+                        No hay registros existentes.
                       </td>
                     </tr>
                   ) : (
@@ -196,9 +192,26 @@ const DashLideres = () => {
                                 <Eye size={14} />
                               </div>
 
-                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEliminar(true); }}>
+                              {<div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEliminar(true); }}>
                                 <Trash2 size={14} />
-                              </div>
+                              </div>}
+
+                                 {/* <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={l.estado === "ACTIVO"}
+                                    onChange={() => {
+                                      setLiderSeleccionado(l);
+                                      if (l.estado === "ACTIVO") {
+                                        eliminarLider(l.matricula);
+                                      } else {
+                                        //falta implementar desactivar en back
+                                      }
+                                    }}
+                                  />
+                                  <span className="slider round"></span>
+                                </label>*/}
+
                             </div>
                           </td>
                         </tr>
@@ -241,8 +254,8 @@ const DashLideres = () => {
         <BorrarUsuario
           tipo="Líder"
           usuario={liderSeleccionado}
-          alCerrar={() => setModalActivo(null)}
-          alConfirmar={() => setMostrarModalEliminar(false)}
+          alCerrar={() => setMostrarModalEliminar(false)}
+          alConfirmar={() => eliminarLider(liderSeleccionado.matricula)}
         />
       )}
     </div>
