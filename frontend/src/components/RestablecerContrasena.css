@@ -1,46 +1,95 @@
-.restablecer-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-}
-
-.restablecer-box {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 350px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.restablecer-box h2 {
+.codigo-container {
+  max-width: 500px;
+  margin: 4rem auto;
   text-align: center;
-  margin-bottom: 1.5rem;
+  font-family: Arial, sans-serif;
   color: #333;
 }
 
-.restablecer-box form {
-  display: flex;
-  flex-direction: column;
+.codigo-container h2 {
+  margin-bottom: 0.5rem;
+  color: #003D66;
 }
 
-.restablecer-box input {
-  padding: 0.6rem;
+.codigo-container p {
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
-.restablecer-box button {
-  padding: 0.7rem;
-  background-color: #007bff; /* azul para diferenciar */
-  color: white;
+.codigo-form {
+  margin-top: 1rem;
+}
+
+.codigo-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.codigo-input {
+  width: 55px;
+  height: 55px;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+}
+
+.codigo-input:focus {
+  border-color: #003D66;
+  outline: none;
+}
+
+.btn-verificar {
+  background-color: #003D66;
+  color: #fff;
   border: none;
-  border-radius: 5px;
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
   cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
-.restablecer-box button:hover {
-  background-color: #0056b3;
+.btn-verificar:hover {
+  background-color: #002B4D;
+}
+
+.mensaje-error {
+  color: red;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.mensaje-exito {
+  color: green;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.codigo-opciones {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.codigo-opciones a {
+  color: #003D66;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.codigo-opciones a:hover {
+  text-decoration: underline;
+}
+
+.codigo-info {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: #555;
 }

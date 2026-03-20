@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { User } from "lucide-react"; 
 import "./RecuperarContrasena.css";
-;
+import { useNavigate } from "react-router-dom";
+
 
 function RecuperarContrasena() {
   const [matricula, setMatricula] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const navigate = useNavigate();
+
 
   const enviarFormulario = async (e) => {
     e.preventDefault();
@@ -22,8 +25,12 @@ function RecuperarContrasena() {
         body: JSON.stringify({ matricula }),
       });
 
+      const data = await respuesta.json().catch(() => null);
+      console.log("Respuesta backend:", respuesta.status, data);
+
       if (respuesta.ok) {
         setMensaje("Se envió un correo para restablecer tu contraseña");
+        navigate("/restablecer-contraseña");
       } else {
         setMensaje("No se pudo procesar la solicitud");
       }

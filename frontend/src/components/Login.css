@@ -106,6 +106,13 @@ html, body {
   font-size: 1rem;
   box-sizing: border-box; 
 }
+.form-control.valido {
+  border: 2px solid green;
+}
+
+.form-control.invalido {
+  border: 2px solid red;
+}
 
 
 .forgot-password {
@@ -145,4 +152,13 @@ html, body {
   background-color: #002B4D;
   border-color: #002B4D;
   color: #ffffff;
+}
+.mensaje-error {
+  color: red;
+  font-weight: 500;
+}
+
+.mensaje-exito {
+  color: green;
+  font-weight: 500;
 }

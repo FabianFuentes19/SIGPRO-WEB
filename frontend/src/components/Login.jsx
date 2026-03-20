@@ -9,13 +9,21 @@ function Login() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
+  // esto es para la validacion de los campos
+  const [touchedUser, setTouchedUser] = useState(false);
+const [touchedPassword, setTouchedPassword] = useState(false);
+  const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
   const submit = async (e) => {
     e.preventDefault();
 
+    if (user.trim() === "" || password.trim() === "") {
+    setMessage("Los campos matrícula y contraseña no pueden estar vacíos");
+    return;
+  }
+
     try {
-      const response = await fetch("http://localhost:8082/auth/login", {
+      const response = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matricula: user, contrasena: password }),
@@ -35,7 +43,7 @@ function Login() {
           navigate("/dashboard");
         }
       } else {
-        setMessage("Credenciales inválidas");
+        setMessage(data.error || "Credenciales inválidas");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -65,22 +73,28 @@ function Login() {
           <div className="mb-3">
             <label className="form-label">Matrícula *</label>
             <input
-              type="text"
-              className="form-control"
-              placeholder="Ej. 20243ds067"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+               type="text"
+                className={`form-control ${
+                  !touchedUser ? "" : user.trim() === "" ? "invalido" : "valido"
+                }`}
+                placeholder="Ej. 20243ds067"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                onBlur={() => setTouchedUser(true)}
             />
           </div>
           <div className="mb-3">
             <label className="form-label">Contraseña *</label>
             <input
-              type="password"
-              className="form-control"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+                  type="password"
+                  className={`form-control ${
+                    !touchedPassword ? "" : PASSWORD_PATTERN.test(password) ? "valido" : "invalido"
+                  }`}
+                  placeholder="Contraseña"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onBlur={() => setTouchedPassword(true)}
+                            />
           </div>
 
           <div className="forgot-password">
