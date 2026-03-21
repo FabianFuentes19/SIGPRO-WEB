@@ -45,16 +45,13 @@ class ProyectoServiceTest {
 
     @BeforeEach
     void setup() {
-        // 1. ROLES: Asegúrate de que coincidan con la lógica de tu Service
         Rol rA = findOrCreateRol("ROLE_ADMINISTRADOR");
         Rol rL = findOrCreateRol("LIDER");
         Rol rM = findOrCreateRol("ROLE_MIEMBRO");
 
-        // 2. USUARIOS: Usamos matrículas reales y consistentes
         uLider = createUsuario("MAT-2024-001", "Ing. Roberto García", rL);
         createUsuario("MAT-2024-088", "Lic. Ana Martínez", rM);
 
-        // 3. AUTH: Los roles aquí deben ser iguales a los que busca Spring Security
         authAdmin = getAuth("admin_system", "ROLE_ADMINISTRADOR");
         authLider = getAuth("MAT-2024-001", "ROLE_LIDER");
         authMiembro = getAuth("MAT-2024-088", "ROLE_MIEMBRO");
@@ -90,8 +87,6 @@ class ProyectoServiceTest {
         d.setLiderMatricula("MAT-2024-001");
         return d;
     }
-
-    // --- PRUEBAS DE CREACIÓN ---
 
     @Test void crearProyectoExitoso() {
         assertNotNull(proyectoService.crearProyecto(dBase(), authAdmin));
@@ -129,15 +124,12 @@ class ProyectoServiceTest {
         assertThrows(IllegalArgumentException.class, () -> proyectoService.crearProyecto(d, authAdmin));
     }
 
-    // --- PRUEBAS DE EDICIÓN ---
-
     @Test void editarProyectoCamposBasicos() {
         ProyectoDTO c = proyectoService.crearProyecto(dBase(), authAdmin);
         ProyectoDTO e = new ProyectoDTO();
         e.setNombre("Sistema de control");
         e.setDescripcion("Desarrollo de app");
         ProyectoDTO res = proyectoService.editarProyecto(c.getId(), e, authAdmin);
-        // Corregido: El assert debe esperar lo que realmente enviaste
         assertEquals("Sistema de control", res.getNombre());
     }
 
@@ -153,8 +145,6 @@ class ProyectoServiceTest {
     @Test void editarProyectoIdInexistente() {
         assertThrows(IllegalArgumentException.class, () -> proyectoService.editarProyecto(999L, dBase(), authAdmin));
     }
-
-    // --- PRUEBAS DE CONSULTA Y SEGURIDAD ---
 
     @Test void consultarProyectoAdminExito() {
         assertNotNull(proyectoService.consultarTodos(authAdmin));
