@@ -79,7 +79,7 @@ class ProyectoServiceTest {
         d.setPresupuesto(new BigDecimal("45000.00"));
         d.setFechaInicio(LocalDate.now());
         d.setFechaFin(LocalDate.now().plusMonths(4));
-        d.setLiderMatricula("MAT-2024-001");
+        d.setLiderMatricula("20243ds001");
         return d;
     }
 
