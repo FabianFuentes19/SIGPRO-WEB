@@ -12,4 +12,6 @@ public interface ProyectoUsuarioRepository extends JpaRepository<ProyectoUsuario
 
     // usuarios en el proyecto
     List<ProyectoUsuario> findByProyectoId(Long proyectoId);
+
+    boolean existsByProyectoIdAndUsuarioMatricula(Long proyectoId, String matricula);
 }

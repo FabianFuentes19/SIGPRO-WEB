@@ -118,3 +118,17 @@ export async function forgotPassword(matricula) {
   }
   return data;
 }
+
+/**
+ * Obtiene el historial de pagos de un usuario por su matrícula.
+ * @param {string} matricula
+ * @returns {Promise<Array>}
+ */
+export async function obtenerPagosUsuario(matricula) {
+  const response = await apiFetch(`/pagos/usuario/${encodeURIComponent(matricula)}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al obtener historial de pagos");
+  }
+  return data;
+}
