@@ -69,6 +69,7 @@ public class AuthService {
 
         // borra el registro si el usuario dio click 2 veces
         tokenRepository.deleteByUsuario(usuario);
+        tokenRepository.flush();
 
         // generación de código aleatorio
         String otp = String.format("%06d", new Random().nextInt(999999));
