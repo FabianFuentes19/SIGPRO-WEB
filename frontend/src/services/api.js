@@ -120,15 +120,28 @@ export async function forgotPassword(matricula) {
 }
 
 /**
- * Obtiene el historial de pagos de un usuario por su matrícula.
- * @param {string} matricula
+ * Obtiene el historial de pagos del usuario autenticado.
  * @returns {Promise<Array>}
  */
-export async function obtenerPagosUsuario(matricula) {
-  const response = await apiFetch(`/pagos/usuario/${encodeURIComponent(matricula)}`);
+export async function consultarMisPagos() {
+  const response = await apiFetch("/pagos/mis-pagos");
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.error || "Error al obtener historial de pagos");
+  }
+  return data;
+}
+
+/**
+ * Obtiene el historial de pagos de un miembro (solo para líderes del mismo proyecto).
+ * @param {string} matricula
+ * @returns {Promise<Array>}
+ */
+export async function consultarPagosMiembro(matricula) {
+  const response = await apiFetch(`/pagos/miembro/${encodeURIComponent(matricula)}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al obtener pagos del miembro");
   }
   return data;
 }

@@ -68,13 +68,15 @@ public class PagoService {
         validarRol(auth, "ROLE_LIDER");
 
         String matriculaLider = (String) auth.getPrincipal();
+        // verifica existencia de lider
         Usuario lider = usuarioRepository.findByMatricula(matriculaLider)
                 .orElseThrow(() -> new IllegalArgumentException("Líder no encontrado"));
 
+        // valida si tiene un proyecto asignado
         Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
         if (proyecto == null) throw new IllegalArgumentException("El líder no tiene un proyecto asignado");
 
-        // Verificar que el miembro pertenece al proyecto del líder
+        // verifica que el miembro pertenezca al proyecto del líder logueado
         if (!proyectoUsuarioRepository.existsByProyectoIdAndUsuarioMatricula(proyecto.getId(), matriculaMiembro)) {
             throw new SecurityException("No autorizado: El usuario no pertenece a su proyecto");
         }
