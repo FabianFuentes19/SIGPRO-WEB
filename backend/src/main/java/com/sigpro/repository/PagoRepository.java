@@ -16,5 +16,8 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
     // Consultar pagos por proyecto
     List<Pago> findByProyectoId(Long proyectoId);
 
+    // Consultar pagos por proyecto
+    List<Pago> findByUsuarioMatriculaAndProyectoId(String matricula, Long proyectoId);
+
 
 }

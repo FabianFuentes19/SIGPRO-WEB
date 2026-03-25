@@ -58,6 +58,9 @@ public class PagoService {
     }
 
     public List<PagoDTO> consultarMisPagos(Authentication auth) {
+        // validar que sea líder o miembro
+        validarMultiplesRoles(auth, "ROLE_LIDER", "ROLE_MIEMBRO");
+
         String matricula = (String) auth.getPrincipal();
         return pagoRepository.findByUsuarioMatricula(matricula).stream()
                 .map(PagoMapper::toDto)
@@ -81,13 +84,41 @@ public class PagoService {
             throw new SecurityException("No autorizado: El usuario no pertenece a su proyecto");
         }
 
-        return pagoRepository.findByUsuarioMatricula(matriculaMiembro).stream()
+        return pagoRepository.findByUsuarioMatriculaAndProyectoId(matriculaMiembro, proyecto.getId()).stream()
+                .map(PagoMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<PagoDTO> consultarPagosProyecto(Authentication auth) {
+        validarRol(auth, "ROLE_LIDER");
+
+        String matriculaLider = (String) auth.getPrincipal();
+        Usuario lider = usuarioRepository.findByMatricula(matriculaLider)
+                .orElseThrow(() -> new IllegalArgumentException("Líder no encontrado"));
+
+        Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
+        if (proyecto == null) throw new IllegalArgumentException("El líder no tiene un proyecto asignado");
+
+        return pagoRepository.findByProyectoId(proyecto.getId()).stream()
                 .map(PagoMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
+            throw new SecurityException("No autorizado para esta operación");
+        }
+    }
+
+    private void validarMultiplesRoles(Authentication auth, String... rolesEsperados) {
+        boolean tieneRol = false;
+        for (String rol : rolesEsperados) {
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rol))) {
+                tieneRol = true;
+                break;
+            }
+        }
+        if (!tieneRol) {
             throw new SecurityException("No autorizado para esta operación");
         }
     }

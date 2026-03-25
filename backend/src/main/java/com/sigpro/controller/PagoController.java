@@ -54,5 +54,19 @@ public class PagoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los pagos del miembro"));
         }
     }
+
+    @GetMapping("/proyecto")
+    public ResponseEntity<?> consultarPagosProyecto(Authentication auth) {
+        try {
+            List<PagoDTO> pagos = pagoService.consultarPagosProyecto(auth);
+            return ResponseEntity.ok(pagos);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los pagos del proyecto"));
+        }
+    }
 }
 
