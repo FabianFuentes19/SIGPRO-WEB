@@ -1,7 +1,6 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.PagoDTO;
-import com.sigpro.dto.PagoMapper;
+import com.sigpro.dto.VoucherDTO;
 import com.sigpro.model.Pago;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.Usuario;
@@ -16,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,6 +103,64 @@ public class PagoService {
         return pagoRepository.findByProyectoId(proyecto.getId()).stream()
                 .map(PagoMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<VoucherDTO> obtenerHistorialVouchers(String matricula, Authentication auth) {
+        // Validar permisos
+        String loggedUserMatricula = (String) auth.getPrincipal();
+        boolean isSelf = loggedUserMatricula.equals(matricula);
+        boolean isLider = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_LIDER"));
+
+        if (!isSelf && !isLider) {
+            throw new SecurityException("No tiene permisos para ver estos vouchers");
+        }
+
+        Usuario usuario = usuarioRepository.findByMatricula(matricula)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        List<Pago> pagos = pagoRepository.findByUsuarioMatricula(matricula);
+        List<VoucherDTO> vouchers = new ArrayList<>();
+
+        LocalDate inicio = usuario.getFechaIngreso();
+        if (inicio == null) inicio = LocalDate.now().minusDays(30);
+
+        LocalDate hoy = LocalDate.now();
+        int contador = 1;
+
+        // Generamos periodos de 15 días desde la fecha de ingreso
+        while (inicio.isBefore(hoy) || inicio.isEqual(hoy)) {
+            LocalDate fin = inicio.plusDays(14); // Periodo de 15 días (ej. 1 al 15)
+            VoucherDTO v = new VoucherDTO();
+            v.setNumeroQuincena(contador++);
+            v.setFechaInicio(inicio);
+            v.setFechaFin(fin);
+            v.setMontoEsperado(usuario.getSalarioQuincenal());
+
+            final LocalDate pInicio = inicio;
+            final LocalDate pFin = fin;
+
+            // Buscamos si existe un pago en este rango de fechas
+            Optional<Pago> pagoMatch = pagos.stream()
+                    .filter(p -> !p.getFecha().isBefore(pInicio) && !p.getFecha().isAfter(pFin))
+                    .findFirst();
+
+            if (pagoMatch.isPresent()) {
+                Pago p = pagoMatch.get();
+                v.setEstado("PAGADO");
+                v.setPagoId(p.getId());
+                v.setFechaPagoReal(p.getFecha());
+                v.setMontoPagado(p.getMonto());
+            } else if (fin.isBefore(hoy)) {
+                v.setEstado("PENDIENTE");
+            } else {
+                v.setEstado("PROXIMO");
+            }
+
+            vouchers.add(v);
+            inicio = fin.plusDays(1); // Siguiente periodo empieza el día después
+        }
+
+        return vouchers;
     }
 
     private void validarRol(Authentication auth, String rolEsperado) {

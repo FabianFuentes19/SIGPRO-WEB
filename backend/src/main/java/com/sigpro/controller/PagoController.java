@@ -68,5 +68,28 @@ public class PagoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los pagos del proyecto"));
         }
     }
+
+    @GetMapping("/mis-vouchers")
+    public ResponseEntity<?> consultarMisVouchers(Authentication auth) {
+        try {
+            String matricula = (String) auth.getPrincipal();
+            List<VoucherDTO> vouchers = pagoService.obtenerHistorialVouchers(matricula, auth);
+            return ResponseEntity.ok(vouchers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar sus vouchers"));
+        }
+    }
+
+    @GetMapping("/vouchers/{matricula}")
+    public ResponseEntity<?> consultarVouchersMiembro(@PathVariable String matricula, Authentication auth) {
+        try {
+            List<VoucherDTO> vouchers = pagoService.obtenerHistorialVouchers(matricula, auth);
+            return ResponseEntity.ok(vouchers);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los vouchers del miembro"));
+        }
+    }
 }
 
