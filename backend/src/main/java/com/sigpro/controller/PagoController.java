@@ -1,6 +1,7 @@
 package com.sigpro.controller;
 
 import com.sigpro.dto.PagoDTO;
+import com.sigpro.dto.VoucherDTO;
 import com.sigpro.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,20 +64,9 @@ public class PagoController {
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Error en la consulta del proyecto"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los pagos del proyecto"));
-        }
-    }
-
-    @GetMapping("/mis-vouchers")
-    public ResponseEntity<?> consultarMisVouchers(Authentication auth) {
-        try {
-            String matricula = (String) auth.getPrincipal();
-            List<VoucherDTO> vouchers = pagoService.obtenerHistorialVouchers(matricula, auth);
-            return ResponseEntity.ok(vouchers);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar sus vouchers"));
         }
     }
 

@@ -116,15 +116,28 @@ public class PagoService {
         List<Pago> pagos = pagoRepository.findByUsuarioMatricula(matricula);
         List<VoucherDTO> vouchers = new ArrayList<>();
 
-        LocalDate inicio = usuario.getFechaIngreso();
-        if (inicio == null) inicio = LocalDate.now().minusDays(30);
+        LocalDate fechaIngreso = usuario.getFechaIngreso();
+        if (fechaIngreso == null) fechaIngreso = LocalDate.now().minusMonths(1);
+        
+        LocalDate inicio;
+        if (fechaIngreso.getDayOfMonth() <= 15) {
+            inicio = fechaIngreso.withDayOfMonth(1);
+        } else {
+            inicio = fechaIngreso.withDayOfMonth(16);
+        }
 
         LocalDate hoy = LocalDate.now();
         int contador = 1;
 
-        while (inicio.isBefore(hoy) || inicio.isEqual(hoy)) {
+        // Iterar quincenas hasta llegar a la quincena actual
+        while (!inicio.isAfter(hoy)) {
+            LocalDate fin;
+            if (inicio.getDayOfMonth() == 1) {
+                fin = inicio.withDayOfMonth(15);
+            } else {
+                fin = inicio.withDayOfMonth(inicio.lengthOfMonth());
+            }
 
-            LocalDate fin = inicio.plusDays(14);
             VoucherDTO v = new VoucherDTO();
             v.setNumeroQuincena(contador++);
             v.setFechaInicio(inicio);
@@ -134,7 +147,6 @@ public class PagoService {
             final LocalDate pInicio = inicio;
             final LocalDate pFin = fin;
 
-            // Buscamos si existe un pago en este rango de fechas
             Optional<Pago> pagoMatch = pagos.stream()
                     .filter(p -> !p.getFecha().isBefore(pInicio) && !p.getFecha().isAfter(pFin))
                     .findFirst();
@@ -145,13 +157,12 @@ public class PagoService {
                 v.setPagoId(p.getId());
                 v.setFechaPagoReal(p.getFecha());
                 v.setMontoPagado(p.getMonto());
-                vouchers.add(v);
-            } else if (fin.isBefore(hoy)) {
+            } else {
                 v.setEstado("PENDIENTE");
-                vouchers.add(v);
             }
 
-            inicio = fin.plusDays(1); // Siguiente periodo empieza el día después
+            vouchers.add(v);
+            inicio = fin.plusDays(1);
         }
 
         return vouchers;
