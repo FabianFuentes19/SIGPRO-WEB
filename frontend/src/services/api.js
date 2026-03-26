@@ -119,7 +119,6 @@ export async function forgotPassword(matricula) {
   return data;
 }
 
-<<<<<<< HEAD
 async function obtenerDatosNominas(token, matriculaLider) {
   const headers = {
     "Authorization": `Bearer ${token}`,
@@ -162,7 +161,7 @@ async function obtenerDatosNominas(token, matriculaLider) {
     proyectoId: proyecto?.id,
     nominas: listaNominas.filter(n => n !== null)
   };
-=======
+}
 /**
  * Lista materiales de un proyecto (GET /api/materiales/proyecto/{proyectoId})
  * @param {number|string} proyectoId
@@ -200,5 +199,4 @@ export async function registrarMaterial(payload) {
     throw new Error(data.error || "Error al registrar material");
   }
   return data;
->>>>>>> 3.5_back_Materiales
 }
