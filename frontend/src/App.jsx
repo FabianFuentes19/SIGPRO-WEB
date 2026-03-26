@@ -6,6 +6,9 @@ import DashLideres from "./pages/DashLideres";
 import DashboardLider from "./components/Dashboards/DashboardLider";
 import LiderRoute from "./components/LiderRoute";
 
+import RecuperarContrasena from "./components/RecuperarContrasena";
+import RestablecerContrasena from "./components/RestablecerContrasena";
+
 function App() {
   return (
     <Router>
@@ -15,7 +18,10 @@ function App() {
 
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta protegida */}
+        {/* Recuperación de contraseña rutas temporales */}
+        <Route path="/recuperar-contraseña" element={<RecuperarContrasena />} />
+        <Route path="/restablecer-contraseña" element={<RestablecerContrasena />} />
+
         <Route path="/proyectos" element={
           <AdminRoute>
             <DashProyectos />
@@ -28,7 +34,7 @@ function App() {
           </AdminRoute>
         } />
 
-        <Route path="/dashboard" element={<Navigate to="/login" />} />
+        <Route path="/dashboard" element={<Navigate to="/dashboard-lider" />} />
         
         <Route path="/dashboard-lider" element={
           <LiderRoute>
