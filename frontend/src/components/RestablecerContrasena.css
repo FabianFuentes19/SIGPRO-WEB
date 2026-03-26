@@ -93,3 +93,75 @@
   font-size: 0.85rem;
   color: #555;
 }
+
+/* Estilos para el paso 2: Nueva Contraseña */
+.reset-password-form {
+  margin: 1.5rem auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  text-align: left;
+  max-width: 400px;
+}
+
+.input-group-reset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group-reset label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding: 0.9rem;
+  padding-right: 3rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.btn-toggle-eye {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  display: flex;
+}
+
+.btn-back {
+  background: none;
+  border: 1px solid #003D66;
+  color: #003D66;
+  padding: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-back:hover {
+  background-color: #f0f7ff;
+}
+
+.mensaje-error {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}

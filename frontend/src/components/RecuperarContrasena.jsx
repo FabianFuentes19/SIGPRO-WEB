@@ -30,7 +30,8 @@ function RecuperarContrasena() {
 
       if (respuesta.ok) {
         setMensaje("Se envió un correo para restablecer tu contraseña");
-        navigate("/restablecer-contraseña");
+        // Pasamos la matrícula al siguiente paso para saber a quién resetearle la pass
+        navigate("/restablecer-contraseña", { state: { matricula: matricula } });
       } else {
         setMensaje("No se pudo procesar la solicitud");
       }
