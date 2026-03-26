@@ -6,7 +6,7 @@ const AgregarMaterial = ({ alCerrar, alRegistrar, tipo = "Material" }) => {
     const [datosFormulario, setDatosFormulario] = useState({
         nombre: '',
         cantidad: '',
-        precio: '',
+        monto: '',
     });
 
     const cambiarValor = (e) => {
@@ -54,9 +54,9 @@ const AgregarMaterial = ({ alCerrar, alRegistrar, tipo = "Material" }) => {
                             <label>Precio*</label>
                             <input
                                 type="number"
-                                name="precio"
+                                name="monto"
                                 placeholder="$70"
-                                value={datosFormulario.precio}
+                                value={datosFormulario.monto}
                                 onChange={cambiarValor}
                                 required
                             />

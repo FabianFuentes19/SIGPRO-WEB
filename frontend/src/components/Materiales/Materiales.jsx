@@ -1,32 +1,87 @@
 import './Materiales.css';
-import React, {useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import AgregarMaterial from './AgregarMaterial.jsx';
+import { obtenerMaterialesPorProyecto, registrarMaterial } from '../../services/api.js';
 
-const Materiales = () => {
+const Materiales = ({ proyectoId }) => {
     const [mostrarModal, setMostrarModal] = useState(false);
+    const [materiales, setMateriales] = useState([]);
+    const [busqueda, setBusqueda] = useState('');
+    const [cargando, setCargando] = useState(false);
 
-    const materiales = [
-        { id: 1, nombre: "Acuarelas", cantidad: 4, unidad: "pz", precio: 320.00 },
-        { id: 2, nombre: "Pinceles Óleo", cantidad: 12, unidad: "pz", precio: 546.00 },
-        { id: 3, nombre: "Lienzo 40x60", cantidad: 2, unidad: "pz", precio: 240.00 }
-    ];
+    const cargarMateriales = async () => {
+        if (!proyectoId) {
+            setMateriales([]);
+            return;
+        }
+        setCargando(true);
+        try {
+            const data = await obtenerMaterialesPorProyecto(proyectoId);
+            setMateriales(Array.isArray(data) ? data : []);
+        } catch (e) {
+            console.error(e);
+            setMateriales([]);
+        } finally {
+            setCargando(false);
+        }
+    };
 
-    // Cálculo automático del total -> para el back
-    const totalSuma = materiales.reduce((acc, item) => acc + item.precio, 0);
+    useEffect(() => {
+        cargarMateriales();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [proyectoId]);
+
+    const materialesFiltrados = useMemo(() => {
+        const q = busqueda.trim().toLowerCase();
+        if (!q) return materiales;
+        return materiales.filter((m) => (m?.nombre || '').toLowerCase().includes(q));
+    }, [materiales, busqueda]);
+
+    const totalSuma = useMemo(() => {
+        return materiales.reduce((acc, item) => acc + (Number(item?.costoTotal) || 0), 0);
+    }, [materiales]);
+
+    const formatearMoneda = (v) =>
+        (Number(v) || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+
+    const onRegistrar = async (datos) => {
+        if (!proyectoId) {
+            alert('No se encontró el proyecto del líder. Recarga la página.');
+            return;
+        }
+        try {
+            // Limpieza: solo nombre, monto, cantidad, proyectoId (NO costoTotal)
+            await registrarMaterial({
+                nombre: datos?.nombre,
+                monto: datos?.monto,
+                cantidad: datos?.cantidad,
+                proyectoId,
+            });
+            await cargarMateriales(); // refresca lista y total automáticamente
+        } catch (e) {
+            alert(e?.message || 'No fue posible registrar el material');
+        }
+    };
 
     return (
         <div className="materiales-container-web">
             <div className="total-material-card-full">
                 <small className="date-label-style">TOTAL DE MATERIAL</small>
                 <h1 className="budget-value">
-                    ${totalSuma.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                    {formatearMoneda(totalSuma)}
                 </h1>
             </div>
 
             <div className="search-bar-materials">
                 <Search size={20} className="search-icon-inner" />
-                <input type="text" placeholder="Buscar materiales..." className="input-search-styled" />
+                <input
+                    type="text"
+                    placeholder="Buscar materiales..."
+                    className="input-search-styled"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                />
             </div>
 
             <div className="material-actions-row">
@@ -37,21 +92,31 @@ const Materiales = () => {
             </div>
 
             <div className="materials-stack-list">
-                {materiales.map((m) => (
+                {cargando ? (
+                    <div className="member-card-item">
+                        <div className="member-data">
+                            <strong>Cargando...</strong>
+                            <span>Consultando materiales</span>
+                        </div>
+                    </div>
+                ) : materialesFiltrados.map((m) => (
                     <div key={m.id} className="member-card-item">
                         <div className="member-data">
                             <strong>{m.nombre}</strong>
-                            <span>{m.cantidad} {m.unidad}</span>
+                            <span>{m.cantidad} pz</span>
                         </div>
                         <div className="mat-price-tag">
-                            ${m.precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                            {formatearMoneda(m.costoTotal)}
                         </div>
                     </div>
                 ))}
             </div>
 
             {mostrarModal && (
-                <AgregarMaterial alCerrar={() => setMostrarModal(false)} />
+                <AgregarMaterial
+                    alCerrar={() => setMostrarModal(false)}
+                    alRegistrar={onRegistrar}
+                />
             )}
         </div>
     );
