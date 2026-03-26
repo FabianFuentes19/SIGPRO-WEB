@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class MaterialResponseDTO {
 
     private Long id;
-    private String descripcion;
+    private String nombre;
     private BigDecimal monto;
     private Integer cantidad;
     private BigDecimal costoTotal;

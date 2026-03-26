@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * El presupuesto restante se calculará en servicio: PRESUPUESTO inicial − suma de costos.
  */
 @Entity
-@Table(name = "MATERIAL")
+@Table(name = "MATERIALES")
 @Data
 public class Material {
 
@@ -30,8 +30,8 @@ public class Material {
     private Proyecto proyecto;
 
     @NotBlank
-    @Column(name = "DESCRIPCION", nullable = false, length = 500)
-    private String descripcion;
+    @Column(name = "NOMBRE", nullable = false, length = 500)
+    private String nombre;
 
     @NotNull
     @Positive
@@ -48,6 +48,6 @@ public class Material {
      */
     @NotNull
     @Positive
-    @Column(name = "COSTO_TOTAL", nullable = false, precision = 15, scale = 2)
+    @Column(name = "COSTO_TOTAL", precision = 15, scale = 2, insertable = false, updatable = false)
     private BigDecimal costoTotal;
 }

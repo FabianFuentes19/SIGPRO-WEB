@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 public class MaterialRequestDTO {
 
     @NotBlank(message = "La descripción es obligatoria")
-    private String descripcion;
+    private String nombre;
 
     @NotNull(message = "El monto es obligatorio")
     @Positive(message = "El monto debe ser mayor que cero")

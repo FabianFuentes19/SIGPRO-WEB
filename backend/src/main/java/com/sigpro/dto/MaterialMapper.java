@@ -13,7 +13,7 @@ public final class MaterialMapper {
         }
         MaterialResponseDTO dto = new MaterialResponseDTO();
         dto.setId(material.getId());
-        dto.setDescripcion(material.getDescripcion());
+        dto.setNombre(material.getNombre());
         dto.setMonto(material.getMonto());
         dto.setCantidad(material.getCantidad());
         dto.setCostoTotal(material.getCostoTotal());

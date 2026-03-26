@@ -53,14 +53,13 @@ public class MaterialService {
         BigDecimal disponible = presupuestoInicial.subtract(gastoActual);
         if (disponible.compareTo(costoTotal) < 0) {
             throw new PresupuestoInsuficienteException(
-                    "El presupuesto del proyecto es insuficiente para registrar este material. "
-                            + "Disponible: " + disponible + ", requerido: " + costoTotal
+                    "Presupuesto insuficiente. Disponible: " + disponible + ", requerido: " + costoTotal
             );
         }
 
         Material material = new Material();
         material.setProyecto(proyecto);
-        material.setDescripcion(dto.getDescripcion().trim());
+        material.setNombre(dto.getNombre().trim());
         material.setMonto(dto.getMonto().setScale(MONEDA_SCALE, RoundingMode.HALF_UP));
         material.setCantidad(dto.getCantidad());
         material.setCostoTotal(costoTotal);

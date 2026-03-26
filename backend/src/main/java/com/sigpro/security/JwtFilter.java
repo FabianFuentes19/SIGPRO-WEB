@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        if (matricula != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (matricula != null) {
             // verifica que el token sea valido
             if (jwtUtil.validarToken(jwt, matricula)) {
                 String rol = jwtUtil.extractRol(jwt); // este método lo agregas en JwtUtil
