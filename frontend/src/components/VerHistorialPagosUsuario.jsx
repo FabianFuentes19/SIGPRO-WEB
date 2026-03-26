@@ -1,14 +1,64 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/GestionUsuario.css';
-import { ReceiptText } from 'lucide-react';
+import { ReceiptText, Loader2 } from 'lucide-react';
+
+const BASE_URL = "http://localhost:8080";
 
 const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
+    const [pagos, setPagos] = useState([]);
+    const [totalAcumulado, setTotalAcumulado] = useState(0);
+
+    const obtenerPagos = async () => {
+        if (!usuario?.matricula) return;
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch(`${BASE_URL}/pagos/miembro/${encodeURIComponent(usuario.matricula)}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // orden descendente
+                const sorted = data.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                setPagos(sorted);
+
+                // total
+                const total = sorted.reduce((sum, p) => sum + (p.monto || 0), 0);
+                setTotalAcumulado(total);
+            }
+        } catch (error) {
+            console.error("Error al cargar historial:", error);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    useEffect(() => {
+        obtenerPagos();
+    }, [usuario]);
+
     if (!usuario) return null;
 
-    // Función para obtener iniciales
     const getIniciales = (nombre) => {
         if (!nombre) return "??";
         return nombre.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(amount);
+    };
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return "N/A";
+        const [year, month, day] = dateStr.split('-');
+        const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+        return `${day} DE ${months[parseInt(month) - 1]}, ${year}`;
     };
 
     return (
@@ -23,36 +73,36 @@ const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
                         <span className="ux-puesto-history">{usuario.puesto || 'Puesto no asignado'}</span>
                         <div className="ux-total-accumulated">
                             <label>Total acumulado</label>
-                            <strong>${new Intl.NumberFormat('es-MX').format(usuario.totalAcumulado || 0)}.00</strong>
+                            <strong>{formatCurrency(totalAcumulado)}</strong>
                         </div>
                     </div>
                 </div>
 
                 <div className="ux-body-scrollable">
                     <h3 className="ux-section-title">Historial de pagos del {tipo.toLowerCase()}</h3>
-
-                    <div className="ux-payments-list">
-                        {(usuario.pagos || [
-                            { fecha: '11 DE FEB, 2026', monto: '15,000.00' },
-                            { fecha: '28 DE ENE, 2026', monto: '15,000.00' }
-                        ]).map((pago, index) => (
-                            <div key={index} className="ux-payment-item-card">
-                                <div className="ux-payment-details">
-                                    <div className="ux-payment-icon">
-                                        <ReceiptText size={18} color="#0c9d72" />
+                        <div className="ux-payments-list">
+                            {pagos.length > 0 ? (
+                                pagos.map((pago, index) => (
+                                    <div key={index} className="ux-payment-item-card">
+                                        <div className="ux-payment-details">
+                                            <div className="ux-payment-icon">
+                                                <ReceiptText size={18} color="#0c9d72" />
+                                            </div>
+                                            <div className="ux-payment-text">
+                                                <label>FECHA DE PAGO</label>
+                                                <strong>{formatDate(pago.fecha)}</strong>
+                                            </div>
+                                        </div>
+                                        <div className="ux-payment-monto">
+                                            <label>MONTO</label>
+                                            <strong>{formatCurrency(pago.monto)}</strong>
+                                        </div>
                                     </div>
-                                    <div className="ux-payment-text">
-                                        <label>FECHA DE PAGO</label>
-                                        <strong>{pago.fecha}</strong>
-                                    </div>
-                                </div>
-                                <div className="ux-payment-monto">
-                                    <label>MONTO</label>
-                                    <strong>${pago.monto}</strong>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                                ))
+                            ) : (
+                                <div className="no-results-history">No se han registrado pagos para este miembro aún.</div>
+                            )}
+                        </div>
                 </div>
 
                 <div className="ux-footer-history">

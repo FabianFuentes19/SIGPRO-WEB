@@ -119,29 +119,46 @@ export async function forgotPassword(matricula) {
   return data;
 }
 
-/**
- * Obtiene el historial de pagos del usuario autenticado.
- * @returns {Promise<Array>}
- */
-export async function consultarMisPagos() {
-  const response = await apiFetch("/pagos/mis-pagos");
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Error al obtener historial de pagos");
-  }
-  return data;
-}
+async function obtenerDatosNominas(token, matriculaLider) {
+  const headers = {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json"
+  };
 
-/**
- * Obtiene el historial de pagos de un miembro (solo para líderes del mismo proyecto).
- * @param {string} matricula
- * @returns {Promise<Array>}
- */
-export async function consultarPagosMiembro(matricula) {
-  const response = await apiFetch(`/pagos/miembro/${encodeURIComponent(matricula)}`);
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Error al obtener pagos del miembro");
-  }
-  return data;
+  // Peticiones iniciales
+  const [resProj, resMiem] = await Promise.all([
+    fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, { headers }),
+    fetch(`${BASE_URL}/usuarios/lider/${encodeURIComponent(matriculaLider)}`, { headers })
+  ]);
+
+  if (!resMiem.ok) throw new Error("Error al obtener el equipo");
+
+  const proyecto = resProj.ok ? await resProj.json() : null;
+  const miembros = await resMiem.json();
+
+  // Obtener vouchers para cada miembro
+  const listaNominas = await Promise.all(miembros.map(async (miembro) => {
+    try {
+      const resV = await fetch(`${BASE_URL}/pagos/vouchers/${miembro.matricula}`, { headers });
+      if (!resV.ok) return null;
+
+      const vouchers = await resV.json();
+      const actual = vouchers.reverse().find(v => v.estado !== "PROXIMO") || vouchers[0];
+
+      return actual ? {
+        id: miembro.matricula,
+        nombre: miembro.nombreCompleto,
+        puesto: miembro.rolNombre || "Miembro",
+        matricula: miembro.matricula,
+        monto: actual.montoEsperado,
+        estado: actual.estado,
+        fecha: actual.fechaFin
+      } : null;
+    } catch { return null; }
+  }));
+
+  return {
+    proyectoId: proyecto?.id,
+    nominas: listaNominas.filter(n => n !== null)
+  };
 }
