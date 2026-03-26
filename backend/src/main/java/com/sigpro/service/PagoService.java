@@ -1,5 +1,7 @@
 package com.sigpro.service;
 
+import com.sigpro.dto.PagoDTO;
+import com.sigpro.dto.PagoMapper;
 import com.sigpro.dto.VoucherDTO;
 import com.sigpro.model.Pago;
 import com.sigpro.model.Proyecto;
@@ -106,14 +108,7 @@ public class PagoService {
     }
 
     public List<VoucherDTO> obtenerHistorialVouchers(String matricula, Authentication auth) {
-        // Validar permisos
-        String loggedUserMatricula = (String) auth.getPrincipal();
-        boolean isSelf = loggedUserMatricula.equals(matricula);
-        boolean isLider = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_LIDER"));
-
-        if (!isSelf && !isLider) {
-            throw new SecurityException("No tiene permisos para ver estos vouchers");
-        }
+        validarRol(auth, "ROLE_LIDER");
 
         Usuario usuario = usuarioRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
@@ -127,9 +122,9 @@ public class PagoService {
         LocalDate hoy = LocalDate.now();
         int contador = 1;
 
-        // Generamos periodos de 15 días desde la fecha de ingreso
         while (inicio.isBefore(hoy) || inicio.isEqual(hoy)) {
-            LocalDate fin = inicio.plusDays(14); // Periodo de 15 días (ej. 1 al 15)
+
+            LocalDate fin = inicio.plusDays(14);
             VoucherDTO v = new VoucherDTO();
             v.setNumeroQuincena(contador++);
             v.setFechaInicio(inicio);
@@ -150,13 +145,12 @@ public class PagoService {
                 v.setPagoId(p.getId());
                 v.setFechaPagoReal(p.getFecha());
                 v.setMontoPagado(p.getMonto());
+                vouchers.add(v);
             } else if (fin.isBefore(hoy)) {
                 v.setEstado("PENDIENTE");
-            } else {
-                v.setEstado("PROXIMO");
+                vouchers.add(v);
             }
 
-            vouchers.add(v);
             inicio = fin.plusDays(1); // Siguiente periodo empieza el día después
         }
 
