@@ -119,6 +119,7 @@ export async function forgotPassword(matricula) {
   return data;
 }
 
+<<<<<<< HEAD
 async function obtenerDatosNominas(token, matriculaLider) {
   const headers = {
     "Authorization": `Bearer ${token}`,
@@ -161,4 +162,43 @@ async function obtenerDatosNominas(token, matriculaLider) {
     proyectoId: proyecto?.id,
     nominas: listaNominas.filter(n => n !== null)
   };
+=======
+/**
+ * Lista materiales de un proyecto (GET /api/materiales/proyecto/{proyectoId})
+ * @param {number|string} proyectoId
+ * @returns {Promise<Array>}
+ */
+export async function obtenerMaterialesPorProyecto(proyectoId) {
+  if (!proyectoId) return [];
+  const response = await apiFetch(`/api/materiales/proyecto/${encodeURIComponent(proyectoId)}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al obtener materiales");
+  }
+  return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Registra un material (POST /api/materiales)
+ * Importante: NO enviar costoTotal; lo calcula la BD/servicio.
+ * @param {{nombre: string, monto: number|string, cantidad: number|string, proyectoId: number|string}} payload
+ * @returns {Promise<Object>}
+ */
+export async function registrarMaterial(payload) {
+  const body = {
+    nombre: payload?.nombre,
+    monto: payload?.monto != null ? Number(payload.monto) : payload?.monto,
+    cantidad: payload?.cantidad != null ? Number(payload.cantidad) : payload?.cantidad,
+    proyectoId: payload?.proyectoId != null ? Number(payload.proyectoId) : payload?.proyectoId,
+  };
+  const response = await apiFetch("/api/materiales", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al registrar material");
+  }
+  return data;
+>>>>>>> 3.5_back_Materiales
 }

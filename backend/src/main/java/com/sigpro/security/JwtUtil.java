@@ -40,12 +40,16 @@ public class JwtUtil {
 
     // extrae el rol
     public String extractRol(String token) {
-        return Jwts.parserBuilder()
+        String rol = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("rol", String.class);
+        if (rol == null || rol.isBlank()) {
+            return null;
+        }
+        return rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
     }
 
     //extracción de la matricula

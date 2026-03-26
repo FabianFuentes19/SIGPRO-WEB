@@ -336,7 +336,7 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
                     {vistaActual === 'nominas' && <Nominas />}
 
                 </main>
