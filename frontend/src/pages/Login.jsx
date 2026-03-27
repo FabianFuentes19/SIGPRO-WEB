@@ -31,19 +31,23 @@ const [touchedPassword, setTouchedPassword] = useState(false);
 
       if (response.ok) {
         const data = await response.json();
-        setMessage("Login exitoso");
-        console.log("Token recibido:", data.token);
+        const role = (data.rol || "").toUpperCase();
+        console.log("Login exitoso. Rol recibido:", role);
 
         localStorage.setItem("token", data.token);
-        localStorage.setItem("rol", data.rol);
+        localStorage.setItem("rol", role);
+        localStorage.setItem("matricula", user);
 
-        if (data.rol === "ADMINISTRADOR") {
+        if (role === "ADMINISTRADOR" || role === "ADMIN") {
+          console.log("Redirigiendo a proyectos (Admin)");
           navigate("/proyectos");
         } else {
+          console.log("Redirigiendo a dashboard (Lider/Miembro)");
           navigate("/dashboard");
         }
       } else {
-        setMessage(data.error || "Credenciales inválidas");
+        const errorData = await response.json().catch(() => ({}));
+        setMessage(errorData.error || "Credenciales inválidas");
       }
     } catch (error) {
       console.error("Error:", error);

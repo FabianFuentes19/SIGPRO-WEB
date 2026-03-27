@@ -3,6 +3,7 @@ import { User } from "lucide-react";
 import "./RecuperarContrasena.css";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = "http://localhost:8080";
 
 function RecuperarContrasena() {
   const [matricula, setMatricula] = useState("");
@@ -19,21 +20,23 @@ function RecuperarContrasena() {
     }
 
     try {
-      const respuesta = await fetch("http://localhost:8080/auth/forgot-password", {
+      const respuesta = await fetch(`${BASE_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matricula }),
+        body: JSON.stringify({ matricula: matricula.trim() }),
       });
 
-      const data = await respuesta.json().catch(() => null);
-      console.log("Respuesta backend:", respuesta.status, data);
+      console.log("Respuesta recibida:", respuesta.status);
+      const data = await respuesta.json().catch(() => ({}));
 
       if (respuesta.ok) {
         setMensaje("Se envió un correo para restablecer tu contraseña");
-        // Pasamos la matrícula al siguiente paso para saber a quién resetearle la pass
-        navigate("/restablecer-contraseña", { state: { matricula: matricula } });
+        // Pasamos la matrícula al siguiente paso
+        setTimeout(() => {
+          navigate("/restablecer-contraseña", { state: { matricula: matricula.trim() } });
+        }, 1500);
       } else {
-        setMensaje("No se pudo procesar la solicitud");
+        setMensaje(data.error || "No se pudo procesar la solicitud. Verifica tu matrícula.");
       }
     } catch (error) {
       setMensaje("Error de conexión con el servidor");

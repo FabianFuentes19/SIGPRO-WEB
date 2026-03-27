@@ -57,6 +57,13 @@ function RestablecerContraseña() {
       return;
     }
 
+    const tokenFinal = codigo.join("");
+    const matriculaFinal = matricula.trim();
+
+    console.log("Iniciando restablecimiento para:", matriculaFinal);
+    console.log("Código ingresado:", tokenFinal);
+    console.log("Nueva contraseña (longitud):", nuevaContrasena.length);
+
     setCargando(true);
     setMensaje("");
 
@@ -65,21 +72,29 @@ function RestablecerContraseña() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          matricula: matricula,
-          token: codigo.join(""),
+          matricula: matriculaFinal,
+          token: tokenFinal,
           nuevaContrasena: nuevaContrasena
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
 
       if (response.ok) {
-        alert("¡Contraseña restablecida correctamente!");
-        navigate("/login");
+        setMensaje("✓ ¡Contraseña restablecida correctamente! Redirigiendo al login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2500);
       } else {
         setMensaje(data.error || "Código inválido o error al procesar.");
       }
     } catch (error) {
+      console.error("Error en reset:", error);
       setMensaje("Error de conexión con el servidor.");
     } finally {
       setCargando(false);
@@ -164,7 +179,11 @@ function RestablecerContraseña() {
         </>
       )}
 
-      {mensaje && <p className="mensaje-error">{mensaje}</p>}
+      {mensaje && (
+        <p className={mensaje.includes("✓") ? "mensaje-exito" : "mensaje-error"}>
+          {mensaje}
+        </p>
+      )}
 
       <div className="codigo-opciones">
         <a href="/login">← Cancelar y volver al inicio</a>

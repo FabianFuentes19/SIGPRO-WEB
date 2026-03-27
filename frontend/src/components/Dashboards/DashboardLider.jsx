@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
+import PerfilLider from './PerfilLider.jsx';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -338,6 +339,7 @@ const DashboardLider = () => {
 
                     {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
                     {vistaActual === 'nominas' && <Nominas />}
+                    {vistaActual === 'perfil' && <PerfilLider/>} 
 
                 </main>
             </div>
