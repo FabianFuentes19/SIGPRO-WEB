@@ -113,6 +113,10 @@ public class PagoService {
         Usuario usuario = usuarioRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
+        if (!"ACTIVO".equalsIgnoreCase(usuario.getEstado())) {
+            throw new IllegalArgumentException ("Cuenta inactiva");
+        }
+
         List<Pago> pagos = pagoRepository.findByUsuarioMatricula(matricula);
         List<VoucherDTO> vouchers = new ArrayList<>();
 

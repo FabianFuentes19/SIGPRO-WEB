@@ -40,7 +40,7 @@ const [touchedPassword, setTouchedPassword] = useState(false);
 
         if (role === "ADMINISTRADOR" || role === "ADMIN") {
           console.log("Redirigiendo a proyectos (Admin)");
-          navigate("/proyectos");
+          navigate("/lideres");
         } else {
           console.log("Redirigiendo a dashboard (Lider/Miembro)");
           navigate("/dashboard");

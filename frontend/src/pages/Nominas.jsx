@@ -48,7 +48,7 @@ const Nominas = () => {
           nombre: miembro.nombreCompleto,
           puesto: miembro.rolNombre || miembro.puesto || "Miembro",
           matricula: miembro.matricula,
-          voucher: v.pagoId || `Q${v.numeroQuincena}`,
+          voucher: v.pagoId || `${v.numeroQuincena}`,
           monto: v.montoEsperado,
           estado: v.estado,
           fecha: v.fechaFin,
@@ -104,7 +104,7 @@ const Nominas = () => {
    * @param {string} matricula 
    * @param {number} monto
    */
-  const handlePay = async (matricula, monto) => {
+  const handlePay = async (matricula, monto, fechaVoucher) => {
     const token = localStorage.getItem("token");
 
     if (!proyectoId) {
@@ -116,7 +116,8 @@ const Nominas = () => {
       proyectoId: proyectoId,
       matriculaUsuario: matricula,
       monto: monto,
-      fecha: new Date().toISOString().split('T')[0]
+      fecha: fechaVoucher
+
     };
 
     try {
@@ -192,7 +193,7 @@ const Nominas = () => {
             <NominaCard
               key={nomina.id}
               nomina={nomina}
-              onPay={() => handlePay(nomina.matricula, nomina.monto)}
+              onPay={() => handlePay(nomina.matricula, nomina.monto, nomina.fecha)}
             />
           ))
         ) : (
