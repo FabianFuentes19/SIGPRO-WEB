@@ -178,7 +178,11 @@ const DashProyectos = () => {
                           <td>{index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
-                          <td>{p.descripcion}</td>
+                          <td>
+                            <div className="desc-cell" title={p.descripcion}>
+                              {p.descripcion}
+                            </div>
+                          </td>
                           <td>{"$" + p.presupuesto}</td>
                           <td>
                             {/*Agrego esto para poner el estado del Proyecto*/}
