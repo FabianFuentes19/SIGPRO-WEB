@@ -39,7 +39,7 @@
 }
 
 
-.btn-cancelar {
+.logout-buttons .btn-cancelar {
   background-color: #ececec;
   color: #003D66;
   border: 1.5px solid #003D66;
@@ -52,12 +52,12 @@
   min-width: 160px;
 }
 
-.btn-cancelar:hover {
+.logout-buttons .btn-cancelar:hover {
   background-color: #dcdcdc;
 }
 
 
-.btn-aceptar {
+.logout-buttons .btn-aceptar {
   background-color: #003D66;
   color: white;
   border: none;
@@ -70,6 +70,6 @@
   min-width: 160px;
 }
 
-.btn-aceptar:hover {
+.logout-buttons .btn-aceptar:hover {
   background-color: #003D66;
 }

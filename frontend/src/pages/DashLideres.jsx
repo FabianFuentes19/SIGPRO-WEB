@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/DashProyecto.css';
 import AgregarUsuario from '../components/AgregarUsuario';
 import EditarUsuario from '../components/EditarUsuario';
@@ -7,8 +7,11 @@ import VerDetallesUsuario from '../components/VerDetallesUsuario';
 import { obtenerUsuarios } from '../services/api';
 import { Eye, LogOut, Pencil, Trash2 } from 'lucide-react';
 import BorrarUsuario from '../components/BorrarUsuario';
+import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 
 const DashLideres = () => {
+  const navigate = useNavigate();
+  const [mostrarModalCerrarSesion, setMostrarModalCerrarSesion] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
@@ -21,6 +24,11 @@ const DashLideres = () => {
   useEffect(() => {
     fetchLideres();
   }, []);
+
+  const handleCerrarSesion = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
 
   const fetchLideres = async () => {
     try {
@@ -128,10 +136,10 @@ const DashLideres = () => {
             </Link>
           </nav>
           <div className="sidebar-footer">
-            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+            <button className="logout-btn" onClick={(e) => { e.preventDefault(); setMostrarModalCerrarSesion(true); }}>
             <LogOut size={20} />
             <span>Salir</span>
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -256,6 +264,14 @@ const DashLideres = () => {
           usuario={liderSeleccionado}
           alCerrar={() => setMostrarModalEliminar(false)}
           alConfirmar={() => eliminarLider(liderSeleccionado.matricula)}
+        />
+      )}
+
+      {/* Modal Cerrar Sesion */}
+      {mostrarModalCerrarSesion && (
+        <ModalCerrarSesion
+          alCancelar={() => setMostrarModalCerrarSesion(false)}
+          alAceptar={handleCerrarSesion}
         />
       )}
     </div>

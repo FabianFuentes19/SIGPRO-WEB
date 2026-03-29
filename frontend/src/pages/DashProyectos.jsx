@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/DashProyecto.css';
 import ModalRegistrarProyecto from '../components/ModalRegistrarProyecto';
 import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
 import ModalEditarProyecto from '../components/ModalEditarProyecto';
+import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import { Eye, LogOut, Pencil } from 'lucide-react';
 
 const DashProyectos = () => {
+  const navigate = useNavigate();
   // Estado para controlar los modales
+  const [mostrarModalCerrarSesion, setMostrarModalCerrarSesion] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
@@ -42,6 +45,11 @@ const DashProyectos = () => {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  const handleCerrarSesion = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
 
   // Función que se ejecuta cuando se registra un nuevo proyecto
   const registrarProyecto = async (nuevoProyecto) => {
@@ -117,10 +125,10 @@ const DashProyectos = () => {
             </Link>
           </nav>
             <div className="sidebar-footer">
-            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+            <button className="logout-btn" onClick={(e) => { e.preventDefault(); setMostrarModalCerrarSesion(true); }}>
             <LogOut size={20} />
             <span>Salir</span>
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -214,6 +222,14 @@ const DashProyectos = () => {
           proyecto={proyectoSeleccionado}
           alCerrar={() => setMostrarModalEditar(false)}
           alActualizar={actualizarProyecto}
+        />
+      )}
+
+      {/* Modal Cerrar Sesion */}
+      {mostrarModalCerrarSesion && (
+        <ModalCerrarSesion
+          alCancelar={() => setMostrarModalCerrarSesion(false)}
+          alAceptar={handleCerrarSesion}
         />
       )}
     </div>
