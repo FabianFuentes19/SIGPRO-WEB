@@ -1,11 +1,10 @@
-
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); 
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,7 +13,7 @@
 
 
 .logout-card {
-  background-color: #e0e0e0; 
+  background-color: #e0e0e0;
   padding: 60px 40px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -42,8 +41,8 @@
 
 .btn-cancelar {
   background-color: #ececec;
-  color: #3f447a; 
-  border: 1.5px solid #3f447a;
+  color: #003D66;
+  border: 1.5px solid #003D66;
   padding: 12px 40px;
   border-radius: 12px;
   font-size: 1.2rem;
@@ -59,7 +58,7 @@
 
 
 .btn-aceptar {
-  background-color: #343773; 
+  background-color: #003D66;
   color: white;
   border: none;
   padding: 12px 40px;
@@ -72,5 +71,5 @@
 }
 
 .btn-aceptar:hover {
-  background-color: #262957;
+  background-color: #003D66;
 }

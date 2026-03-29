@@ -22,14 +22,17 @@ import {
     Eye,
     History
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
+import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
 
 const BASE_URL = "http://localhost:8080";
 
 const DashboardLider = () => {
+    const navigate = useNavigate();
     const [mostrarModal, setMostrarModal] = useState(false);
+    const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
     const [vistaActual, setVistaActual] = useState('proyecto');
 
     // Estados para CRUD miembros (Tres puntitos)
@@ -203,9 +206,10 @@ const DashboardLider = () => {
                 <div className="header-brand">Panel Líder</div>
                 <div className="header-title">
                     {vistaActual === 'proyecto' ? 'Proyecto' :
-                        vistaActual === 'materiales' ? 'Materiales' : 'Nóminas'}
+                        vistaActual === 'materiales' ? 'Materiales' :
+                        vistaActual === 'perfil' ? 'Perfil' : 'Nóminas'}
                 </div>
-                <div className="header-user" onClick={() => setVistaActual('perfil')}>
+                <div className="header-user" onClick={() => setVistaActual('perfil')} style={{ cursor: 'pointer' }}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
 
@@ -237,10 +241,10 @@ const DashboardLider = () => {
                         </div>
                     </nav>
                     <div className="sidebar-footer">
-                        <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+                        <button className="logout-btn" onClick={() => setMostrarCerrarSesion(true)}>
                         <LogOut size={20} />
                         <span>Salir</span>
-                        </Link>
+                        </button>
                     </div>
                 </aside>
 
@@ -383,6 +387,16 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
+                />
+            )}
+
+            {mostrarCerrarSesion && (
+                <ModalCerrarSesion
+                    alCancelar={() => setMostrarCerrarSesion(false)}
+                    alAceptar={() => {
+                        localStorage.clear();
+                        navigate('/login');
+                    }}
                 />
             )}
         </div>

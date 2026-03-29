@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import "../css/Login.css";
 import { useNavigate } from "react-router-dom";
-
-
+import { Eye, EyeOff } from "lucide-react";
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const navigate = useNavigate();
   // esto es para la validacion de los campos
   const [touchedUser, setTouchedUser] = useState(false);
-const [touchedPassword, setTouchedPassword] = useState(false);
+  const [touchedPassword, setTouchedPassword] = useState(false);
   const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
   const submit = async (e) => {
@@ -89,16 +89,24 @@ const [touchedPassword, setTouchedPassword] = useState(false);
           </div>
           <div className="mb-3">
             <label className="form-label">Contraseña *</label>
-            <input
-                  type="password"
-                  className={`form-control ${
-                    !touchedPassword ? "" : PASSWORD_PATTERN.test(password) ? "valido" : "invalido"
-                  }`}
-                  placeholder="Contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onBlur={() => setTouchedPassword(true)}
-                            />
+            <div className="password-container">
+              <input
+                    type={mostrarPassword ? "text" : "password"}
+                    className={`form-control ${
+                      !touchedPassword ? "" : PASSWORD_PATTERN.test(password) ? "valido" : "invalido"
+                    }`}
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onBlur={() => setTouchedPassword(true)}
+              />
+              <div 
+                className="password-toggle-icon" 
+                onClick={() => setMostrarPassword(!mostrarPassword)}
+              >
+                {mostrarPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
+            </div>
           </div>
 
           <div className="forgot-password">
