@@ -1,0 +1,89 @@
+/* Contenedor principal */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* La Card del Modal (Específico para Éxito) */
+.modal-exito {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px; 
+  width: 400px; 
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+}
+
+/* Icono de Checkmark en círculo */
+.icon-container-exito {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.icon-bg-exito {
+  background-color: #6ee7b7; 
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-check {
+  color: #166534; 
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.modal-titulo-exito {
+  color: #0f172a;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.modal-mensaje-exito {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 35px;
+  max-width: 80%; 
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Botón "Aceptar"  */
+.acciones-exito {
+  display: flex;
+  width: 100%;
+}
+
+.btn-aceptar-exito {
+  flex: 1; 
+  background: #166534; 
+  border: none;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(22, 101, 52, 0.3); 
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-aceptar-exito:hover {
+  background: #15803d; 
+}
+
+.btn-aceptar-exito:active {
+  transform: translateY(1px); 
+}
