@@ -49,7 +49,7 @@ html, body {
 }
 
 .color-teal {
-  color: #0c9d72; /* Color verde agua como el icono */
+  color: #0c9d72; 
 }
 
 .tarjeta-datos {
@@ -60,7 +60,7 @@ html, body {
   width: 100%;
 }
 
-/* Personal info grid */
+
 .cuadricula-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -106,7 +106,7 @@ html, body {
   display: inline-block;
 }
 
-/* Table */
+/* Tabla */
 .tabla-historial {
   width: 100%;
   border-collapse: collapse;

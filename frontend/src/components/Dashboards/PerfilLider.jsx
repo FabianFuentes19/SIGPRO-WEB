@@ -7,13 +7,17 @@ import "./PerfilLider.css";
 const BASE_URL = "http://localhost:8080";
 
 const PerfilLider = () => {
+  //Estos son los estados 
   const [usuario, setUsuario] = useState(null);
   const [listaPagos, setListaPagos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
+  //Carga los datos al iniciar 
   useEffect(() => {
+    //Llama este componente cargarPerfil
     const cargarPerfil = async () => {
       try {
+        //Obtiene matricula y el Token
         const matricula = localStorage.getItem("matricula");
         const token = localStorage.getItem("token");
 
@@ -58,6 +62,7 @@ const PerfilLider = () => {
     cargarPerfil();
   }, []);
 
+  //Este lo puse para que convierta los numeros a un formato en este caso moneda MXN
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
@@ -65,6 +70,7 @@ const PerfilLider = () => {
     }).format(amount);
   };
 
+  //Este lo puse para que convierta fechas a un formato legible para los usuarios
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
     const [year, month, day] = dateStr.split('-');
@@ -72,6 +78,7 @@ const PerfilLider = () => {
     return `${day} ${months[parseInt(month) - 1]} ${year}`;
   };
 
+  //Para que se muestre que se esta cargando la infomacion
   if (cargando) {
       return (
           <div className="contenedor-perfil" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -80,6 +87,7 @@ const PerfilLider = () => {
       );
   }
 
+  //Si no hay un usuario muestra este mensaje
   if (!usuario) {
       return (
           <div className="contenedor-perfil" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

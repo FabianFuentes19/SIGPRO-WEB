@@ -390,6 +390,7 @@ const DashboardLider = () => {
                 />
             )}
 
+            {/* Este es el modal para cerrar sesión*/}
             {mostrarCerrarSesion && (
                 <ModalCerrarSesion
                     alCancelar={() => setMostrarCerrarSesion(false)}
