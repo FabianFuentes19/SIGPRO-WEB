@@ -6,6 +6,7 @@ import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
 import ModalEditarProyecto from '../components/ModalEditarProyecto';
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import { Eye, LogOut, Pencil } from 'lucide-react';
+import ModalMensajes from '../components/Usuarios/ModalMensajes'
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const DashProyectos = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mensajeModal, setModalMensajes] = useState(null);
 
   // Estado para guardar la lista de proyectos
   const [proyectos, setProyectos] = useState([]);
@@ -64,14 +66,24 @@ const DashProyectos = () => {
         body: JSON.stringify(nuevoProyecto),
       });
 
+      // Esto agrege para que se muestre el mensaje
       if (response.ok) {
         const data = await response.json();
         console.log("Proyecto registrado en backend:", data);
-        alert("Proyecto agregado correctamente");
-        fetchProjects(); // recargar lista
+        setModalMensajes({
+          titulo: "Registro Exitoso",
+          mensaje: "Proyecto agregado correctamente",
+          tipo: "registrar"
+        });
+        fetchProjects();
       } else {
-        alert("Error al agregar proyecto");
+        setModalMensajes({
+          titulo: "Error",
+          mensaje: "Error al agregar proyecto",
+          tipo: "error"
+        });
       }
+
     } catch (error) {
       console.error("Error:", error);
       alert("Error de conexión con el servidor");
@@ -91,12 +103,22 @@ const DashProyectos = () => {
         body: JSON.stringify(proyectoActualizado),
       });
 
+      //Agregue esto parea que se muestre el mensaje de actulización exitosa
       if (response.ok) {
-        alert("Proyecto actualizado correctamente");
+        setModalMensajes({
+          titulo: "Actualización Exitosa",
+          mensaje: "Proyecto actualizado correctamente",
+          tipo: "actualizar"
+        });
         fetchProjects();
       } else {
-        alert("Error al actualizar proyecto");
+        setModalMensajes({
+          titulo: "Error",
+          mensaje: "Error al actualizar proyecto",
+          tipo: "error"
+        });
       }
+
     } catch (error) {
       console.error("Error:", error);
       alert("Error de conexión con el servidor");
@@ -241,6 +263,17 @@ const DashProyectos = () => {
         <ModalCerrarSesion
           alCancelar={() => setMostrarModalCerrarSesion(false)}
           alAceptar={handleCerrarSesion}
+        />
+      )}
+
+
+        {mensajeModal && (
+        <ModalMensajes
+          titulo={mensajeModal.titulo}
+          mensaje={mensajeModal.mensaje}
+          tipo={mensajeModal.tipo}
+          onConfirm={() => setModalMensajes(null)}
+          onCancel={() => setModalMensajes(null)}
         />
       )}
     </div>
