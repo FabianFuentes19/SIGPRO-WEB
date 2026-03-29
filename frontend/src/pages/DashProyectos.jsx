@@ -155,13 +155,14 @@ const DashProyectos = () => {
                     <th>LÍDER</th>
                     <th>DESCRIPCIÓN</th>
                     <th>PRESUPUESTO</th>
+                    <th>ESTADO</th>
                     <th>ACCIONES</th>
                   </tr>
                 </thead>
                 <tbody>
                   {proyectos.length === 0 ? (
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
                         No hay proyectos registrados aún.
                       </td>
                     </tr>
@@ -179,6 +180,12 @@ const DashProyectos = () => {
                           <td>{p.liderNombre}</td>
                           <td>{p.descripcion}</td>
                           <td>{"$" + p.presupuesto}</td>
+                          <td>
+                            {/*Agrego esto para poner el estado del Proyecto*/}
+                            <span className={`badge ${p.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}`}>
+                              {p.estado === 'ACTIVO' ? 'ACTIVO' : 'INACTIVO'}
+                            </span>
+                          </td>
                           <td>
                             <div className="dropdown-container">
                               <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
