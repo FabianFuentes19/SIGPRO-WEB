@@ -1,6 +1,7 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.ProyectoDTO;
+import com.sigpro.dto.ProyectoRequestDTO;
+import com.sigpro.dto.ProyectoResponseDTO;
 import com.sigpro.dto.ProyectoMapper;
 import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.model.Proyecto;
@@ -10,6 +11,7 @@ import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
@@ -39,13 +41,13 @@ public class ProyectoService {
     @Autowired
     private UsuarioService usuarioService;
 
-    public List<ProyectoDTO> consultarTodos(Authentication auth){
+    public List<ProyectoResponseDTO> consultarTodos(Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
         return proyectoRepository.findAll().stream()
-                .map(ProyectoMapper::toDto).toList();
+                .map(ProyectoMapper::toResponseDto).toList();
     }
 
-    public List<ProyectoDTO> buscarPorNombre(String nombre, Authentication auth){
+    public List<ProyectoResponseDTO> buscarPorNombre(String nombre, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
         if(nombre == null || nombre.isBlank()){
             throw new IllegalArgumentException("El criterio de búsqueda no puede estar vacío");
@@ -56,11 +58,11 @@ public class ProyectoService {
             throw new IllegalArgumentException("No se encontraron resultados");
         }
 
-        return proyectos.stream().map(ProyectoMapper::toDto).toList();
+        return proyectos.stream().map(ProyectoMapper::toResponseDto).toList();
     }
 
     @Transactional
-    public ProyectoDTO crearProyecto(ProyectoDTO dto, Authentication auth){
+    public ProyectoResponseDTO crearProyecto(@Valid ProyectoRequestDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
         // validación de campos
@@ -97,18 +99,18 @@ public class ProyectoService {
         Proyecto proyecto = ProyectoMapper.toEntity(dto, lider);
         proyecto.setEstado(ESTADO_ACTIVO);
         Proyecto proyectoGuardado = proyectoRepository.save(proyecto);
-
+ 
         // inserción de líder en proyecto_usuario
         ProyectoUsuario pUsuario = new ProyectoUsuario();
         pUsuario.setProyecto(proyectoGuardado);
         pUsuario.setUsuario(lider);
         proyectoUsuarioRepository.save(pUsuario);
-
-        return ProyectoMapper.toDto(proyectoGuardado);
+ 
+        return ProyectoMapper.toResponseDto(proyectoGuardado);
     }
 
     @Transactional
-    public ProyectoDTO editarProyecto(Long id, ProyectoDTO dto, Authentication auth){
+    public ProyectoResponseDTO editarProyecto(Long id, @Valid ProyectoRequestDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
         Proyecto proyecto = proyectoRepository.findById(id)
@@ -120,10 +122,10 @@ public class ProyectoService {
         if (dto.getObjetivoGeneral() != null && !dto.getObjetivoGeneral().isBlank()) proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
         if (dto.getPresupuesto() != null && dto.getPresupuesto().compareTo(BigDecimal.ZERO) > 0) proyecto.setPresupuesto(dto.getPresupuesto());
 
-        return ProyectoMapper.toDto(proyectoRepository.save(proyecto));
+        return ProyectoMapper.toResponseDto(proyectoRepository.save(proyecto));
     }
 
-    public ProyectoDTO consultarProyectoLider(Authentication auth) {
+    public ProyectoResponseDTO consultarProyectoLider(Authentication auth) {
         validarRol(auth, "ROLE_LIDER");
 
         Usuario lider = usuarioRepository.findByMatricula((String) auth.getPrincipal())
@@ -132,10 +134,10 @@ public class ProyectoService {
         Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
         if (proyecto == null) throw new IllegalArgumentException("No tiene proyecto asignado");
 
-        return ProyectoMapper.toDto(proyecto);
+        return ProyectoMapper.toResponseDto(proyecto);
     }
 
-    public ProyectoDTO consultarProyectoMiembro(Authentication auth) {
+    public ProyectoResponseDTO consultarProyectoMiembro(Authentication auth) {
         validarRol(auth, "ROLE_MIEMBRO");
 
         Usuario usuario = usuarioRepository.findByMatricula((String) auth.getPrincipal())
@@ -144,7 +146,7 @@ public class ProyectoService {
         ProyectoUsuario pu = proyectoUsuarioRepository.findByUsuarioId(usuario.getId());
         if (pu == null) throw new IllegalArgumentException("No pertenece a ningún proyecto");
 
-        return ProyectoMapper.toDto(pu.getProyecto());
+        return ProyectoMapper.toResponseDto(pu.getProyecto());
     }
 
     @Transactional
@@ -172,7 +174,7 @@ public class ProyectoService {
     }
 
 
-    public ProyectoDTO obtenerDetalleProyecto(Long id, Authentication auth) {
+    public ProyectoResponseDTO obtenerDetalleProyecto(Long id, Authentication auth) {
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
         Proyecto proyecto = proyectoRepository.findById(id)

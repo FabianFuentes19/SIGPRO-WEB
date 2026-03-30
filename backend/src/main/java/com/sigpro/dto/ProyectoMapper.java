@@ -3,55 +3,57 @@ package com.sigpro.dto;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.Usuario;
 
+import java.util.List;
+
 public class ProyectoMapper {
 
-    // convierte un dto en una entidad para guardar en bd
-    public static Proyecto toEntity(ProyectoDTO dto, Usuario lider){
-        if(dto == null){
-            return null;
-        }
-
+    public static Proyecto toEntity(ProyectoRequestDTO dto, Usuario lider) {
+        if (dto == null) return null;
         Proyecto proyecto = new Proyecto();
         proyecto.setNombre(dto.getNombre());
         proyecto.setDescripcion(dto.getDescripcion());
         proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
-        proyecto.setLider(lider);
         proyecto.setPresupuesto(dto.getPresupuesto());
         proyecto.setFechaInicio(dto.getFechaInicio());
         proyecto.setFechaFin(dto.getFechaFin());
-        proyecto.setEstado(dto.getEstado());
-
+        proyecto.setLider(lider);
         return proyecto;
     }
 
-    // convierte una entidad en dto para que se pueda enviar al cliente
-    public static ProyectoDTO toDto(Proyecto proyecto){
-        if(proyecto == null){
-            return null;
+    public static ProyectoResponseDTO toResponseDto(Proyecto proyecto) {
+        if (proyecto == null) return null;
+        ProyectoResponseDTO response = new ProyectoResponseDTO();
+        response.setId(proyecto.getId());
+        response.setNombre(proyecto.getNombre());
+        response.setDescripcion(proyecto.getDescripcion());
+        response.setObjetivoGeneral(proyecto.getObjetivoGeneral());
+        response.setPresupuesto(proyecto.getPresupuesto());
+        response.setFechaInicio(proyecto.getFechaInicio());
+        response.setFechaFin(proyecto.getFechaFin());
+        response.setEstado(proyecto.getEstado());
+        if (proyecto.getLider() != null) {
+            response.setLiderId(proyecto.getLider().getId());
+            response.setLiderNombre(proyecto.getLider().getNombreCompleto());
+            response.setLiderMatricula(proyecto.getLider().getMatricula());
         }
-
-        ProyectoDTO dto = new ProyectoDTO();
-        dto.setId(proyecto.getId());
-        dto.setNombre(proyecto.getNombre());
-        dto.setDescripcion(proyecto.getDescripcion());
-        dto.setObjetivoGeneral(proyecto.getObjetivoGeneral());
-        dto.setLiderId(proyecto.getLider() != null ? proyecto.getLider().getId() : null);
-        dto.setLiderNombre(proyecto.getLider() != null ? proyecto.getLider().getNombreCompleto() : null);
-        dto.setPresupuesto(proyecto.getPresupuesto());
-        dto.setFechaInicio(proyecto.getFechaInicio());
-        dto.setFechaFin(proyecto.getFechaFin());
-        dto.setEstado(proyecto.getEstado()); // Usamos el campo normal
-
-        return dto;
+        return response;
     }
 
-    public static ProyectoDTO toDetailedDto(Proyecto proyecto, java.util.List<Usuario> miembros) {
-        ProyectoDTO dto = toDto(proyecto);
+    public static ProyectoResponseDTO toDetailedDto(Proyecto proyecto, List<Usuario> miembros) {
+        ProyectoResponseDTO response = toResponseDto(proyecto);
         if (miembros != null) {
-            dto.setMiembros(miembros.stream()
-                    .map(UsuarioMapper::toDto)
-                    .toList());
+            response.setMiembros(
+                    miembros.stream()
+                            .map(u -> {
+                                UsuarioDTO dto = new UsuarioDTO();
+                                dto.setId(u.getId());
+                                dto.setNombreCompleto(u.getNombreCompleto());
+                                dto.setMatricula(u.getMatricula());
+                                return dto;
+                            })
+                            .toList()
+            );
         }
-        return dto;
+        return response;
     }
 }

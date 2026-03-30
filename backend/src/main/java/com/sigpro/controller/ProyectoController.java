@@ -1,9 +1,11 @@
 package com.sigpro.controller;
 
-import com.sigpro.dto.ProyectoDTO;
+import com.sigpro.dto.ProyectoRequestDTO;
+import com.sigpro.dto.ProyectoResponseDTO;
 import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.service.ProyectoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class ProyectoController {
     @GetMapping
     public ResponseEntity<?> consultarTodos(Authentication auth) {
         try {
-            List<ProyectoDTO> proyectos = proyectoService.consultarTodos(auth);
+            List<ProyectoResponseDTO> proyectos = proyectoService.consultarTodos(auth);
             return ResponseEntity.ok(proyectos);
         } catch (SecurityException e) {
             Map<String, String> error = new HashMap<>();
@@ -41,7 +43,7 @@ public class ProyectoController {
     @GetMapping("/buscar")
     public ResponseEntity<?> buscarPorNombre(@RequestParam String nombre, Authentication auth) {
         try {
-            List<ProyectoDTO> proyectos = proyectoService.buscarPorNombre(nombre, auth);
+            List<ProyectoResponseDTO> proyectos = proyectoService.buscarPorNombre(nombre, auth);
             return ResponseEntity.ok(proyectos);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -59,9 +61,9 @@ public class ProyectoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crearProyecto(@RequestBody ProyectoDTO dto, Authentication auth) {
+    public ResponseEntity<?> crearProyecto(@Valid @RequestBody ProyectoRequestDTO dto, Authentication auth) {
         try {
-            ProyectoDTO nuevoProyecto = proyectoService.crearProyecto(dto, auth);
+            ProyectoResponseDTO nuevoProyecto = proyectoService.crearProyecto(dto, auth);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProyecto);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -79,9 +81,9 @@ public class ProyectoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editarProyecto(@PathVariable Long id, @RequestBody ProyectoDTO dto, Authentication auth) {
+    public ResponseEntity<?> editarProyecto(@PathVariable Long id, @Valid @RequestBody ProyectoRequestDTO dto, Authentication auth) {
         try {
-            ProyectoDTO proyectoActualizado = proyectoService.editarProyecto(id, dto, auth);
+            ProyectoResponseDTO proyectoActualizado = proyectoService.editarProyecto(id, dto, auth);
             return ResponseEntity.ok(proyectoActualizado);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -101,7 +103,7 @@ public class ProyectoController {
     @GetMapping("/mi-proyecto/lider")
     public ResponseEntity<?> consultarProyectoLider(Authentication auth) {
         try {
-            ProyectoDTO proyecto = proyectoService.consultarProyectoLider(auth);
+            ProyectoResponseDTO proyecto = proyectoService.consultarProyectoLider(auth);
             return ResponseEntity.ok(proyecto);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -121,7 +123,7 @@ public class ProyectoController {
     @GetMapping("/mi-proyecto/miembro")
     public ResponseEntity<?> consultarProyectoMiembro(Authentication auth) {
         try {
-            ProyectoDTO proyecto = proyectoService.consultarProyectoMiembro(auth);
+            ProyectoResponseDTO proyecto = proyectoService.consultarProyectoMiembro(auth);
             return ResponseEntity.ok(proyecto);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -142,7 +144,7 @@ public class ProyectoController {
     @GetMapping("/{id}")
     public ResponseEntity<?> consultarDetalle(@PathVariable Long id, Authentication auth) {
         try {
-            ProyectoDTO proyecto = proyectoService.obtenerDetalleProyecto(id, auth);
+            ProyectoResponseDTO proyecto = proyectoService.obtenerDetalleProyecto(id, auth);
             return ResponseEntity.ok(proyecto);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();

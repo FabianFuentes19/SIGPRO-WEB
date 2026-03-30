@@ -4,9 +4,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
-public class ProyectoDTO {
+public class ProyectoResponseDTO {
     private Long id;
     private String nombre;
     private String descripcion;
@@ -18,5 +19,5 @@ public class ProyectoDTO {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String estado;
-    private java.util.List<UsuarioDTO> miembros;
+    private List<UsuarioDTO> miembros;
 }
