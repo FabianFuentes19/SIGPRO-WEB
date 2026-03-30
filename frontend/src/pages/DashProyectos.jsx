@@ -62,6 +62,8 @@ const DashProyectos = () => {
         alert("Proyecto agregado correctamente");
         fetchProjects(); // recargar lista
       } else {
+        const errorData = await response.json();
+      console.error("Error al agregar proyecto:", errorData);
         alert("Error al agregar proyecto");
       }
     } catch (error) {

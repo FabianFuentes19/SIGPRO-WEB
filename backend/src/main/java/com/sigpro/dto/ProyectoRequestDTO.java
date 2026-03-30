@@ -1,9 +1,6 @@
 package com.sigpro.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,9 +12,11 @@ public class ProyectoRequestDTO {
     @Size(max = 150)
     private String nombre;
 
+    @NotBlank(message = "La descripción del proyecto es obligatoria")
     @Size(max = 1000)
     private String descripcion;
 
+    @NotBlank(message = "El objetivo general del proyecto es obligatoria")
     @Size(max = 1000)
     private String objetivoGeneral;
 
@@ -25,10 +24,12 @@ public class ProyectoRequestDTO {
     @Positive(message = "El presupuesto debe ser mayor a cero")
     private BigDecimal presupuesto;
 
-    @NotNull(message = "La fecha de inicio es obligaqtoria")
+    @NotNull(message = "La fecha de inicio es obligatoria")
+    @FutureOrPresent(message = "La fecha de inicio no puede ser anterior a la fecha actual")
     private LocalDate fechaInicio;
 
-    @NotNull(message = "La fecha fin es obligatoria")
+    @NotNull(message = "La fecha de fin es obligatoria")
+    @Future(message = "La fecha de fin debe ser posterior a la fecha actual")
     private LocalDate fechaFin;
 
     private String liderMatricula;

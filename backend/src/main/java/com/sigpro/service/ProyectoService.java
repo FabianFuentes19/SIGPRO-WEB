@@ -65,16 +65,6 @@ public class ProyectoService {
     public ProyectoResponseDTO crearProyecto(@Valid ProyectoRequestDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
 
-        // validación de campos
-        if (dto.getNombre() == null || dto.getNombre().isBlank() ||
-                dto.getDescripcion() == null || dto.getDescripcion().isBlank() ||
-                dto.getObjetivoGeneral() == null || dto.getObjetivoGeneral().isBlank() ||
-                dto.getPresupuesto() == null || dto.getPresupuesto().compareTo(BigDecimal.ZERO) <= 0 ||
-                dto.getFechaInicio() == null || dto.getFechaFin() == null ||
-                dto.getFechaInicio().isAfter(dto.getFechaFin())) {
-            throw new IllegalArgumentException("Campos obligatorios inválidos o reglas de negocio incumplidas");
-        }
-
         Usuario lider;
         if (dto.getLiderMatricula() != null && !dto.getLiderMatricula().isBlank()) {
             lider = usuarioRepository.findByMatricula(dto.getLiderMatricula().trim())
@@ -117,10 +107,18 @@ public class ProyectoService {
         .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
 
         // solo se pueden editar nombre, descripción, objetivo general y presupuesto
-        if (dto.getNombre() != null && !dto.getNombre().isBlank()) proyecto.setNombre(dto.getNombre());
-        if (dto.getDescripcion() != null && !dto.getDescripcion().isBlank()) proyecto.setDescripcion(dto.getDescripcion());
-        if (dto.getObjetivoGeneral() != null && !dto.getObjetivoGeneral().isBlank()) proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
-        if (dto.getPresupuesto() != null && dto.getPresupuesto().compareTo(BigDecimal.ZERO) > 0) proyecto.setPresupuesto(dto.getPresupuesto());
+        if (dto.getNombre() != null) {
+            proyecto.setNombre(dto.getNombre());
+        }
+        if (dto.getDescripcion() != null) {
+            proyecto.setDescripcion(dto.getDescripcion());
+        }
+        if (dto.getObjetivoGeneral() != null) {
+            proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
+        }
+        if (dto.getPresupuesto() != null) {
+            proyecto.setPresupuesto(dto.getPresupuesto());
+        }
 
         return ProyectoMapper.toResponseDto(proyectoRepository.save(proyecto));
     }
