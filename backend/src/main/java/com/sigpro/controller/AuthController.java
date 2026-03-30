@@ -1,9 +1,12 @@
 package com.sigpro.controller;
 
+import com.sigpro.dto.AuthResponseDTO;
+import com.sigpro.dto.LoginRequestDTO;
 import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.model.Usuario;
 import com.sigpro.security.JwtUtil;
 import com.sigpro.service.AuthService;
+import jakarta.validation.Valid;
 import com.sigpro.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,21 +37,18 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
         try {
-            UsuarioDTO usuario = authService.validarLogin(
-                    credenciales.get("matricula"),
-                    credenciales.get("contrasena")
-            );
+            AuthResponseDTO response = authService.validarLogin(request);
 
-            String token = jwtUtil.generateToken(usuario);
+            UsuarioDTO usuarioDto = new UsuarioDTO();
+            usuarioDto.setMatricula(response.getMatricula());
+            usuarioDto.setRolNombre(response.getRol());
 
-            Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("token", token);
-            respuesta.put("rol", usuario.getRolNombre());
-            respuesta.put("matricula", usuario.getMatricula());
+            String token = jwtUtil.generateToken(usuarioDto);
+            response.setToken(token);
 
-            return ResponseEntity.ok(respuesta);
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();

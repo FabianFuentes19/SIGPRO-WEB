@@ -1,7 +1,7 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.UsuarioDTO;
-import com.sigpro.dto.UsuarioMapper;
+import com.sigpro.dto.AuthResponseDTO;
+import com.sigpro.dto.LoginRequestDTO;
 import com.sigpro.dto.UsuarioDTO;
 import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.PasswordResetToken;
@@ -31,7 +31,10 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public UsuarioDTO validarLogin(String matricula, String contrasena) throws Exception {
+    public AuthResponseDTO validarLogin(LoginRequestDTO dto) throws Exception {
+        String matricula = dto.getMatricula();
+        String contrasena = dto.getContrasena();
+
         System.out.println("[AuthService] Validando login para matricula: " + matricula);
 
         // Verificación de campos vacíos
@@ -56,8 +59,15 @@ public class AuthService {
 
         System.out.println("Login exitoso para: " + matricula);
 
-        // Retornar a través del Mapper por seguridad (la contraseña no se expone)
-        return UsuarioMapper.toDto(usuario);
+        // Retornar a través del Mapper para obtener datos limpios y el token generado
+        // Nota: En una arquitectura más avanzada, el token se generaría aquí o en el controller.
+        // Mantenemos la lógica de generación compatible con lo que ya tenías.
+        return new AuthResponseDTO(
+                null, // El token lo asignará el Controller o se puede inyectar JwtUtil aquí
+                usuario.getRol() != null ? usuario.getRol().getNombre() : null,
+                usuario.getMatricula(),
+                usuario.getNombreCompleto()
+        );
     }
 
     // @Transactional asegura que si ocurre un error la inserción en BD se deshaga.
