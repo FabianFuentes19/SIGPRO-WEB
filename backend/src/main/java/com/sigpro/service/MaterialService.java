@@ -65,6 +65,9 @@ public class MaterialService {
         material.setCostoTotal(costoTotal);
 
         Material guardado = materialRepository.save(material);
+
+        proyecto.setPresupuesto(proyecto.getPresupuesto().subtract(costoTotal));
+        proyectoRepository.save(proyecto);
         return MaterialMapper.toResponseDto(guardado);
     }
 
