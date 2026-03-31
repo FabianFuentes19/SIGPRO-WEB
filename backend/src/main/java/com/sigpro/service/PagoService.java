@@ -142,7 +142,7 @@ public class PagoService {
 
         LocalDate fechaIngreso = usuario.getFechaIngreso();
         if (fechaIngreso == null) {
-            fechaIngreso = LocalDate.now(); // si no hay fecha, asumimos hoy
+            fechaIngreso = LocalDate.now();
         }
 
         LocalDate inicio = fechaIngreso;
@@ -150,14 +150,15 @@ public class PagoService {
         int contador = 1;
 
         while (!inicio.isAfter(hoy)) {
+            //calcula fin de quincena
             LocalDate fin = (inicio.getDayOfMonth() <= 15)
                     ? inicio.withDayOfMonth(15)
                     : inicio.withDayOfMonth(inicio.lengthOfMonth());
 
             BigDecimal montoQuincenal = usuario.getSalarioQuincenal();
-            if (vouchers.isEmpty()) { // Es el primer voucher del historial
+            if (vouchers.isEmpty()) {
                 long diasTrabajados = ChronoUnit.DAYS.between(inicio, fin) + 1;
-                // Si la quincena es parcial (menos de 15 días trabajados), se paga el proporcional
+                // calculo de pago proporcional
                 if (diasTrabajados < 15) {
                     montoQuincenal = montoQuincenal.multiply(BigDecimal.valueOf(diasTrabajados))
                             .divide(BigDecimal.valueOf(15), 2, RoundingMode.HALF_UP);
@@ -179,7 +180,7 @@ public class PagoService {
                     .findFirst();
 
             if (!hoy.isBefore(fin)) {
-                // Quincena ya terminó o es hoy
+                // valida si la quincena ya finalizo
                 if (pagoMatch.isPresent()) {
                     Pago p = pagoMatch.get();
                     v.setEstado("PAGADO");
@@ -190,13 +191,15 @@ public class PagoService {
                     v.setEstado("PENDIENTE");
                 }
             } else {
-                // Quincena en curso
+                // Qquincena en curso
                 v.setEstado("PROGRAMADO");
-                // 👇 aquí puedes decidir qué fecha mostrar
-                v.setFechaPagoReal(null); // aún no hay pago
+                v.setFechaPagoReal(null);
             }
 
-            vouchers.add(v);
+            // no se agregan las quincenas en curso
+            if (!"PROGRAMADO".equals(v.getEstado())) {
+                vouchers.add(v);
+            }
             inicio = fin.plusDays(1);
         }
 

@@ -97,6 +97,10 @@
   background-color: #e7f5ff;
   color: #228be6;
 }
+.status-badge.programado {
+  background-color: #f0f0f0;
+  color: #6c757d;
+}
 
 .date-info {
   display: flex;

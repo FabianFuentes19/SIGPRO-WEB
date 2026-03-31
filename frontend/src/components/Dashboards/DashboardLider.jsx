@@ -30,7 +30,12 @@ const BASE_URL = "http://localhost:8080";
 
 const DashboardLider = () => {
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [vistaActual, setVistaActual] = useState('proyecto');
+    const [vistaActual, setVistaActual] = useState(localStorage.getItem("dashLiderVista") || 'proyecto');
+
+    const cambiarVista = (nuevaVista) => {
+        setVistaActual(nuevaVista);
+        localStorage.setItem("dashLiderVista", nuevaVista);
+    };
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
@@ -236,21 +241,21 @@ const DashboardLider = () => {
                     <nav className="sidebar-nav">
                         <div
                             className={`nav-item ${vistaActual === 'proyecto' ? 'active' : ''}`}
-                            onClick={() => setVistaActual('proyecto')}
+                            onClick={() => cambiarVista('proyecto')}
                         >
                             <LayoutDashboard size={20} />
                             <span>Proyecto</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'materiales' ? 'active' : ''}`}
-                            onClick={() => setVistaActual('materiales')}
+                            onClick={() => cambiarVista('materiales')}
                         >
                             <Box size={20} />
                             <span>Materiales</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'nominas' ? 'active' : ''}`}
-                            onClick={() => setVistaActual('nominas')}
+                            onClick={() => cambiarVista('nominas')}
                         >
                             <Wallet size={20} />
                             <span>Nóminas</span>
@@ -378,7 +383,7 @@ const DashboardLider = () => {
                     )}
 
                     {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
-                    {vistaActual === 'nominas' && <Nominas />}
+                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={cargarProyecto} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 
                 </main>

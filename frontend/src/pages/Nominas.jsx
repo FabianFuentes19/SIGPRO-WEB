@@ -5,7 +5,7 @@ import { Search, ChevronDown, Loader2 } from 'lucide-react';
 
 const BASE_URL = "http://localhost:8080";
 
-const Nominas = () => {
+const Nominas = ({ onPaymentSuccess }) => {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("Todos");
   const [nominas, setNominas] = useState([]);
@@ -42,7 +42,6 @@ const Nominas = () => {
 
   const obtenerVouchersDeMiembro = async (token, miembro) => {
     try {
-      // Agregamos un timestamp para evitar el caché del navegador y asegurar datos frescos
       const resp = await fetch(`${BASE_URL}/pagos/vouchers/${miembro.matricula}?t=${Date.now()}`, {
         headers: {
           "Authorization": `Bearer ${token}`
@@ -55,12 +54,12 @@ const Nominas = () => {
         return vouchersList.map(v => ({
           id: `${miembro.matricula}-${v.numeroQuincena}`,
           nombre: miembro.nombreCompleto,
-          puesto: miembro.rolNombre || miembro.puesto || "Miembro",
+          puesto: miembro.puesto,
           matricula: miembro.matricula,
           voucher: v.pagoId || `${v.numeroQuincena}`,
           monto: v.montoEsperado,
           estado: v.estado,
-          fecha: v.fechaFin,
+          fecha: v.estado === "PAGADO" ? v.fechaPagoReal : v.fechaFin,
           numeroQuincena: v.numeroQuincena
         }));
       }
@@ -142,6 +141,10 @@ const Nominas = () => {
       if (response.ok) {
         alert("¡Pago registrado con éxito!");
         await cargarTodo();
+        // Avisar al dashboard para que actualice el presupuesto del proyecto
+        if (typeof onPaymentSuccess === 'function') {
+          onPaymentSuccess();
+        }
       } else {
         const errorData = await response.json();
         alert(`Error al registrar pago: ${errorData.error || "Ocurrió un problema"}`);

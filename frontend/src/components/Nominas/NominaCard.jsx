@@ -49,7 +49,7 @@ const NominaCard = ({ nomina, onPay }) => {
             <span>Pagado con éxito</span>
           </button>
         ) : (
-          <button className="btn-pay-nomina" onClick={onPay}>
+          <button className="btn-pay-nomina" onClick={onPay} disabled={nomina.estado !== "PENDIENTE"}>
             <Banknote size={18} />
             <span>Pagar Nómina</span>
           </button>
