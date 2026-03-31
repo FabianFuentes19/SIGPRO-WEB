@@ -1,5 +1,6 @@
 package com.sigpro.service;
 
+import com.sigpro.dto.UsuarioRequestDTO;
 import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
@@ -75,7 +76,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("CP-US-001: Registro exitoso")
     void cpUs001_registroExitoso() {
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password123!");
         dto.setNombreCompleto("Juan Perez");
@@ -112,7 +113,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("CP-US-003: Registro rechazado — Campos faltantes")
     void cpUs003_registroCamposFaltantes() {
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023002");
         dto.setNombreCompleto(null);
 
@@ -127,7 +128,7 @@ class UsuarioServiceTest {
         existente.setMatricula("2023001");
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -145,7 +146,7 @@ class UsuarioServiceTest {
     void cpUs005_registroContrasenaDebil() {
         when(usuarioRepository.findByMatricula("2023002")).thenReturn(Optional.empty());
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023002");
         dto.setContrasena("123!");
         dto.setNombreCompleto("paco el chato ");
@@ -164,7 +165,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.empty());
         when(rolRepository.findById(99L)).thenReturn(Optional.empty());
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -185,7 +186,7 @@ class UsuarioServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn(HASHED);
         when(usuarioRepository.save(any(Usuario.class))).thenThrow(new RuntimeException("ORA-00001"));
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023002");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -366,7 +367,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioResponseDTO cambios = new UsuarioResponseDTO();
+        UsuarioRequestDTO cambios = new UsuarioRequestDTO();
         cambios.setNombreCompleto("Juan Perez Modificado");
         cambios.setGrupo("B");
 
@@ -397,7 +398,7 @@ class UsuarioServiceTest {
     void cpMd003_modificarNoExiste() {
         when(usuarioRepository.findByMatricula("999")).thenReturn(Optional.empty());
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setNombreCompleto("X");
 
         IllegalArgumentException ex = assertThrows(
@@ -427,7 +428,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioResponseDTO cambios = new UsuarioResponseDTO();
+        UsuarioRequestDTO cambios = new UsuarioRequestDTO();
         cambios.setNombreCompleto("Juan Perez Nuevo");
         cambios.setCarrera("ITI");
 
@@ -454,7 +455,7 @@ class UsuarioServiceTest {
             return u;
         });
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("Estudiante");
@@ -473,7 +474,7 @@ class UsuarioServiceTest {
     void registrarUsuarioConRol_rolNoEncontrado() {
         when(rolRepository.findByNombreIgnoreCase("INEXISTENTE")).thenReturn(Optional.empty());
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("X");

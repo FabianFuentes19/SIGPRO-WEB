@@ -22,9 +22,9 @@ public class PagoController {
     private PagoService pagoService;
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarPago(@RequestBody PagoRequestDTO dto) {
+    public ResponseEntity<?> registrarPago(@RequestBody PagoRequestDTO dto, Authentication auth) {
         try {
-            PagoResponseDTO pago = pagoService.registrarPago(dto);
+            PagoResponseDTO pago = pagoService.registrarPago(dto, auth);
             return ResponseEntity.ok(pago);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));

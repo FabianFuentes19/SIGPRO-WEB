@@ -18,7 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +42,9 @@ public class PagoService {
     private ProyectoUsuarioRepository proyectoUsuarioRepository;
 
     @Transactional
-    public PagoResponseDTO registrarPago(@Valid PagoRequestDTO dto) {
+    public PagoResponseDTO registrarPago(@Valid PagoRequestDTO dto, Authentication auth) {
+        validarRol(auth,"ROLE_LIDER");
+
         Usuario usuario = usuarioRepository.findByMatricula(dto.getMatriculaUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
@@ -51,6 +55,16 @@ public class PagoService {
             throw new IllegalArgumentException("El monto debe ser mayor a cero");
         }
 
+        //valida si hay presupuesto disponible
+        if(proyecto.getPresupuesto() == null){
+            throw new IllegalArgumentException("El proyecto no tiene presupuesto disponible");
+        }
+
+        //valida si el monto no excede del presupuesto
+        if(proyecto.getPresupuesto().compareTo(dto.getMonto()) < 0){
+            throw new IllegalArgumentException("El monto excede del presupuesto disponible");
+        }
+
         Pago pago = new Pago();
         pago.setUsuario(usuario);
         pago.setProyecto(proyecto);
@@ -58,6 +72,10 @@ public class PagoService {
         pago.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDate.now());
 
         Pago guardado = pagoRepository.save(pago);
+
+        //actualiza presupuesto del proyecto
+        proyecto.setPresupuesto(proyecto.getPresupuesto().subtract(dto.getMonto()));
+        proyectoRepository.save(proyecto);
 
         return PagoMapper.toResponseDto(guardado);
     }
@@ -116,38 +134,42 @@ public class PagoService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         if (!"ACTIVO".equalsIgnoreCase(usuario.getEstado())) {
-            throw new IllegalArgumentException ("Cuenta inactiva");
+            throw new IllegalArgumentException("Cuenta inactiva");
         }
 
         List<Pago> pagos = pagoRepository.findByUsuarioMatricula(matricula);
         List<VoucherDTO> vouchers = new ArrayList<>();
 
         LocalDate fechaIngreso = usuario.getFechaIngreso();
-        if (fechaIngreso == null) fechaIngreso = LocalDate.now().minusMonths(1);
-        
-        LocalDate inicio;
-        if (fechaIngreso.getDayOfMonth() <= 15) {
-            inicio = fechaIngreso.withDayOfMonth(1);
-        } else {
-            inicio = fechaIngreso.withDayOfMonth(16);
+        if (fechaIngreso == null) {
+            fechaIngreso = LocalDate.now(); // si no hay fecha, asumimos hoy
         }
 
+        LocalDate inicio = fechaIngreso;
         LocalDate hoy = LocalDate.now();
         int contador = 1;
 
         while (!inicio.isAfter(hoy)) {
-            LocalDate fin;
-            if (inicio.getDayOfMonth() == 1) {
-                fin = inicio.withDayOfMonth(15);
-            } else {
-                fin = inicio.withDayOfMonth(inicio.lengthOfMonth());
+            LocalDate fin = (inicio.getDayOfMonth() <= 15)
+                    ? inicio.withDayOfMonth(15)
+                    : inicio.withDayOfMonth(inicio.lengthOfMonth());
+
+            BigDecimal montoQuincenal = usuario.getSalarioQuincenal();
+            if (vouchers.isEmpty()) { // Es el primer voucher del historial
+                long diasTrabajados = ChronoUnit.DAYS.between(inicio, fin) + 1;
+                // Si la quincena es parcial (menos de 15 días trabajados), se paga el proporcional
+                if (diasTrabajados < 15) {
+                    montoQuincenal = montoQuincenal.multiply(BigDecimal.valueOf(diasTrabajados))
+                            .divide(BigDecimal.valueOf(15), 2, RoundingMode.HALF_UP);
+                }
             }
 
             VoucherDTO v = new VoucherDTO();
             v.setNumeroQuincena(contador++);
             v.setFechaInicio(inicio);
             v.setFechaFin(fin);
-            v.setMontoEsperado(usuario.getSalarioQuincenal());
+            v.setMontoEsperado(montoQuincenal);
+            v.setPuesto(usuario.getPuesto());
 
             final LocalDate pInicio = inicio;
             final LocalDate pFin = fin;
@@ -156,14 +178,22 @@ public class PagoService {
                     .filter(p -> !p.getFecha().isBefore(pInicio) && !p.getFecha().isAfter(pFin))
                     .findFirst();
 
-            if (pagoMatch.isPresent()) {
-                Pago p = pagoMatch.get();
-                v.setEstado("PAGADO");
-                v.setPagoId(p.getId());
-                v.setFechaPagoReal(p.getFecha());
-                v.setMontoPagado(p.getMonto());
+            if (!hoy.isBefore(fin)) {
+                // Quincena ya terminó o es hoy
+                if (pagoMatch.isPresent()) {
+                    Pago p = pagoMatch.get();
+                    v.setEstado("PAGADO");
+                    v.setPagoId(p.getId());
+                    v.setFechaPagoReal(p.getFecha());
+                    v.setMontoPagado(p.getMonto());
+                } else {
+                    v.setEstado("PENDIENTE");
+                }
             } else {
-                v.setEstado("PENDIENTE");
+                // Quincena en curso
+                v.setEstado("PROGRAMADO");
+                // 👇 aquí puedes decidir qué fecha mostrar
+                v.setFechaPagoReal(null); // aún no hay pago
             }
 
             vouchers.add(v);

@@ -14,4 +14,5 @@ public class VoucherDTO {
     private Long pagoId;
     private LocalDate fechaPagoReal;
     private BigDecimal montoPagado;
+    private String puesto;
 }
