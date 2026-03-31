@@ -4,7 +4,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class UsuarioDTO {
+public class UsuarioResponseDTO {
     private Long id;
     private String nombreCompleto;
     private String contrasena;

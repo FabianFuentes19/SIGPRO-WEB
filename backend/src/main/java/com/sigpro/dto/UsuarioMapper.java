@@ -5,7 +5,7 @@ import com.sigpro.model.Usuario;
 
 public class UsuarioMapper {
 
-    public static Usuario toEntity(UsuarioDTO dto, Rol rol) {
+    public static Usuario toEntity(UsuarioRequestDTO dto, Rol rol) {
         if (dto == null) {
             return null;
         }
@@ -19,18 +19,17 @@ public class UsuarioMapper {
         usuario.setCuatrimestre(dto.getCuatrimestre());
         usuario.setPuesto(dto.getPuesto());
         usuario.setSalarioQuincenal(dto.getSalarioQuincenal());
-        usuario.setEstado(dto.getEstado());
         usuario.setRol(rol);
 
         return usuario;
     }
 
-    public static UsuarioDTO toDto(Usuario usuario) {
+    public static UsuarioResponseDTO toResponseDto(Usuario usuario) {
         if (usuario == null) {
             return null;
         }
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setId(usuario.getId());
         dto.setNombreCompleto(usuario.getNombreCompleto());
         dto.setGrupo(usuario.getGrupo());

@@ -2,11 +2,13 @@ package com.sigpro.controller;
 
 import com.sigpro.dto.AuthResponseDTO;
 import com.sigpro.dto.LoginRequestDTO;
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioRequestDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.model.Usuario;
 import com.sigpro.security.JwtUtil;
 import com.sigpro.service.AuthService;
 import jakarta.validation.Valid;
+import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,11 +43,11 @@ public class AuthController {
         try {
             AuthResponseDTO response = authService.validarLogin(request);
 
-            UsuarioDTO usuarioDto = new UsuarioDTO();
-            usuarioDto.setMatricula(response.getMatricula());
-            usuarioDto.setRolNombre(response.getRol());
+            UsuarioResponseDTO usuarioResponseDto = new UsuarioResponseDTO();
+            usuarioResponseDto.setMatricula(response.getMatricula());
+            usuarioResponseDto.setRolNombre(response.getRol());
 
-            String token = jwtUtil.generateToken(usuarioDto);
+            String token = jwtUtil.generateToken(usuarioResponseDto);
             response.setToken(token);
 
             return ResponseEntity.ok(response);
@@ -58,23 +60,23 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UsuarioDTO dto) {
+    public ResponseEntity<?> register(@Valid @RequestBody UsuarioRequestDTO dto) {
         return registrar(dto, null);
     }
 
     /** Registro de Líder: se ignora el rol del cliente y se fuerza ROL_ID_FK = 2 (Líder). */
     @PostMapping("/register/lider")
-    public ResponseEntity<?> registerLider(@RequestBody UsuarioDTO dto) {
+    public ResponseEntity<?> registerLider(@Valid @RequestBody UsuarioRequestDTO dto) {
         return registrar(dto, 2L);
     }
 
     /** Registro de Miembro: se ignora el rol del cliente y se fuerza ROL_ID_FK = 3 (Miembro). */
     @PostMapping("/register/miembro")
-    public ResponseEntity<?> registerMiembro(@RequestBody UsuarioDTO dto) {
+    public ResponseEntity<?> registerMiembro(@Valid @RequestBody UsuarioRequestDTO dto) {
         return registrar(dto, 3L);
     }
 
-    private ResponseEntity<?> registrar(UsuarioDTO dto, Long rolIdForzado) {
+    private ResponseEntity<?> registrar(@Valid UsuarioRequestDTO dto, Long rolIdForzado) {
         try {
             if (rolIdForzado != null) {
                 dto.setRolId(rolIdForzado);

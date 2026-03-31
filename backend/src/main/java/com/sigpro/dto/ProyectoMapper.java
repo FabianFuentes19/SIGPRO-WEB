@@ -45,13 +45,13 @@ public class ProyectoMapper {
             response.setMiembros(
                     miembros.stream()
                             .map(u -> {
-                                UsuarioDTO dto = new UsuarioDTO();
+                                UsuarioResponseDTO dto = new UsuarioResponseDTO();
                                 dto.setId(u.getId());
                                 dto.setNombreCompleto(u.getNombreCompleto());
                                 dto.setMatricula(u.getMatricula());
                                 return dto;
                             })
-                            .toList()
+                            .collect(java.util.stream.Collectors.toList())
             );
         }
         return response;

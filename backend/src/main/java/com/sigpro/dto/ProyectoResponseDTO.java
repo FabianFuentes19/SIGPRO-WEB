@@ -19,5 +19,5 @@ public class ProyectoResponseDTO {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String estado;
-    private List<UsuarioDTO> miembros;
+    private List<UsuarioResponseDTO> miembros;
 }

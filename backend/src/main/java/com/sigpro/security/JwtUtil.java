@@ -1,6 +1,6 @@
 package com.sigpro.security;
 
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -24,7 +24,7 @@ public class JwtUtil {
     }
 
     // genera el token, el cual incluye rol y nombre
-    public String generateToken(UsuarioDTO usuario) {
+    public String generateToken(UsuarioResponseDTO usuario) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", "ROLE_" + usuario.getRolNombre().toUpperCase());
         claims.put("nombre", usuario.getNombreCompleto());

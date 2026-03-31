@@ -1,6 +1,6 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.model.Rol;
@@ -75,7 +75,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("CP-US-001: Registro exitoso")
     void cpUs001_registroExitoso() {
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password123!");
         dto.setNombreCompleto("Juan Perez");
@@ -112,7 +112,7 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("CP-US-003: Registro rechazado — Campos faltantes")
     void cpUs003_registroCamposFaltantes() {
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023002");
         dto.setNombreCompleto(null);
 
@@ -127,7 +127,7 @@ class UsuarioServiceTest {
         existente.setMatricula("2023001");
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -145,7 +145,7 @@ class UsuarioServiceTest {
     void cpUs005_registroContrasenaDebil() {
         when(usuarioRepository.findByMatricula("2023002")).thenReturn(Optional.empty());
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023002");
         dto.setContrasena("123!");
         dto.setNombreCompleto("paco el chato ");
@@ -164,7 +164,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.empty());
         when(rolRepository.findById(99L)).thenReturn(Optional.empty());
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -185,7 +185,7 @@ class UsuarioServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn(HASHED);
         when(usuarioRepository.save(any(Usuario.class))).thenThrow(new RuntimeException("ORA-00001"));
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023002");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("José Juan ");
@@ -215,7 +215,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(usuario));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioDTO dto = usuarioService.bajaLogica("2023001");
+        UsuarioResponseDTO dto = usuarioService.bajaLogica("2023001");
 
         assertEquals("INACTIVO", dto.getEstado());
         verify(usuarioRepository).save(any(Usuario.class));
@@ -258,10 +258,10 @@ class UsuarioServiceTest {
         });
         when(usuarioRepository.findAll()).thenReturn(lista);
 
-        List<UsuarioDTO> resultado = usuarioService.listarUsuarios();
+        List<UsuarioResponseDTO> resultado = usuarioService.listarUsuarios();
 
         assertEquals(23, resultado.size());
-        assertTrue(resultado.stream().allMatch(d -> d instanceof UsuarioDTO));
+        assertTrue(resultado.stream().allMatch(d -> d instanceof UsuarioResponseDTO));
     }
 
     @Test
@@ -269,7 +269,7 @@ class UsuarioServiceTest {
     void cpLs002_listarTodosVacio() {
         when(usuarioRepository.findAll()).thenReturn(List.of());
 
-        List<UsuarioDTO> resultado = usuarioService.listarUsuarios();
+        List<UsuarioResponseDTO> resultado = usuarioService.listarUsuarios();
 
         assertTrue(resultado.isEmpty());
     }
@@ -281,7 +281,7 @@ class UsuarioServiceTest {
         Usuario u2 = usuarioConRol(2L, "A2", "LIDER");
         when(usuarioRepository.findByRolNombre("LIDER")).thenReturn(List.of(u1, u2));
 
-        List<UsuarioDTO> resultado = usuarioService.obtenerUsuariosPorRol("LIDER");
+        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("LIDER");
 
         assertEquals(2, resultado.size());
         assertTrue(resultado.stream().allMatch(d -> "LIDER".equals(d.getRolNombre())));
@@ -292,7 +292,7 @@ class UsuarioServiceTest {
     void cpRl002_listarPorRolSinDatos() {
         when(usuarioRepository.findByRolNombre("MIEMBRO")).thenReturn(List.of());
 
-        List<UsuarioDTO> resultado = usuarioService.obtenerUsuariosPorRol("MIEMBRO");
+        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("MIEMBRO");
 
         assertTrue(resultado.isEmpty());
     }
@@ -302,7 +302,7 @@ class UsuarioServiceTest {
     @ValueSource(strings = {"   ", "\t"})
     @DisplayName("CP-RL-003: Listar por rol — inválido (null o en blanco)")
     void cpRl003_listarPorRolInvalido(String rolNombre) {
-        List<UsuarioDTO> resultado = usuarioService.obtenerUsuariosPorRol(rolNombre);
+        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol(rolNombre);
 
         assertTrue(resultado.isEmpty());
         verify(usuarioRepository, never()).findByRolNombre(any());
@@ -315,7 +315,7 @@ class UsuarioServiceTest {
         usuario.setNombreCompleto("Juan Perez");
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(usuario));
 
-        UsuarioDTO dto = usuarioService.obtenerDetallePorMatricula("2023001");
+        UsuarioResponseDTO dto = usuarioService.obtenerDetallePorMatricula("2023001");
 
         assertEquals("2023001", dto.getMatricula());
         assertEquals("Juan Perez", dto.getNombreCompleto());
@@ -366,11 +366,11 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioDTO cambios = new UsuarioDTO();
+        UsuarioResponseDTO cambios = new UsuarioResponseDTO();
         cambios.setNombreCompleto("Juan Perez Modificado");
         cambios.setGrupo("B");
 
-        UsuarioDTO resultado = usuarioService.modificarUsuario("2023001", cambios);
+        UsuarioResponseDTO resultado = usuarioService.modificarUsuario("2023001", cambios);
 
         assertEquals("Juan Perez Modificado", resultado.getNombreCompleto());
         assertEquals("B", resultado.getGrupo());
@@ -397,7 +397,7 @@ class UsuarioServiceTest {
     void cpMd003_modificarNoExiste() {
         when(usuarioRepository.findByMatricula("999")).thenReturn(Optional.empty());
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setNombreCompleto("X");
 
         IllegalArgumentException ex = assertThrows(
@@ -427,11 +427,11 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioDTO cambios = new UsuarioDTO();
+        UsuarioResponseDTO cambios = new UsuarioResponseDTO();
         cambios.setNombreCompleto("Juan Perez Nuevo");
         cambios.setCarrera("ITI");
 
-        UsuarioDTO resultado = usuarioService.modificarUsuario("2023001", cambios);
+        UsuarioResponseDTO resultado = usuarioService.modificarUsuario("2023001", cambios);
 
         assertEquals("Juan Perez Nuevo", resultado.getNombreCompleto());
         assertEquals("ITI", resultado.getCarrera());
@@ -454,7 +454,7 @@ class UsuarioServiceTest {
             return u;
         });
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("Estudiante");
@@ -473,7 +473,7 @@ class UsuarioServiceTest {
     void registrarUsuarioConRol_rolNoEncontrado() {
         when(rolRepository.findByNombreIgnoreCase("INEXISTENTE")).thenReturn(Optional.empty());
 
-        UsuarioDTO dto = new UsuarioDTO();
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setMatricula("2023001");
         dto.setContrasena("Password456!");
         dto.setNombreCompleto("X");
@@ -531,7 +531,7 @@ class UsuarioServiceTest {
         when(proyectoRepository.findByLiderId(1L)).thenReturn(proyecto);
         when(proyectoUsuarioRepository.findByProyectoId(100L)).thenReturn(List.of(pu1, pu2, pu3));
 
-        List<UsuarioDTO> resultado = usuarioService.listarMiembrosPorLider("LID01");
+        List<UsuarioResponseDTO> resultado = usuarioService.listarMiembrosPorLider("LID01");
 
         assertEquals(3, resultado.size());
         assertTrue(resultado.stream().noneMatch(d -> "LID01".equals(d.getMatricula())));

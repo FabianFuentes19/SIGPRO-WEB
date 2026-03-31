@@ -2,7 +2,8 @@ package com.sigpro.controller;
 
 import com.sigpro.dto.ProyectoRequestDTO;
 import com.sigpro.dto.ProyectoResponseDTO;
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioRequestDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.service.ProyectoService;
 import jakarta.validation.Valid;
@@ -106,14 +107,20 @@ public class ProyectoController {
             ProyectoResponseDTO proyecto = proyectoService.consultarProyectoLider(auth);
             return ResponseEntity.ok(proyecto);
         } catch (IllegalArgumentException e) {
+            // Si no tiene proyecto, devolvemos un objeto vacío en lugar de un error 404
+            if (e.getMessage().contains("proyecto")) {
+                return ResponseEntity.ok(new ProyectoResponseDTO());
+            }
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (SecurityException e) {
+            System.out.println("[DEBUG] Security Error: " + e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         } catch (Exception e) {
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("error", "No fue posible consultar el proyecto del líder");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -162,7 +169,7 @@ public class ProyectoController {
     }
 
     @PostMapping("/{proyectoId}/miembros")
-    public ResponseEntity<?> registrarMiembro(@PathVariable Long proyectoId, @RequestBody UsuarioDTO dto, Authentication auth) {
+    public ResponseEntity<?> registrarMiembro(@PathVariable Long proyectoId, @Valid @RequestBody UsuarioRequestDTO dto, Authentication auth) {
         try {
             ProyectoUsuario nuevoMiembro = proyectoService.registrarMiembro(proyectoId, dto, auth);
             

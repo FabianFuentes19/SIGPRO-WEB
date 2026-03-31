@@ -1,6 +1,7 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioRequestDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
@@ -9,6 +10,7 @@ import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,14 +45,14 @@ public class UsuarioService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public Usuario registrarUsuario(UsuarioDTO dto) {
+    public Usuario registrarUsuario(@Valid UsuarioRequestDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("Datos de registro inválidos");
         }
-
+ 
         String matricula = safeTrim(dto.getMatricula());
         String contrasena = safeTrim(dto.getContrasena());
-
+ 
         if (matricula == null || matricula.isEmpty()
                 || contrasena == null || contrasena.isEmpty()
                 || safeTrim(dto.getNombreCompleto()) == null || safeTrim(dto.getNombreCompleto()).isEmpty()
@@ -60,38 +62,25 @@ public class UsuarioService {
                 || dto.getRolId() == null) {
             throw new IllegalArgumentException("Campos incompletos");
         }
-
+ 
         if (usuarioRepository.findByMatricula(matricula).isPresent()) {
             throw new IllegalArgumentException("La matrícula ya existe");
         }
-
+ 
         if (!PASSWORD_PATTERN.matcher(contrasena).matches()) {
             throw new IllegalArgumentException(
                     "La contraseña no cumple con los criterios de seguridad: mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"
             );
         }
-
+ 
         Rol rol = rolRepository.findById(dto.getRolId())
                 .orElseThrow(() -> new IllegalArgumentException("Rol no válido"));
-
+ 
         Usuario usuario = UsuarioMapper.toEntity(dto, rol);
         usuario.setMatricula(matricula);
         usuario.setContrasena(passwordEncoder.encode(contrasena));
         usuario.setEstado(ESTADO_ACTIVO);
-
-        System.out.println("[UsuarioService] Insertando usuario:");
-        System.out.println("  nombreCompleto=" + usuario.getNombreCompleto());
-        System.out.println("  contrasena(BCrypt)=(no se imprime por seguridad)");
-        System.out.println("  grupo=" + usuario.getGrupo());
-        System.out.println("  matricula=" + usuario.getMatricula());
-        System.out.println("  carrera=" + usuario.getCarrera());
-        System.out.println("  cuatrimestre=" + usuario.getCuatrimestre());
-        System.out.println("  puesto=" + usuario.getPuesto());
-        System.out.println("  salarioQuincenal=" + usuario.getSalarioQuincenal());
-        System.out.println("  estado=" + usuario.getEstado());
-        System.out.println("  rolId=" + (usuario.getRol() != null ? usuario.getRol().getId() : null));
-        System.out.println("  rolNombre=" + (usuario.getRol() != null ? usuario.getRol().getNombre() : null));
-
+ 
         try {
             return usuarioRepository.save(usuario);
         } catch (Exception e) {
@@ -100,7 +89,7 @@ public class UsuarioService {
         }
     }
 
-    public UsuarioDTO bajaLogica(String matricula) {
+    public UsuarioResponseDTO bajaLogica(String matricula) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
@@ -111,35 +100,35 @@ public class UsuarioService {
 
         usuario.setEstado(ESTADO_INACTIVO);
         Usuario actualizado = usuarioRepository.save(usuario);
-        return UsuarioMapper.toDto(actualizado);
+        return UsuarioMapper.toResponseDto(actualizado);
     }
 
-    public List<UsuarioDTO> listarUsuarios() {
+    public List<UsuarioResponseDTO> listarUsuarios() {
         return usuarioRepository.findAll().stream()
-                .map(UsuarioMapper::toDto)
+                .map(UsuarioMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public List<UsuarioDTO> obtenerUsuariosPorRol(String rolNombre) {
+    public List<UsuarioResponseDTO> obtenerUsuariosPorRol(String rolNombre) {
         if (rolNombre == null || rolNombre.isBlank()) {
             return List.of();
         }
         return usuarioRepository.findByRolNombre(rolNombre).stream()
-                .map(UsuarioMapper::toDto)
+                .map(UsuarioMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public UsuarioDTO obtenerDetallePorMatricula(String matricula) {
+    public UsuarioResponseDTO obtenerDetallePorMatricula(String matricula) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
         }
         Usuario usuario = usuarioRepository.findByMatricula(m)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        return UsuarioMapper.toDto(usuario);
+        return UsuarioMapper.toResponseDto(usuario);
     }
 
-    public UsuarioDTO modificarUsuario(String matricula, UsuarioDTO dto) {
+    public UsuarioResponseDTO modificarUsuario(String matricula, UsuarioRequestDTO dto) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");
@@ -167,21 +156,20 @@ public class UsuarioService {
 
         // No se permite modificar: matricula, puesto, salarioQuincenal, fechaIngreso, contrasena, rol
         Usuario actualizado = usuarioRepository.save(usuario);
-        return UsuarioMapper.toDto(actualizado);
+        return UsuarioMapper.toResponseDto(actualizado);
     }
 
-    public Usuario registrarUsuarioConRol(UsuarioDTO dto, String nombreRol) {
+    public Usuario registrarUsuarioConRol(@Valid UsuarioRequestDTO dto, String nombreRol) {
         Rol rol = rolRepository.findByNombreIgnoreCase(nombreRol)
                 .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
         dto.setRolId(rol.getId());
-        dto.setRolNombre(rol.getNombre());
         return registrarUsuario(dto);
     }
 
     /**
      * Lista los miembros del proyecto del líder dado por matrícula (excluye al líder).
      */
-    public List<UsuarioDTO> listarMiembrosPorLider(String matriculaLider) {
+    public List<UsuarioResponseDTO> listarMiembrosPorLider(String matriculaLider) {
         String m = safeTrim(matriculaLider);
         if (m == null || m.isEmpty()) {
             return List.of();
@@ -197,7 +185,7 @@ public class UsuarioService {
                 .filter(u -> !u.getId().equals(lider.getId()))
                 .filter(u -> "ACTIVO".equalsIgnoreCase(u.getEstado())) // solo activos
                 .collect(Collectors.toList());
-        return usuarios.stream().map(UsuarioMapper::toDto).collect(Collectors.toList());
+        return usuarios.stream().map(UsuarioMapper::toResponseDto).collect(Collectors.toList());
     }
 
     private static String safeTrim(String v) {

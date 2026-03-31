@@ -11,7 +11,8 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
         carrera: '',
         puesto: '',
         salarioQuincenal: '',
-        fechaIngreso: ''
+        fechaIngreso: '',
+        contrasena: ''
     });
 
     const cambiarValor = (e) => {

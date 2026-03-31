@@ -14,12 +14,21 @@ const Nominas = () => {
   const [proyectoId, setProyectoId] = useState(null);
 
   const obtenerProyecto = async (token) => {
-    const resp = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    return data.id;
+    try {
+      const resp = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!resp.ok) return null;
+      
+      const text = await resp.text();
+      if (!text) return null;
+      
+      const data = JSON.parse(text);
+      return data && data.id ? data.id : null;
+    } catch (e) {
+      console.error("Error al obtener proyecto en nóminas:", e);
+      return null;
+    }
   };
 
 

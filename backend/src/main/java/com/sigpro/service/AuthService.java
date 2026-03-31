@@ -2,8 +2,6 @@ package com.sigpro.service;
 
 import com.sigpro.dto.AuthResponseDTO;
 import com.sigpro.dto.LoginRequestDTO;
-import com.sigpro.dto.UsuarioDTO;
-import com.sigpro.dto.UsuarioMapper;
 import com.sigpro.model.PasswordResetToken;
 import com.sigpro.model.Usuario;
 import com.sigpro.repository.PasswordResetTokenRepository;

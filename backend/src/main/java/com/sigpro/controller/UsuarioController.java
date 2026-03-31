@@ -1,7 +1,9 @@
 package com.sigpro.controller;
 
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.UsuarioRequestDTO;
+import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class UsuarioController {
     @GetMapping
     public ResponseEntity<?> listarTodos() {
         try {
-            List<UsuarioDTO> usuarios = usuarioService.listarUsuarios();
+            List<UsuarioResponseDTO> usuarios = usuarioService.listarUsuarios();
             return ResponseEntity.ok(usuarios);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -34,7 +36,7 @@ public class UsuarioController {
     @GetMapping("/rol/{rolNombre}")
     public ResponseEntity<?> listarPorRol(@PathVariable String rolNombre) {
         try {
-            List<UsuarioDTO> usuarios = usuarioService.obtenerUsuariosPorRol(rolNombre);
+            List<UsuarioResponseDTO> usuarios = usuarioService.obtenerUsuariosPorRol(rolNombre);
             return ResponseEntity.ok(usuarios);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -46,7 +48,7 @@ public class UsuarioController {
     @GetMapping("/lider/{matriculaLider}")
     public ResponseEntity<?> listarMiembrosPorLider(@PathVariable String matriculaLider) {
         try {
-            List<UsuarioDTO> miembros = usuarioService.listarMiembrosPorLider(matriculaLider);
+            List<UsuarioResponseDTO> miembros = usuarioService.listarMiembrosPorLider(matriculaLider);
             return ResponseEntity.ok(miembros);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -62,7 +64,7 @@ public class UsuarioController {
     @GetMapping("/{matricula}")
     public ResponseEntity<?> buscarPorMatricula(@PathVariable String matricula) {
         try {
-            UsuarioDTO usuario = usuarioService.obtenerDetallePorMatricula(matricula);
+            UsuarioResponseDTO usuario = usuarioService.obtenerDetallePorMatricula(matricula);
             return ResponseEntity.ok(usuario);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -76,9 +78,9 @@ public class UsuarioController {
     }
 
     @PutMapping("/{matricula}")
-    public ResponseEntity<?> actualizar(@PathVariable String matricula, @RequestBody UsuarioDTO dto) {
+    public ResponseEntity<?> actualizar(@PathVariable String matricula, @Valid @RequestBody UsuarioRequestDTO dto) {
         try {
-            UsuarioDTO actualizado = usuarioService.modificarUsuario(matricula, dto);
+            UsuarioResponseDTO actualizado = usuarioService.modificarUsuario(matricula, dto);
             return ResponseEntity.ok(actualizado);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
@@ -94,7 +96,7 @@ public class UsuarioController {
     @PatchMapping("/{matricula}/desactivar")
     public ResponseEntity<?> desactivar(@PathVariable String matricula) {
         try {
-            UsuarioDTO actualizado = usuarioService.bajaLogica(matricula);
+            UsuarioResponseDTO actualizado = usuarioService.bajaLogica(matricula);
 
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Usuario desactivado correctamente");

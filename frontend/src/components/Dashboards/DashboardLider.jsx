@@ -39,11 +39,13 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
+    const [cargandoProyecto, setCargandoProyecto] = useState(true);
 
     // Cargar el proyecto del líder
     const cargarProyecto = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
+        setCargandoProyecto(true);
         try {
             const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
                 headers: {
@@ -51,13 +53,31 @@ const DashboardLider = () => {
                     "Authorization": `Bearer ${token}`
                 }
             });
+
+            if (response.status === 404 || response.status === 204 || response.status === 200 && response.headers.get("content-length") === "0") {
+                setProyecto(null);
+                setProyectoId(null);
+                return;
+            }
+
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
-            const data = await response.json();
+
+            const text = await response.text();
+            if (!text) {
+                setProyecto(null);
+                setProyectoId(null);
+                return;
+            }
+
+            const data = JSON.parse(text);
             console.log("Proyecto del líder:", data);
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
             console.error("Error al cargar proyecto:", error);
+            setProyecto(null);
+        } finally {
+            setCargandoProyecto(false);
         }
     };
 
@@ -117,10 +137,10 @@ const DashboardLider = () => {
             setMostrarModal(false);
             alert("Miembro registrado correctamente");
             await cargarMiembros();
-            } catch (error) {
-                console.error("Error al registrar miembro:", error);
-                alert(error.message || "Error al registrar miembro");
-            }
+        } catch (error) {
+            console.error("Error al registrar miembro:", error);
+            alert(error.message || "Error al registrar miembro");
+        }
     }
 
     const actualizarMiembro = async (datosActualizados) => {
@@ -166,10 +186,10 @@ const DashboardLider = () => {
             alert("Miembro eliminado correctamente");
             setModalActivo(null);
             await cargarMiembros();
-            } catch (error) {
-                console.error("Error al desactivar miembro:", error);
-                alert(error.message || "Error al desactivar miembro");
-            }
+        } catch (error) {
+            console.error("Error al desactivar miembro:", error);
+            alert(error.message || "Error al desactivar miembro");
+        }
     }
 
     useEffect(() => {
@@ -238,8 +258,8 @@ const DashboardLider = () => {
                     </nav>
                     <div className="sidebar-footer">
                         <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
-                        <LogOut size={20} />
-                        <span>Salir</span>
+                            <LogOut size={20} />
+                            <span>Salir</span>
                         </Link>
                     </div>
                 </aside>
@@ -247,7 +267,7 @@ const DashboardLider = () => {
                 <main className="main-content">
                     {vistaActual === 'proyecto' && (
                         <>
-                            {proyecto ? (
+                            {proyecto && proyecto.id ? (
                                 <div className="project-card">
                                     <div className="project-header-section">
                                         <h2>{proyecto.nombre}</h2>
@@ -286,14 +306,34 @@ const DashboardLider = () => {
                                         </div>
                                     </div>
                                 </div>
+                            ) : !cargandoProyecto ? (
+                                <div className="no-project-alert" style={{
+                                    padding: '40px',
+                                    textAlign: 'center',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    borderRadius: '12px',
+                                    border: '1px dashed rgba(255,255,255,0.2)',
+                                    marginBottom: '30px'
+                                }}>
+                                    <h3 style={{ color: '#d4af37', marginBottom: '10px' }}>Sin Proyecto Asignado</h3>
+                                    <p style={{ color: '#ccc' }}>
+                                        Actualmente no tienes un proyecto asignado.
+                                        Por favor, contacta al administrador para que se te asigne uno y puedas comenzar a gestionar miembros y materiales.
+                                    </p>
+                                </div>
                             ) : (
-                                <p>Cargando proyecto...</p>
+                                <p style={{ textAlign: 'center', padding: '40px' }}>Cargando información del proyecto...</p>
                             )}
 
                             <div className="members-section">
                                 <div className="members-top-row">
                                     <h2>Miembros</h2>
-                                    <button className="gold-add-btn" onClick={() => setMostrarModal(true)}>
+                                    <button
+                                        className={`gold-add-btn ${!proyectoId ? 'disabled' : ''}`}
+                                        onClick={() => proyectoId ? setMostrarModal(true) : alert("Debes tener un proyecto asignado para agregar miembros")}
+                                        disabled={!proyectoId}
+                                        style={!proyectoId ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                                    >
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
                                     </button>
@@ -339,7 +379,7 @@ const DashboardLider = () => {
 
                     {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
                     {vistaActual === 'nominas' && <Nominas />}
-                    {vistaActual === 'perfil' && <PerfilLider/>} 
+                    {vistaActual === 'perfil' && <PerfilLider />}
 
                 </main>
             </div>

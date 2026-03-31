@@ -1,9 +1,6 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.ProyectoRequestDTO;
-import com.sigpro.dto.ProyectoResponseDTO;
-import com.sigpro.dto.ProyectoMapper;
-import com.sigpro.dto.UsuarioDTO;
+import com.sigpro.dto.*;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.model.Usuario;
@@ -18,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -148,7 +144,7 @@ public class ProyectoService {
     }
 
     @Transactional
-    public ProyectoUsuario registrarMiembro(Long proyectoId, UsuarioDTO dto, Authentication auth) {
+    public ProyectoUsuario registrarMiembro(Long proyectoId, UsuarioRequestDTO dto, Authentication auth) {
         validarRol(auth, "ROLE_LIDER");
 
         // valida que el líder sea dueño del proyecto
