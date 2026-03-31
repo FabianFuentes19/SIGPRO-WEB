@@ -195,6 +195,7 @@ public class UsuarioService {
         List<Usuario> usuarios = proyectoUsuarioRepository.findByProyectoId(proyecto.getId()).stream()
                 .map(ProyectoUsuario::getUsuario)
                 .filter(u -> !u.getId().equals(lider.getId()))
+                .filter(u -> "ACTIVO".equalsIgnoreCase(u.getEstado())) // solo activos
                 .collect(Collectors.toList());
         return usuarios.stream().map(UsuarioMapper::toDto).collect(Collectors.toList());
     }

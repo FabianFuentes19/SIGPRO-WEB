@@ -1,6 +1,7 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.PagoDTO;
+import com.sigpro.dto.PagoRequestDTO;
+import com.sigpro.dto.PagoResponseDTO;
 import com.sigpro.dto.PagoMapper;
 import com.sigpro.dto.VoucherDTO;
 import com.sigpro.model.Pago;
@@ -11,6 +12,7 @@ import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class PagoService {
     private ProyectoUsuarioRepository proyectoUsuarioRepository;
 
     @Transactional
-    public PagoDTO registrarPago(PagoDTO dto) {
+    public PagoResponseDTO registrarPago(@Valid PagoRequestDTO dto) {
         Usuario usuario = usuarioRepository.findByMatricula(dto.getMatriculaUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
@@ -57,20 +59,20 @@ public class PagoService {
 
         Pago guardado = pagoRepository.save(pago);
 
-        return PagoMapper.toDto(guardado);
+        return PagoMapper.toResponseDto(guardado);
     }
 
-    public List<PagoDTO> consultarMisPagos(Authentication auth) {
+    public List<PagoResponseDTO> consultarMisPagos(Authentication auth) {
         // validar que sea líder o miembro
         validarMultiplesRoles(auth, "ROLE_LIDER", "ROLE_MIEMBRO");
 
         String matricula = (String) auth.getPrincipal();
         return pagoRepository.findByUsuarioMatricula(matricula).stream()
-                .map(PagoMapper::toDto)
+                .map(PagoMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public List<PagoDTO> consultarPagosMiembro(String matriculaMiembro, Authentication auth) {
+    public List<PagoResponseDTO> consultarPagosMiembro(String matriculaMiembro, Authentication auth) {
         validarRol(auth, "ROLE_LIDER");
 
         String matriculaLider = (String) auth.getPrincipal();
@@ -88,11 +90,11 @@ public class PagoService {
         }
 
         return pagoRepository.findByUsuarioMatriculaAndProyectoId(matriculaMiembro, proyecto.getId()).stream()
-                .map(PagoMapper::toDto)
+                .map(PagoMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public List<PagoDTO> consultarPagosProyecto(Authentication auth) {
+    public List<PagoResponseDTO> consultarPagosProyecto(Authentication auth) {
         validarRol(auth, "ROLE_LIDER");
 
         String matriculaLider = (String) auth.getPrincipal();
@@ -103,7 +105,7 @@ public class PagoService {
         if (proyecto == null) throw new IllegalArgumentException("El líder no tiene un proyecto asignado");
 
         return pagoRepository.findByProyectoId(proyecto.getId()).stream()
-                .map(PagoMapper::toDto)
+                .map(PagoMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -133,7 +135,6 @@ public class PagoService {
         LocalDate hoy = LocalDate.now();
         int contador = 1;
 
-        // Iterar quincenas hasta llegar a la quincena actual
         while (!inicio.isAfter(hoy)) {
             LocalDate fin;
             if (inicio.getDayOfMonth() == 1) {

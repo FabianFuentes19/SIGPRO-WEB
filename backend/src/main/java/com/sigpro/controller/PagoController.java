@@ -1,6 +1,7 @@
 package com.sigpro.controller;
 
-import com.sigpro.dto.PagoDTO;
+import com.sigpro.dto.PagoRequestDTO;
+import com.sigpro.dto.PagoResponseDTO;
 import com.sigpro.dto.VoucherDTO;
 import com.sigpro.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,9 @@ public class PagoController {
     private PagoService pagoService;
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarPago(@RequestBody PagoDTO dto) {
+    public ResponseEntity<?> registrarPago(@RequestBody PagoRequestDTO dto) {
         try {
-            PagoDTO pago = pagoService.registrarPago(dto);
+            PagoResponseDTO pago = pagoService.registrarPago(dto);
             return ResponseEntity.ok(pago);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -35,7 +36,7 @@ public class PagoController {
     @GetMapping("/mis-pagos")
     public ResponseEntity<?> consultarMisPagos(Authentication auth) {
         try {
-            List<PagoDTO> pagos = pagoService.consultarMisPagos(auth);
+            List<PagoResponseDTO> pagos = pagoService.consultarMisPagos(auth);
             return ResponseEntity.ok(pagos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar sus pagos"));
@@ -45,7 +46,7 @@ public class PagoController {
     @GetMapping("/miembro/{matricula}")
     public ResponseEntity<?> consultarPagosMiembro(@PathVariable String matricula, Authentication auth) {
         try {
-            List<PagoDTO> pagos = pagoService.consultarPagosMiembro(matricula, auth);
+            List<PagoResponseDTO> pagos = pagoService.consultarPagosMiembro(matricula, auth);
             return ResponseEntity.ok(pagos);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
@@ -59,7 +60,7 @@ public class PagoController {
     @GetMapping("/proyecto")
     public ResponseEntity<?> consultarPagosProyecto(Authentication auth) {
         try {
-            List<PagoDTO> pagos = pagoService.consultarPagosProyecto(auth);
+            List<PagoResponseDTO> pagos = pagoService.consultarPagosProyecto(auth);
             return ResponseEntity.ok(pagos);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
@@ -76,9 +77,14 @@ public class PagoController {
             List<VoucherDTO> vouchers = pagoService.obtenerHistorialVouchers(matricula, auth);
             return ResponseEntity.ok(vouchers);
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "No fue posible consultar los vouchers del miembro"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error inesperado al consultar los vouchers"));
         }
     }
 }
