@@ -14,6 +14,7 @@ public class ProyectoMapper {
         proyecto.setDescripcion(dto.getDescripcion());
         proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
         proyecto.setPresupuesto(dto.getPresupuesto());
+        proyecto.setPresupuestoInicial(dto.getPresupuesto());
         proyecto.setFechaInicio(dto.getFechaInicio());
         proyecto.setFechaFin(dto.getFechaFin());
         proyecto.setLider(lider);
@@ -28,6 +29,7 @@ public class ProyectoMapper {
         response.setDescripcion(proyecto.getDescripcion());
         response.setObjetivoGeneral(proyecto.getObjetivoGeneral());
         response.setPresupuesto(proyecto.getPresupuesto());
+        response.setPresupuestoInicial(proyecto.getPresupuestoInicial());
         response.setFechaInicio(proyecto.getFechaInicio());
         response.setFechaFin(proyecto.getFechaFin());
         response.setEstado(proyecto.getEstado());
