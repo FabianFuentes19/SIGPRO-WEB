@@ -75,7 +75,7 @@ const DashboardLider = () => {
             }
 
             const data = JSON.parse(text);
-            console.log("Proyecto del líder:", data);
+            //console.log("Proyecto del líder:", data);
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
@@ -104,7 +104,7 @@ const DashboardLider = () => {
             });
             if (!response.ok) throw new Error("Error al obtener miembros");
             const data = await response.json();
-            console.log("Miembros recibidos:", data);
+            //console.log("Miembros recibidos:", data);
             const lista = Array.isArray(data) ? data : [];
             setMiembros(lista
                 .filter((m) => m.estado !== 'INACTIVO')
@@ -382,7 +382,7 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={cargarProyecto} />}
                     {vistaActual === 'nominas' && <Nominas onPaymentSuccess={cargarProyecto} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 
