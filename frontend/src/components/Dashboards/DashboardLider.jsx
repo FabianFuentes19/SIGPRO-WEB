@@ -26,6 +26,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
 import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
+import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -42,6 +43,7 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
+    const [mensajeModal, setMensajeModal] = useState(null);
 
     // Cargar el proyecto del líder
     const cargarProyecto = async () => {
@@ -101,7 +103,11 @@ const DashboardLider = () => {
     const registrarMiembro = async (datos) => {
         try {
             if (!proyectoId) {
-                alert("No se encontró el proyecto del líder. Recarga la página.");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: "No se encontró el proyecto del líder. Recarga la página.",
+                    tipo: "error"
+                });
                 return;
             }
             const token = localStorage.getItem("token");
@@ -111,20 +117,26 @@ const DashboardLider = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify(datos)
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || "Error al registrar miembro");
-            }
-            setMostrarModal(false);
-            alert("Miembro registrado correctamente");
-            await cargarMiembros();
+                            body: JSON.stringify(datos)
+                        });
+                        const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Error al registrar miembro");
+
+                setMostrarModal(false);
+                setMensajeModal({
+                titulo: "Registro Exitoso",
+                mensaje: "Miembro registrado correctamente",
+                tipo: "exito"
+                });
+                await cargarMiembros();
             } catch (error) {
-                console.error("Error al registrar miembro:", error);
-                alert(error.message || "Error al registrar miembro");
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al registrar miembro",
+                tipo: "error"
+                });
             }
-    }
+            };
 
     const actualizarMiembro = async (datosActualizados) => {
         try {
@@ -138,19 +150,34 @@ const DashboardLider = () => {
                 body: JSON.stringify(datosActualizados),
             });
 
-            if (response.ok) {
-                alert("Miembro actualizado correctamente");
-                setModalActivo(null);
-                await cargarMiembros();
-            } else {
+           if (response.ok) {
+                    const updatedData = await response.json(); // Esto recibe el objeto actualizado del backend
+                    setUsuarioSeleccionado(updatedData);       // Este es para que refresque el modal de detalles
+                    setMensajeModal({
+                        titulo: "Actualización Exitosa",
+                        mensaje: "Miembro actualizado correctamente",
+                        tipo: "exito"
+                    });
+                    setModalActivo(null);
+                    await cargarMiembros(); // refresca la lista completa
+                }
+
+                    else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar miembro");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: errorData.error || "Error al actualizar miembro",
+                    tipo: "error"
+                });
+                }
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: "Error de conexión con el servidor",
+                tipo: "error"
+                });
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error de conexión con el servidor");
-        }
-    };
+            };
 
     const eliminarMiembro = async (mat) => {
         try {
@@ -165,15 +192,22 @@ const DashboardLider = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Error al desactivar miembro");
-            }
-            alert("Miembro eliminado correctamente");
-            setModalActivo(null);
-            await cargarMiembros();
+                }
+                setMensajeModal({
+                titulo: "Eliminación Exitosa",
+                mensaje: "Miembro eliminado correctamente",
+                tipo: "exito"
+                });
+                setModalActivo(null);
+                await cargarMiembros();
             } catch (error) {
-                console.error("Error al desactivar miembro:", error);
-                alert(error.message || "Error al desactivar miembro");
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al desactivar miembro",
+                tipo: "error"
+                });
             }
-    }
+            };
 
     useEffect(() => {
         cargarProyecto();
@@ -400,6 +434,16 @@ const DashboardLider = () => {
                     }}
                 />
             )}
+
+                {mensajeModal && (
+                <ModalMensajes
+                    titulo={mensajeModal.titulo}
+                    mensaje={mensajeModal.mensaje}
+                    tipo={mensajeModal.tipo}
+                    onConfirm={() => setMensajeModal(null)}
+                />
+                )}
+
         </div>
     );
 };
