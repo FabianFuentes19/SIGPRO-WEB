@@ -31,15 +31,28 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario" }) => {
         setDatosFormulario({ ...datosFormulario, [name]: value });
     };
 
-    const enviarEdicion = (e) => {
-        e.preventDefault();
-        const payload = {
-            ...datosFormulario,
-            cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),
-            salarioQuincenal: datosFormulario.salarioQuincenal ? parseFloat(datosFormulario.salarioQuincenal) : null
-        };
-        alGuardar(payload);
-    };
+
+  const enviarEdicion = (e) => {
+  e.preventDefault();
+  const payload = {
+    nombreCompleto: datosFormulario.nombreCompleto,
+    matricula: datosFormulario.matricula,
+    contrasena: usuario?.contrasena || "1234", 
+    grupo: datosFormulario.grupo,
+    carrera: datosFormulario.carrera,
+    cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),
+    puesto: datosFormulario.puesto,
+    salarioQuincenal: datosFormulario.salarioQuincenal
+      ? parseFloat(datosFormulario.salarioQuincenal)
+      : 0,
+    estado: "ACTIVO",
+    rol: { id: 2, nombre: "LIDER" } 
+  };
+  alGuardar(payload);
+};
+
+
+
 
     return (
         <div className="modal-overlay">
