@@ -8,6 +8,8 @@ import { obtenerUsuarios } from '../services/api';
 import { Eye, LogOut, Pencil, Trash2 } from 'lucide-react';
 import BorrarUsuario from '../components/BorrarUsuario';
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
+import ModalMensajes from '../components/Usuarios/ModalMensajes';
+
 
 const DashLideres = () => {
   const navigate = useNavigate();
@@ -20,6 +22,10 @@ const DashLideres = () => {
   const [lideres, setLideres] = useState([]);
   const [liderSeleccionado, setLiderSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
+
+  const [mensajeModal, setMensajeModal] = useState(null);
+
+
 
   useEffect(() => {
     fetchLideres();
@@ -53,18 +59,31 @@ const DashLideres = () => {
         body: JSON.stringify(nuevoLider),
       });
 
-      if (response.ok) {
-        alert("Líder agregado correctamente");
-        setMostrarModal(false);
-        fetchLideres();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Error al agregar líder");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error de conexión con el servidor");
-    }
+              if (response.ok) {
+              const data = await response.json();
+              setMensajeModal({
+                titulo: "Registro Exitoso",
+                mensaje: data.mensaje || "Líder agregado correctamente",
+                tipo: "exito"
+              });
+              setMostrarModal(false);
+              fetchLideres();
+            } else {
+              const errorData = await response.json();
+              setMensajeModal({
+                titulo: "Error",
+                mensaje: errorData.error || "Error al agregar líder",
+                tipo: "error"
+              });
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            setMensajeModal({
+              titulo: "Error",
+              mensaje: "Error de conexión con el servidor",
+              tipo: "error"
+            });
+          }
   };
 
   const actualizarLider = async (datosActualizados) => {
@@ -80,17 +99,28 @@ const DashLideres = () => {
       });
 
       if (response.ok) {
-        alert("Líder actualizado correctamente");
-        setMostrarModalEditar(false);
-        fetchLideres();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Error al actualizar líder");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error de conexión con el servidor");
+      setMensajeModal({
+        titulo: "Actualización Exitosa",
+        mensaje: "Líder actualizado correctamente",
+        tipo: "exito"
+      });
+      setMostrarModalEditar(false);
+      fetchLideres();
+    } else {
+      const errorData = await response.json();
+      setMensajeModal({
+        titulo: "Error",
+        mensaje: errorData.error || "Error al actualizar líder",
+        tipo: "error"
+      });
     }
+  } catch (error) {
+    setMensajeModal({
+      titulo: "Error",
+      mensaje: "Error de conexión con el servidor",
+      tipo: "error"
+    });
+  }
   };
 
   const eliminarLider = async (matricula) => {
@@ -102,16 +132,30 @@ const DashLideres = () => {
           "Authorization": `Bearer ${token}`
         }
       });
-      if (response.ok) {
-        setMostrarModalEliminar(false);
-        alert("Líder desactivado correctamente");
-        fetchLideres();
-      } else {
-        alert("No se pudo desactivar el líder");
-      }
-    } catch (error) {
-      console.error("Error al desactivar:", error);
+       if (response.ok) {
+      setMostrarModalEliminar(false);
+      setMensajeModal({
+        titulo: "Eliminación Exitosa",
+        mensaje: "Líder desactivado correctamente",
+        tipo: "exito"
+      });
+      fetchLideres();
+    } else {
+      const errorData = await response.json();
+      setMensajeModal({
+        titulo: "Error",
+        mensaje: errorData.error || "No se pudo desactivar el líder",
+        tipo: "error"
+      });
     }
+  } catch (error) {
+    console.error("Error al desactivar:", error);
+    setMensajeModal({
+      titulo: "Error",
+      mensaje: "Error de conexión con el servidor",
+      tipo: "error"
+    });
+  }
   };
 
   return (
@@ -274,6 +318,16 @@ const DashLideres = () => {
           alAceptar={handleCerrarSesion}
         />
       )}
+
+          {mensajeModal && (
+      <ModalMensajes
+        titulo={mensajeModal.titulo}
+        mensaje={mensajeModal.mensaje}
+        tipo={mensajeModal.tipo}
+        onConfirm={() => setMensajeModal(null)}
+      />
+    )}
+
     </div>
   );
 };
