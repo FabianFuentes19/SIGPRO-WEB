@@ -73,7 +73,7 @@ const DashProyectos = () => {
         setModalMensajes({
           titulo: "Registro Exitoso",
           mensaje: "Proyecto agregado correctamente",
-          tipo: "registrar"
+          tipo: "exito"
         });
         fetchProjects();
       } else {
@@ -108,7 +108,7 @@ const DashProyectos = () => {
         setModalMensajes({
           titulo: "Actualización Exitosa",
           mensaje: "Proyecto actualizado correctamente",
-          tipo: "actualizar"
+          tipo: "exito"
         });
         fetchProjects();
       } else {
