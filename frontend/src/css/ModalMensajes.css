@@ -87,3 +87,79 @@
 .btn-aceptar-exito:active {
   transform: translateY(1px); 
 }
+
+/* La Card del Modal (Específico para Error) */
+.modal-error {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px; 
+  width: 400px; 
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+}
+
+.icon-container-error {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.icon-bg-error {
+  background-color: #fca5a5; 
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-cross {
+  color: #b91c1c; 
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.modal-titulo-error {
+  color: #b91c1c;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.modal-mensaje-error {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 35px;
+  max-width: 80%; 
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.acciones-error {
+  display: flex;
+  width: 100%;
+}
+
+.btn-aceptar-error {
+  flex: 1; 
+  background: #b91c1c; 
+  border: none;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3); 
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-aceptar-error:hover {
+  background: #991b1b; 
+}
+
+.btn-aceptar-error:active {
+  transform: translateY(1px); 
+}
