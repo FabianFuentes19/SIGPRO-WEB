@@ -127,6 +127,18 @@ const DashProyectos = () => {
     }
   };
 
+  // Función para determinar el estado visual del presupuesto
+  const calculateBudgetStatus = (actual, inicial) => {
+    if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: '' };
+    const perc = (actual / inicial) * 100;
+    
+    if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: 'Agotado' };
+    if (perc <= 10) return { perc, colorClass: 'budget-critical', text: 'Crítico' };
+    if (perc <= 20) return { perc, colorClass: 'budget-warning', text: 'En riesgo' };
+    return { perc, colorClass: 'budget-healthy', text: 'Equilibrado' };
+  };
+
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -207,7 +219,27 @@ const DashProyectos = () => {
                               {p.descripcion}
                             </div>
                           </td>
-                          <td>{"$" + p.presupuesto}</td>
+                          <td>
+                            <div className="budget-cell-container">
+                              <span className="budget-amount">{"$" + Number(p.presupuesto).toLocaleString()}</span>
+                              {(() => {
+                                const status = calculateBudgetStatus(p.presupuesto, p.presupuestoInicial);
+                                return (
+                                  <>
+                                    <div className="budget-progress-outer">
+                                      <div 
+                                        className={`budget-progress-inner ${status.colorClass}`} 
+                                        style={{ width: `${Math.min(status.perc, 100)}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className={`budget-status-text ${status.colorClass.replace('budget-', 'text-')}`}>
+                                      {status.text} ({Math.round(status.perc)}%)
+                                    </span>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          </td>
                           <td>
                             {/*Agrego esto para poner el estado del Proyecto*/}
                             <span className={`badge ${p.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}`}>

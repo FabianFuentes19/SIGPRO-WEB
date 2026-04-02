@@ -163,3 +163,80 @@
 .btn-aceptar-error:active {
   transform: translateY(1px); 
 }
+
+/* La Card del Modal (Específico para Advertencia) */
+.modal-advertencia {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px; 
+  width: 400px; 
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+}
+
+.icon-container-advertencia {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.icon-bg-advertencia {
+  background-color: #fef3c7; /* Amber light */
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-warn {
+  color: #d97706; /* Amber dark */
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.modal-titulo-advertencia {
+  color: #d97706;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.modal-mensaje-advertencia {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 35px;
+  max-width: 80%; 
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.acciones-advertencia {
+  display: flex;
+  width: 100%;
+}
+
+.btn-aceptar-advertencia {
+  flex: 1; 
+  background: #f59e0b; 
+  border: none;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); 
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-aceptar-advertencia:hover {
+  background: #d97706;
+}
+
+.btn-aceptar-advertencia:active {
+  transform: translateY(1px); 
+}
+

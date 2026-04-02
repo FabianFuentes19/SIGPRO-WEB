@@ -77,7 +77,10 @@
     margin: 0 10px;
 }
 
-.sidebar-footer { margin-top: auto; padding: 20px; }
+.sidebar-footer {
+    margin-top: auto;
+    padding: 20px;
+}
 
 .logout-btn {
     background: none;
@@ -103,7 +106,7 @@
     border-radius: 12px;
     padding: 30px;
     border-top: 8px solid var(--teal-green);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
 }
 
@@ -112,12 +115,14 @@
     margin: 0;
     color: #333;
 }
+
 .description-text {
     color: #666;
     font-size: 0.95rem;
     margin: 15px 0;
     line-height: 1.5;
-    max-width: 100%; }
+    max-width: 100%;
+}
 
 .dates-row-container {
     display: flex;
@@ -165,6 +170,7 @@
 .budget-section-left {
     margin: 25px 0;
 }
+
 .budget-label {
     color: #99abb4;
     font-weight: bold;
@@ -182,17 +188,21 @@
 .progress-info-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px; font-weight: 600;
+    margin-bottom: 10px;
+    font-weight: 600;
     color: #666;
 }
+
 .progress-perc {
     color: var(--teal-green);
 }
+
 .progress-bar-outer {
     background: #eee;
     height: 12px;
     border-radius: 10px;
 }
+
 .progress-bar-inner-fill {
     background: var(--teal-green);
     height: 100%;
@@ -206,6 +216,7 @@
     justify-content: space-between;
     margin-bottom: 25px;
 }
+
 .count-badge {
     color: #99abb4;
     font-weight: normal;
@@ -215,7 +226,8 @@
 .gold-add-btn {
     background: var(--gold-color);
     color: white;
-    border: none; padding: 10px 22px;
+    border: none;
+    padding: 10px 22px;
     border-radius: 25px;
     font-weight: bold;
     cursor: pointer;
@@ -231,7 +243,7 @@
     padding: 15px 20px;
     border-radius: 12px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
 }
 
 .circle-avatar {
@@ -250,14 +262,17 @@
     margin-left: 15px;
     flex: 1;
 }
+
 .member-data strong {
     display: block;
     color: var(--primary-blue);
 }
+
 .member-data span {
     color: #999;
     font-size: 0.85rem;
 }
+
 .more-dots {
     margin-left: auto;
     color: #ccc;
@@ -273,7 +288,7 @@
     top: 20px;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 100;
     width: 160px;
     padding: 5px 0;
@@ -301,4 +316,46 @@
 
 .dropdown-item svg {
     color: #666;
+}
+
+/* --- Estilos de Barra de Presupuesto --- */
+.budget-progress-outer {
+    background: #e9ecef;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.budget-progress-inner {
+    height: 100%;
+    transition: width 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.budget-healthy {
+    background-color: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.2);
+}
+
+.budget-warning {
+    background-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+}
+
+.budget-critical {
+    background-color: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.2);
+}
+
+.budget-exhausted {
+    background-color: #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.budget-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }

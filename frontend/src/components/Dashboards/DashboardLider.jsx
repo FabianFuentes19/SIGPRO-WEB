@@ -45,8 +45,22 @@ const DashboardLider = () => {
     const [proyectoId, setProyectoId] = useState(null);
     const [mensajeModal, setMensajeModal] = useState(null);
 
-    // Cargar el proyecto del líder
-    const cargarProyecto = async () => {
+    // rastrea el presupuesto anterior y evitar alertas repetitivas al navegar
+    const lastBudgetRef = useRef(null);
+
+    // Función para calcular el estado presupuesto
+    const calculateBudgetStatus = (actual, inicial) => {
+        if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
+        const perc = (actual / inicial) * 100;
+        
+        if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'CRITICAL', text: 'Presupuesto Agotado' };
+        if (perc <= 10) return { perc, colorClass: 'budget-critical', status: 'CRITICAL', text: 'Presupuesto rítico' };
+        if (perc <= 20) return { perc, colorClass: 'budget-warning', status: 'WARNING', text: 'Presupuesto en riesgo' };
+        return { perc, colorClass: 'budget-healthy', status: 'OK', text: 'Equilibrado' };
+    };
+
+
+    const cargarProyecto = async (triggerAlert = false) => {
         const token = localStorage.getItem("token");
         if (!token) return;
         try {
@@ -58,7 +72,21 @@ const DashboardLider = () => {
             });
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
             const data = await response.json();
-            console.log("Proyecto del líder:", data);
+            
+            // verifica si al insertar un gasto el presupuesto entra en riesgo
+            if (triggerAlert && lastBudgetRef.current !== null && lastBudgetRef.current !== data.presupuesto) {
+                const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoInicial);
+                if (statusInfo.status !== 'OK') {
+                    setMensajeModal({
+                        titulo: statusInfo.status === 'CRITICAL' ? "¡ALERTA CRÍTICA!" : "Advertencia de Presupuesto",
+                        mensaje: statusInfo.text,
+                        tipo: statusInfo.status === 'CRITICAL' ? "error" : "advertencia"
+                    });
+                }
+
+            }
+            
+            lastBudgetRef.current = data.presupuesto;
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
@@ -311,17 +339,33 @@ const DashboardLider = () => {
 
                                     <div className="budget-section-left">
                                         <span className="budget-label">Presupuesto Total</span>
-                                        <h3 className="budget-value">${proyecto.presupuesto}</h3>
+                                        <h3 className="budget-value">${proyecto.presupuesto.toLocaleString()}</h3>
                                     </div>
 
                                     <div className="progress-section-bottom">
-                                        <div className="progress-info-row">
-                                            <span>Progreso Del Proyecto</span>
-                                            <span className="progress-perc">0%</span>
-                                        </div>
-                                        <div className="progress-bar-outer">
-                                            <div className="progress-bar-inner-fill" style={{ width: '0%' }}></div>
-                                        </div>
+                                        {(() => {
+                                            const status = calculateBudgetStatus(proyecto.presupuesto, proyecto.presupuestoInicial);
+                                            return (
+                                                <>
+                                                    <div className="progress-info-row">
+                                                        <span>Estado del presupuesto</span>
+                                                        <span className={`progress-perc ${status.colorClass.replace('budget-', 'text-')}`}>
+                                                            {Math.round(status.perc)}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="budget-progress-outer">
+                                                        <div 
+                                                            className={`budget-progress-inner ${status.colorClass}`} 
+                                                            style={{ width: `${Math.min(status.perc, 100)}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <div className="budget-summary-row">
+                                                        <span className={status.colorClass.replace('budget-', 'text-')}>{status.text}</span>
+                                                        <span>Consumido: ${ (proyecto.presupuestoInicial - proyecto.presupuesto).toLocaleString() }</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             ) : (
@@ -375,8 +419,8 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={cargarProyecto} />}
-                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={cargarProyecto} />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={() => cargarProyecto(true)} />}
+                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={() => cargarProyecto(true)} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 
                 </main>

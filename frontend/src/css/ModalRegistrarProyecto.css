@@ -147,3 +147,29 @@ textarea {
   resize: vertical;
   min-height: 40px;
 }
+
+/*Ojito de conraseña*/
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.form-control.valido {
+  border: 2px solid green;
+}
+
+.form-control.invalido {
+  border: 2px solid red;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

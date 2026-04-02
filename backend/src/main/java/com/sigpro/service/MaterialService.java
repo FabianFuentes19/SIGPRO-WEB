@@ -44,13 +44,11 @@ public class MaterialService {
                 .multiply(BigDecimal.valueOf(dto.getCantidad()))
                 .setScale(MONEDA_SCALE, RoundingMode.HALF_UP);
 
-        BigDecimal presupuestoInicial = proyecto.getPresupuesto();
-        BigDecimal gastoActual = materialRepository.sumCostoTotalByProyectoId(dto.getProyectoId());
-        if (gastoActual == null) {
-            gastoActual = BigDecimal.ZERO;
+        BigDecimal disponible = proyecto.getPresupuesto();
+        if (disponible == null) {
+            disponible = BigDecimal.ZERO;
         }
 
-        BigDecimal disponible = presupuestoInicial.subtract(gastoActual);
         if (disponible.compareTo(costoTotal) < 0) {
             throw new PresupuestoInsuficienteException(
                     "Presupuesto insuficiente. Disponible: " + disponible + ", requerido: " + costoTotal
