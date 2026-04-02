@@ -112,4 +112,10 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
+    @GetMapping("lideres/sin-proyecto")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarLideresSinProyecto(){
+        List<UsuarioResponseDTO> lideres = usuarioService.consultarLideresSinProyecto();
+        return ResponseEntity.ok(lideres);
+    }
 }

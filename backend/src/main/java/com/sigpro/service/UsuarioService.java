@@ -12,6 +12,7 @@ import com.sigpro.repository.RolRepository;
 import com.sigpro.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -186,6 +187,13 @@ public class UsuarioService {
                 .filter(u -> "ACTIVO".equalsIgnoreCase(u.getEstado())) // solo activos
                 .collect(Collectors.toList());
         return usuarios.stream().map(UsuarioMapper::toResponseDto).collect(Collectors.toList());
+    }
+
+    public List<UsuarioResponseDTO> consultarLideresSinProyecto(){
+        return usuarioRepository.findLideresSinProyecto()
+                .stream()
+                .map(UsuarioMapper::toResponseDto)
+                .toList();
     }
 
     private static String safeTrim(String v) {

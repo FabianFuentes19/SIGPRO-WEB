@@ -33,17 +33,8 @@ const BASE_URL = "http://localhost:8080";
 const DashboardLider = () => {
     const navigate = useNavigate();
     const [mostrarModal, setMostrarModal] = useState(false);
-<<<<<<< HEAD
-    const [vistaActual, setVistaActual] = useState(localStorage.getItem("dashLiderVista") || 'proyecto');
-
-    const cambiarVista = (nuevaVista) => {
-        setVistaActual(nuevaVista);
-        localStorage.setItem("dashLiderVista", nuevaVista);
-    };
-=======
     const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
     const [vistaActual, setVistaActual] = useState('proyecto');
->>>>>>> dev_copia
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
@@ -52,17 +43,12 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
-<<<<<<< HEAD
-    const [cargandoProyecto, setCargandoProyecto] = useState(true);
-=======
     const [mensajeModal, setMensajeModal] = useState(null);
->>>>>>> dev_copia
 
     // Cargar el proyecto del líder
     const cargarProyecto = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
-        setCargandoProyecto(true);
         try {
             const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
                 headers: {
@@ -70,31 +56,13 @@ const DashboardLider = () => {
                     "Authorization": `Bearer ${token}`
                 }
             });
-
-            if (response.status === 404 || response.status === 204 || response.status === 200 && response.headers.get("content-length") === "0") {
-                setProyecto(null);
-                setProyectoId(null);
-                return;
-            }
-
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
-
-            const text = await response.text();
-            if (!text) {
-                setProyecto(null);
-                setProyectoId(null);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            //console.log("Proyecto del líder:", data);
+            const data = await response.json();
+            console.log("Proyecto del líder:", data);
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
             console.error("Error al cargar proyecto:", error);
-            setProyecto(null);
-        } finally {
-            setCargandoProyecto(false);
         }
     };
 
@@ -116,7 +84,7 @@ const DashboardLider = () => {
             });
             if (!response.ok) throw new Error("Error al obtener miembros");
             const data = await response.json();
-            //console.log("Miembros recibidos:", data);
+            console.log("Miembros recibidos:", data);
             const lista = Array.isArray(data) ? data : [];
             setMiembros(lista
                 .filter((m) => m.estado !== 'INACTIVO')
@@ -149,22 +117,6 @@ const DashboardLider = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-<<<<<<< HEAD
-                body: JSON.stringify(datos)
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || "Error al registrar miembro");
-            }
-            setMostrarModal(false);
-            alert("Miembro registrado correctamente");
-            await cargarMiembros();
-        } catch (error) {
-            console.error("Error al registrar miembro:", error);
-            alert(error.message || "Error al registrar miembro");
-        }
-    }
-=======
                             body: JSON.stringify(datos)
                         });
                         const data = await response.json();
@@ -185,7 +137,6 @@ const DashboardLider = () => {
                 });
             }
             };
->>>>>>> dev_copia
 
     const actualizarMiembro = async (datosActualizados) => {
         try {
@@ -241,17 +192,6 @@ const DashboardLider = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Error al desactivar miembro");
-<<<<<<< HEAD
-            }
-            alert("Miembro eliminado correctamente");
-            setModalActivo(null);
-            await cargarMiembros();
-        } catch (error) {
-            console.error("Error al desactivar miembro:", error);
-            alert(error.message || "Error al desactivar miembro");
-        }
-    }
-=======
                 }
                 setMensajeModal({
                 titulo: "Eliminación Exitosa",
@@ -268,7 +208,6 @@ const DashboardLider = () => {
                 });
             }
             };
->>>>>>> dev_copia
 
     useEffect(() => {
         cargarProyecto();
@@ -315,45 +254,38 @@ const DashboardLider = () => {
                     <nav className="sidebar-nav">
                         <div
                             className={`nav-item ${vistaActual === 'proyecto' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('proyecto')}
+                            onClick={() => setVistaActual('proyecto')}
                         >
                             <LayoutDashboard size={20} />
                             <span>Proyecto</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'materiales' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('materiales')}
+                            onClick={() => setVistaActual('materiales')}
                         >
                             <Box size={20} />
                             <span>Materiales</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'nominas' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('nominas')}
+                            onClick={() => setVistaActual('nominas')}
                         >
                             <Wallet size={20} />
                             <span>Nóminas</span>
                         </div>
                     </nav>
                     <div className="sidebar-footer">
-<<<<<<< HEAD
-                        <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
-                            <LogOut size={20} />
-                            <span>Salir</span>
-                        </Link>
-=======
                         <button className="logout-btn" onClick={() => setMostrarCerrarSesion(true)}>
                         <LogOut size={20} />
                         <span>Salir</span>
                         </button>
->>>>>>> dev_copia
                     </div>
                 </aside>
 
                 <main className="main-content">
                     {vistaActual === 'proyecto' && (
                         <>
-                            {proyecto && proyecto.id ? (
+                            {proyecto ? (
                                 <div className="project-card">
                                     <div className="project-header-section">
                                         <h2>{proyecto.nombre}</h2>
@@ -392,34 +324,14 @@ const DashboardLider = () => {
                                         </div>
                                     </div>
                                 </div>
-                            ) : !cargandoProyecto ? (
-                                <div className="no-project-alert" style={{
-                                    padding: '40px',
-                                    textAlign: 'center',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    borderRadius: '12px',
-                                    border: '1px dashed rgba(255,255,255,0.2)',
-                                    marginBottom: '30px'
-                                }}>
-                                    <h3 style={{ color: '#d4af37', marginBottom: '10px' }}>Sin Proyecto Asignado</h3>
-                                    <p style={{ color: '#ccc' }}>
-                                        Actualmente no tienes un proyecto asignado.
-                                        Por favor, contacta al administrador para que se te asigne uno y puedas comenzar a gestionar miembros y materiales.
-                                    </p>
-                                </div>
                             ) : (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>Cargando información del proyecto...</p>
+                                <p>Cargando proyecto...</p>
                             )}
 
                             <div className="members-section">
                                 <div className="members-top-row">
                                     <h2>Miembros</h2>
-                                    <button
-                                        className={`gold-add-btn ${!proyectoId ? 'disabled' : ''}`}
-                                        onClick={() => proyectoId ? setMostrarModal(true) : alert("Debes tener un proyecto asignado para agregar miembros")}
-                                        disabled={!proyectoId}
-                                        style={!proyectoId ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-                                    >
+                                    <button className="gold-add-btn" onClick={() => setMostrarModal(true)}>
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
                                     </button>

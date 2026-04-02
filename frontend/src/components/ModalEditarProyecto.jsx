@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import '../css/ModalEditarProyecto.css';
 
-const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
+const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensajes }) => {
   const [datosFormulario, setDatosFormulario] = useState({
     nombre: '',
-    objetivo: '',
+    objetivoGeneral: '',
     descripcion: '',
     fechaInicio: '',
     fechaFin: '',
-    lider: '',
+    liderNombre: '',
     presupuesto: ''
   });
 
@@ -28,6 +28,21 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
   // Al enviar el formulario, llama a alActualizar pasando los datos del proyecto editado
   const guardarProyecto = (e) => {
     e.preventDefault();
+
+    // Validar que la fecha de fin no sea anterior a la de inicio
+    if (datosFormulario.fechaInicio && datosFormulario.fechaFin) {
+      const inicio = new Date(datosFormulario.fechaInicio);
+      const fin = new Date(datosFormulario.fechaFin);
+      if (fin < inicio) {
+        setModalMensajes({
+          titulo: "Fecha Inválida",
+          mensaje: "La fecha de fin no puede ser anterior a la fecha de inicio",
+          tipo: "error"
+        });
+        return;
+      }
+    }
+
     alActualizar(datosFormulario); 
     alCerrar();
   };
@@ -45,7 +60,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
 
           <div className="form-group">
             <label>Objetivo *</label>
-            <input type="text" name="objetivo" value={datosFormulario.objetivoGeneral || ''} onChange={cambiarValor} required />
+            <input type="text" name="objetivoGeneral" value={datosFormulario.objetivoGeneral || ''} onChange={cambiarValor} required />
           </div>
 
           <div className="form-group">
@@ -66,7 +81,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar }) => {
 
           <div className="form-group">
             <label>Líder *</label>
-            <input type="text" name="lider" value={datosFormulario.liderNombre || ''} onChange={cambiarValor} disabled required />
+            <input type="text" name="liderNombre" value={datosFormulario.liderNombre || ''} onChange={cambiarValor} disabled required />
           </div>
 
           <div className="form-group">

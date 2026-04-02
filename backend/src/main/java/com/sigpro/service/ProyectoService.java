@@ -60,6 +60,7 @@ public class ProyectoService {
     @Transactional
     public ProyectoResponseDTO crearProyecto(@Valid ProyectoRequestDTO dto, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
+        validarFechas(dto.getFechaInicio(), dto.getFechaFin());
 
         Usuario lider;
         if (dto.getLiderMatricula() != null && !dto.getLiderMatricula().isBlank()) {
@@ -101,6 +102,13 @@ public class ProyectoService {
 
         Proyecto proyecto = proyectoRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        // valida que las fechas sean coherentes
+        if (dto.getFechaInicio() != null || dto.getFechaFin() != null) {
+            java.time.LocalDate inicio = dto.getFechaInicio() != null ? dto.getFechaInicio() : proyecto.getFechaInicio();
+            java.time.LocalDate fin = dto.getFechaFin() != null ? dto.getFechaFin() : proyecto.getFechaFin();
+            validarFechas(inicio, fin);
+        }
 
         // solo se pueden editar nombre, descripción, objetivo general y presupuesto
         if (dto.getNombre() != null) {
@@ -185,6 +193,12 @@ public class ProyectoService {
     private void validarRol(Authentication auth, String rolEsperado) {
         if (!auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(rolEsperado))) {
             throw new SecurityException("No autorizado para esta operación");
+        }
+    }
+
+    private void validarFechas(java.time.LocalDate inicio, java.time.LocalDate fin) {
+        if (inicio != null && fin != null && fin.isBefore(inicio)) {
+            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
         }
     }
 

@@ -3,7 +3,7 @@ import '../css/ModalRegistrarProyecto.css';
 import { obtenerUsuarios } from '../services/api';
 
 // recibe 2 props al cerrar y al registra , que son funciones
-const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
+const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => {
   //hook useState, 
   const [datosFormulario, setDatosFormulario] = useState({
     nombre: '',
@@ -20,9 +20,19 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
   useEffect(() => {
     const cargarLideres = async () => {
       try {
-        const data = await obtenerUsuarios("LIDER");
-        const activos = (Array.isArray(data) ? data : []).filter((u) => (u?.estado || "").toUpperCase() === "ACTIVO");
-        setLideres(activos);
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8080/usuarios/lideres/sin-proyecto", {
+          headers:{
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if(response.ok){
+          const data = await response.json();
+          setLideres(data);
+        }else{
+          setLideres("No hay lideres disponobles");
+        }
       } catch (error) {
         console.error("Error al cargar líderes:", error);
         setLideres([]);
@@ -38,6 +48,35 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
 
   const guardarProyecto = (e) => {
     e.preventDefault();
+
+    // valida que la fecha de fin no sea anterior a la de inicio
+    if (datosFormulario.fechaInicio && datosFormulario.fechaFin) {
+      const inicio = new Date(datosFormulario.fechaInicio);
+      const fin = new Date(datosFormulario.fechaFin);
+      if (fin < inicio) {
+        setModalMensajes({
+          titulo: "Fecha Inválida",
+          mensaje: "La fecha de fin no puede ser anterior a la fecha de inicio",
+          tipo: "error"
+        });
+        return;
+      }
+    }
+
+    // valida que la fecha de inicio no esté en el pasado
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaInicioElegida = new Date(datosFormulario.fechaInicio + "T00:00:00");
+
+    if (fechaInicioElegida < hoy) {
+      setModalMensajes({
+        titulo: "Fecha Invalida",
+        mensaje: "No puedes registrar un proyecto con una fecha de inicio en el pasado.",
+        tipo: "error"
+      });
+      return;
+    }
+
     const payload = {
       ...datosFormulario,
       liderId: datosFormulario.liderId ? Number(datosFormulario.liderId) : null,
@@ -70,7 +109,14 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar }) => {
           <div className="form-row-2-col">
             <div className="form-group">
               <label>Fecha Inicio*</label>
-              <input type="date" name="fechaInicio" value={datosFormulario.fechaInicio} onChange={cambiarValor} required />
+              <input 
+                type="date" 
+                name="fechaInicio" 
+                value={datosFormulario.fechaInicio} 
+                onChange={cambiarValor} 
+                min={new Date().toISOString().split('T')[0]}
+                required 
+              />
             </div>
             <div className="form-group">
               <label>Fecha Fin*</label>

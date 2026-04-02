@@ -77,9 +77,10 @@ const DashProyectos = () => {
         });
         fetchProjects();
       } else {
+        const errorData = await response.json();
         setModalMensajes({
           titulo: "Error",
-          mensaje: "Error al agregar proyecto",
+          mensaje: errorData.error || "Error al agregar proyecto",
           tipo: "error"
         });
       }
@@ -112,9 +113,10 @@ const DashProyectos = () => {
         });
         fetchProjects();
       } else {
+        const errorData = await response.json();
         setModalMensajes({
           titulo: "Error",
-          mensaje: "Error al actualizar proyecto",
+          mensaje: errorData.error || "Error al actualizar proyecto",
           tipo: "error"
         });
       }
@@ -238,6 +240,7 @@ const DashProyectos = () => {
         <ModalRegistrarProyecto
           alCerrar={() => setMostrarModal(false)}
           alRegistrar={registrarProyecto}
+          setModalMensajes={setModalMensajes}
         />
       )}
 
@@ -255,6 +258,7 @@ const DashProyectos = () => {
           proyecto={proyectoSeleccionado}
           alCerrar={() => setMostrarModalEditar(false)}
           alActualizar={actualizarProyecto}
+          setModalMensajes={setModalMensajes}
         />
       )}
 
