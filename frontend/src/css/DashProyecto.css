@@ -212,6 +212,18 @@ body {
   font-size: 0.9rem;
 }
 
+.desc-cell {
+  max-width: 280px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
 .custom-table tbody tr:last-child td {
   border-bottom: none;
 }

@@ -114,6 +114,27 @@ html, body {
   border: 2px solid red;
 }
 
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  padding-right: 40px; /* dejar espacio para el ojito */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 .forgot-password {
   text-align: center; 
@@ -161,4 +182,10 @@ html, body {
 .mensaje-exito {
   color: green;
   font-weight: 500;
+}
+
+/* Ocultar el botón nativo de revelado de contraseña en Edge/Internet Explorer */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
 }

@@ -22,20 +22,28 @@ import {
     Eye,
     History
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
+import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
+import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
 
 const BASE_URL = "http://localhost:8080";
 
 const DashboardLider = () => {
+    const navigate = useNavigate();
     const [mostrarModal, setMostrarModal] = useState(false);
+<<<<<<< HEAD
     const [vistaActual, setVistaActual] = useState(localStorage.getItem("dashLiderVista") || 'proyecto');
 
     const cambiarVista = (nuevaVista) => {
         setVistaActual(nuevaVista);
         localStorage.setItem("dashLiderVista", nuevaVista);
     };
+=======
+    const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
+    const [vistaActual, setVistaActual] = useState('proyecto');
+>>>>>>> dev_copia
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
@@ -44,7 +52,11 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
+<<<<<<< HEAD
     const [cargandoProyecto, setCargandoProyecto] = useState(true);
+=======
+    const [mensajeModal, setMensajeModal] = useState(null);
+>>>>>>> dev_copia
 
     // Cargar el proyecto del líder
     const cargarProyecto = async () => {
@@ -123,7 +135,11 @@ const DashboardLider = () => {
     const registrarMiembro = async (datos) => {
         try {
             if (!proyectoId) {
-                alert("No se encontró el proyecto del líder. Recarga la página.");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: "No se encontró el proyecto del líder. Recarga la página.",
+                    tipo: "error"
+                });
                 return;
             }
             const token = localStorage.getItem("token");
@@ -133,6 +149,7 @@ const DashboardLider = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
+<<<<<<< HEAD
                 body: JSON.stringify(datos)
             });
             const data = await response.json();
@@ -147,6 +164,28 @@ const DashboardLider = () => {
             alert(error.message || "Error al registrar miembro");
         }
     }
+=======
+                            body: JSON.stringify(datos)
+                        });
+                        const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Error al registrar miembro");
+
+                setMostrarModal(false);
+                setMensajeModal({
+                titulo: "Registro Exitoso",
+                mensaje: "Miembro registrado correctamente",
+                tipo: "exito"
+                });
+                await cargarMiembros();
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al registrar miembro",
+                tipo: "error"
+                });
+            }
+            };
+>>>>>>> dev_copia
 
     const actualizarMiembro = async (datosActualizados) => {
         try {
@@ -160,19 +199,34 @@ const DashboardLider = () => {
                 body: JSON.stringify(datosActualizados),
             });
 
-            if (response.ok) {
-                alert("Miembro actualizado correctamente");
-                setModalActivo(null);
-                await cargarMiembros();
-            } else {
+           if (response.ok) {
+                    const updatedData = await response.json(); // Esto recibe el objeto actualizado del backend
+                    setUsuarioSeleccionado(updatedData);       // Este es para que refresque el modal de detalles
+                    setMensajeModal({
+                        titulo: "Actualización Exitosa",
+                        mensaje: "Miembro actualizado correctamente",
+                        tipo: "exito"
+                    });
+                    setModalActivo(null);
+                    await cargarMiembros(); // refresca la lista completa
+                }
+
+                    else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar miembro");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: errorData.error || "Error al actualizar miembro",
+                    tipo: "error"
+                });
+                }
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: "Error de conexión con el servidor",
+                tipo: "error"
+                });
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error de conexión con el servidor");
-        }
-    };
+            };
 
     const eliminarMiembro = async (mat) => {
         try {
@@ -187,6 +241,7 @@ const DashboardLider = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Error al desactivar miembro");
+<<<<<<< HEAD
             }
             alert("Miembro eliminado correctamente");
             setModalActivo(null);
@@ -196,6 +251,24 @@ const DashboardLider = () => {
             alert(error.message || "Error al desactivar miembro");
         }
     }
+=======
+                }
+                setMensajeModal({
+                titulo: "Eliminación Exitosa",
+                mensaje: "Miembro eliminado correctamente",
+                tipo: "exito"
+                });
+                setModalActivo(null);
+                await cargarMiembros();
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al desactivar miembro",
+                tipo: "error"
+                });
+            }
+            };
+>>>>>>> dev_copia
 
     useEffect(() => {
         cargarProyecto();
@@ -228,9 +301,10 @@ const DashboardLider = () => {
                 <div className="header-brand">Panel Líder</div>
                 <div className="header-title">
                     {vistaActual === 'proyecto' ? 'Proyecto' :
-                        vistaActual === 'materiales' ? 'Materiales' : 'Nóminas'}
+                        vistaActual === 'materiales' ? 'Materiales' :
+                        vistaActual === 'perfil' ? 'Perfil' : 'Nóminas'}
                 </div>
-                <div className="header-user" onClick={() => setVistaActual('perfil')}>
+                <div className="header-user" onClick={() => setVistaActual('perfil')} style={{ cursor: 'pointer' }}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
 
@@ -262,10 +336,17 @@ const DashboardLider = () => {
                         </div>
                     </nav>
                     <div className="sidebar-footer">
+<<<<<<< HEAD
                         <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
                             <LogOut size={20} />
                             <span>Salir</span>
                         </Link>
+=======
+                        <button className="logout-btn" onClick={() => setMostrarCerrarSesion(true)}>
+                        <LogOut size={20} />
+                        <span>Salir</span>
+                        </button>
+>>>>>>> dev_copia
                     </div>
                 </aside>
 
@@ -430,6 +511,27 @@ const DashboardLider = () => {
                     alCerrar={() => setModalActivo(null)}
                 />
             )}
+
+            {/* Este es el modal para cerrar sesión*/}
+            {mostrarCerrarSesion && (
+                <ModalCerrarSesion
+                    alCancelar={() => setMostrarCerrarSesion(false)}
+                    alAceptar={() => {
+                        localStorage.clear();
+                        navigate('/login');
+                    }}
+                />
+            )}
+
+                {mensajeModal && (
+                <ModalMensajes
+                    titulo={mensajeModal.titulo}
+                    mensaje={mensajeModal.mensaje}
+                    tipo={mensajeModal.tipo}
+                    onConfirm={() => setMensajeModal(null)}
+                />
+                )}
+
         </div>
     );
 };
