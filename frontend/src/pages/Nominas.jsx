@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../css/Nominas.css';
 import NominaCard from '../components/Nominas/NominaCard';
 import { Search, ChevronDown, Loader2 } from 'lucide-react';
+import ModalMensajes from '../components/Usuarios/ModalMensajes';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -12,6 +13,8 @@ const Nominas = ({ onPaymentSuccess }) => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [proyectoId, setProyectoId] = useState(null);
+  const [mensajeModal, setMensajeModal] = useState(null);
+  
 
   const obtenerProyecto = async (token) => {
     try {
@@ -19,10 +22,10 @@ const Nominas = ({ onPaymentSuccess }) => {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (!resp.ok) return null;
-      
+
       const text = await resp.text();
       if (!text) return null;
-      
+
       const data = JSON.parse(text);
       return data && data.id ? data.id : null;
     } catch (e) {
@@ -32,15 +35,15 @@ const Nominas = ({ onPaymentSuccess }) => {
   };
 
 
-  const obtenerMiembrosProyecto = async (token, matriculaLider) => {
-    const resp = await fetch(`${BASE_URL}/usuarios/lider/${encodeURIComponent(matriculaLider)}`, {
+  const obtenerMiembrosProyecto = async (token) => {
+    const resp = await fetch(`${BASE_URL}/proyectos/mi-equipo`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!resp.ok) throw new Error("No se pudieron cargar los miembros del equipo.");
     return await resp.json();
   };
 
-  const obtenerVouchersDeMiembro = async (token, miembro) => {
+  const obtenerVouchersDeMiembro = async (token, miembro, matriculaLider) => {
     try {
       const resp = await fetch(`${BASE_URL}/pagos/vouchers/${miembro.matricula}?t=${Date.now()}`, {
         headers: {
@@ -60,10 +63,14 @@ const Nominas = ({ onPaymentSuccess }) => {
           monto: v.montoEsperado,
           estado: v.estado,
           fecha: v.estado === "PAGADO" ? v.fechaPagoReal : v.fechaFin,
-          numeroQuincena: v.numeroQuincena
+          numeroQuincena: v.numeroQuincena,
+          esPropio: miembro.matricula === matriculaLider
         }));
+      } else {
+        const errorData = await resp.json();
+        console.error(`Error 400 en vouchers para ${miembro.matricula}:`, errorData.error);
+        return [];
       }
-      return [];
     } catch (e) {
       console.error(`Error cargando vouchers de ${miembro.matricula}:`, e);
       return [];
@@ -92,10 +99,11 @@ const Nominas = ({ onPaymentSuccess }) => {
       const idProyecto = await obtenerProyecto(token);
       setProyectoId(idProyecto);
 
-      const miembros = await obtenerMiembrosProyecto(token, matriculaLider);
+      // se obtiene todos los miembros incluyendo el lider
+      const equipo = await obtenerMiembrosProyecto(token);
 
       const arraysDeNominas = await Promise.all(
-        miembros.map(miembro => obtenerVouchersDeMiembro(token, miembro))
+        equipo.map(miembro => obtenerVouchersDeMiembro(token, miembro, matriculaLider))
       );
 
       setNominas(arraysDeNominas.flat());
@@ -139,7 +147,11 @@ const Nominas = ({ onPaymentSuccess }) => {
       });
 
       if (response.ok) {
-        alert("¡Pago registrado con éxito!");
+          setMensajeModal({
+            titulo: "Registro Exitoso",
+            mensaje: "Pago registrado correctamente",
+            tipo: "exito"
+          });
         await cargarTodo();
         // Avisar al dashboard para que actualice el presupuesto del proyecto
         if (typeof onPaymentSuccess === 'function') {
@@ -147,7 +159,11 @@ const Nominas = ({ onPaymentSuccess }) => {
         }
       } else {
         const errorData = await response.json();
-        alert(`Error al registrar pago: ${errorData.error || "Ocurrió un problema"}`);
+        setMensajeModal({
+            titulo: "Error al registrar",
+            mensaje: errorData.error || "Ocurrió un problema al procesar el pago",
+            tipo: "error"
+          });
       }
     } catch (error) {
       console.error("Error en la petición de pago:", error);
@@ -210,6 +226,15 @@ const Nominas = ({ onPaymentSuccess }) => {
           ))
         ) : (
           <div className="no-results">No se encontraron nóminas para mostrar.</div>
+        )}
+
+        {mensajeModal && (
+          <ModalMensajes
+            titulo={mensajeModal.titulo}
+            mensaje={mensajeModal.mensaje}
+            tipo={mensajeModal.tipo}
+            onConfirm={() => setMensajeModal(null)}
+          />
         )}
       </div>
     </div>

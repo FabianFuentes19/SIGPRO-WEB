@@ -13,7 +13,10 @@ const NominaCard = ({ nomina, onPay }) => {
     <div className="nomina-card">
       <div className="nomina-card-header">
         <div className="employee-info">
-          <h3 className="employee-name">{nomina.nombre}</h3>
+          <div className="employee-name-row">
+            <h3 className="employee-name">{nomina.nombre}</h3>
+            {nomina.esPropio && <span className="self-badge">Tú</span>}
+          </div>
           <span className="employee-role">{nomina.puesto}</span>
         </div>
         <div className="voucher-info">

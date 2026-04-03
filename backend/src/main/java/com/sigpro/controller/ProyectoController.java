@@ -147,6 +147,22 @@ public class ProyectoController {
         }
     }
 
+    @GetMapping("/mi-equipo")
+    public ResponseEntity<?> consultarEquipoCompleto(Authentication auth) {
+        try {
+            List<UsuarioResponseDTO> equipo = proyectoService.consultarEquipoCompleto(auth);
+            return ResponseEntity.ok(equipo);
+        } catch (SecurityException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al consultar el equipo del proyecto");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> consultarDetalle(@PathVariable Long id, Authentication auth) {

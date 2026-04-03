@@ -133,8 +133,10 @@ public class PagoService {
         Usuario usuario = usuarioRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        if (!"ACTIVO".equalsIgnoreCase(usuario.getEstado())) {
-            throw new IllegalArgumentException("Cuenta inactiva");
+        String estado = usuario.getEstado() != null ? usuario.getEstado().trim() : "";
+        if (!"ACTIVO".equalsIgnoreCase(estado)) {
+            System.err.println("[DEBUG] Bloqueo de nómina: Usuario " + matricula + " tiene estado [" + estado + "]");
+            throw new IllegalArgumentException("Cuenta inactiva (" + estado + ")");
         }
 
         List<Pago> pagos = pagoRepository.findByUsuarioMatricula(matricula);
@@ -155,8 +157,11 @@ public class PagoService {
                     ? inicio.withDayOfMonth(15)
                     : inicio.withDayOfMonth(inicio.lengthOfMonth());
 
-            BigDecimal montoQuincenal = usuario.getSalarioQuincenal();
-            if (vouchers.isEmpty()) {
+            BigDecimal montoQuincenal = usuario.getSalarioQuincenal() != null 
+                    ? usuario.getSalarioQuincenal() 
+                    : BigDecimal.ZERO;
+
+            if (vouchers.isEmpty() && montoQuincenal.compareTo(BigDecimal.ZERO) > 0) {
                 long diasTrabajados = ChronoUnit.DAYS.between(inicio, fin) + 1;
                 // calculo de pago proporcional
                 if (diasTrabajados < 15) {
