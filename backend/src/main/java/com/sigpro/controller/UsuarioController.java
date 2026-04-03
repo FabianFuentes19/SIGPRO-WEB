@@ -114,6 +114,7 @@ public class UsuarioController {
     }
 
 
+
     @PutMapping("/{matricula}/cambiar-contrasena")
     public ResponseEntity<?> cambiarContrasena(
             @PathVariable String matricula,
@@ -145,5 +146,12 @@ public class UsuarioController {
 
 
 
+
+
+    @GetMapping("lideres/sin-proyecto")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarLideresSinProyecto(){
+        List<UsuarioResponseDTO> lideres = usuarioService.consultarLideresSinProyecto();
+        return ResponseEntity.ok(lideres);
+    }
 
 }

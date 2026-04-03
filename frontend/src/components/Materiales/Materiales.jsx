@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import AgregarMaterial from './AgregarMaterial.jsx';
 import { obtenerMaterialesPorProyecto, registrarMaterial } from '../../services/api.js';
+import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
 
-const Materiales = ({ proyectoId }) => {
+const Materiales = ({ proyectoId, onMaterialSuccess }) => {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [materiales, setMateriales] = useState([]);
     const [busqueda, setBusqueda] = useState('');
     const [cargando, setCargando] = useState(false);
+    const [mensajeModal, setMensajeModal] = useState(null);
 
     const cargarMateriales = async () => {
         if (!proyectoId) {
@@ -58,9 +60,23 @@ const Materiales = ({ proyectoId }) => {
                 cantidad: datos?.cantidad,
                 proyectoId,
             });
+            setMostrarModal(false);
+            setMensajeModal({
+                titulo: "Registro Exitoso",
+                mensaje: "Material registrado correctamente",
+                tipo: "exito"
+            });
             await cargarMateriales(); // refresca lista y total automáticamente
+            if (typeof onMaterialSuccess === 'function') {
+                onMaterialSuccess();
+            }
         } catch (e) {
-            alert(e?.message || 'No fue posible registrar el material');
+            setMostrarModal(false);
+            setMensajeModal({
+                titulo: "Error",
+                mensaje: e?.message  || "Error al registrar material",
+                tipo: "error"
+            });
         }
     };
 
@@ -85,7 +101,12 @@ const Materiales = ({ proyectoId }) => {
             </div>
 
             <div className="material-actions-row">
-                <button className="gold-add-btn" onClick={() => setMostrarModal(true)}>
+                <button
+                    className={`gold-add-btn ${!proyectoId ? 'disabled' : ''}`}
+                    onClick={() => proyectoId ? setMostrarModal(true) : alert("Debes tener un proyecto asignado para agregar miembros")}
+                    disabled={!proyectoId}
+                    style={!proyectoId ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                >
                     <Plus size={18} />
                     <span>Agregar material</span>
                 </button>
@@ -118,6 +139,15 @@ const Materiales = ({ proyectoId }) => {
                     alRegistrar={onRegistrar}
                 />
             )}
+
+            {mensajeModal && (
+                <ModalMensajes
+                    titulo={mensajeModal.titulo}
+                    mensaje={mensajeModal.mensaje}
+                    tipo={mensajeModal.tipo}
+                    onConfirm={() => setMensajeModal(null)}
+                />
+                )}
         </div>
     );
 };

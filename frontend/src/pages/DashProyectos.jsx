@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/DashProyecto.css';
 import ModalRegistrarProyecto from '../components/ModalRegistrarProyecto';
 import ModalConsultarProyecto from '../components/ModalConsultarProyecto';
 import ModalEditarProyecto from '../components/ModalEditarProyecto';
+import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import { Eye, LogOut, Pencil } from 'lucide-react';
+import ModalMensajes from '../components/Usuarios/ModalMensajes'
 
 const DashProyectos = () => {
+  const navigate = useNavigate();
   // Estado para controlar los modales
+  const [mostrarModalCerrarSesion, setMostrarModalCerrarSesion] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalConsultar, setMostrarModalConsultar] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mensajeModal, setModalMensajes] = useState(null);
 
   // Estado para guardar la lista de proyectos
   const [proyectos, setProyectos] = useState([]);
@@ -43,6 +48,11 @@ const DashProyectos = () => {
     fetchProjects();
   }, []);
 
+  const handleCerrarSesion = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
   // Función que se ejecuta cuando se registra un nuevo proyecto
   const registrarProyecto = async (nuevoProyecto) => {
     try {
@@ -56,14 +66,25 @@ const DashProyectos = () => {
         body: JSON.stringify(nuevoProyecto),
       });
 
+      // Esto agrege para que se muestre el mensaje
       if (response.ok) {
         const data = await response.json();
         console.log("Proyecto registrado en backend:", data);
-        alert("Proyecto agregado correctamente");
-        fetchProjects(); // recargar lista
+        setModalMensajes({
+          titulo: "Registro Exitoso",
+          mensaje: "Proyecto agregado correctamente",
+          tipo: "exito"
+        });
+        fetchProjects();
       } else {
-        alert("Error al agregar proyecto");
+        const errorData = await response.json();
+        setModalMensajes({
+          titulo: "Error",
+          mensaje: errorData.error || "Error al agregar proyecto",
+          tipo: "error"
+        });
       }
+
     } catch (error) {
       console.error("Error:", error);
       alert("Error de conexión con el servidor");
@@ -83,17 +104,40 @@ const DashProyectos = () => {
         body: JSON.stringify(proyectoActualizado),
       });
 
+      //Agregue esto parea que se muestre el mensaje de actulización exitosa
       if (response.ok) {
-        alert("Proyecto actualizado correctamente");
+        setModalMensajes({
+          titulo: "Actualización Exitosa",
+          mensaje: "Proyecto actualizado correctamente",
+          tipo: "exito"
+        });
         fetchProjects();
       } else {
-        alert("Error al actualizar proyecto");
+        const errorData = await response.json();
+        setModalMensajes({
+          titulo: "Error",
+          mensaje: errorData.error || "Error al actualizar proyecto",
+          tipo: "error"
+        });
       }
+
     } catch (error) {
       console.error("Error:", error);
       alert("Error de conexión con el servidor");
     }
   };
+
+  // Función para determinar el estado visual del presupuesto
+  const calculateBudgetStatus = (actual, inicial) => {
+    if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: '' };
+    const perc = (actual / inicial) * 100;
+    
+    if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: 'Agotado' };
+    if (perc <= 10) return { perc, colorClass: 'budget-critical', text: 'Crítico' };
+    if (perc <= 20) return { perc, colorClass: 'budget-warning', text: 'En riesgo' };
+    return { perc, colorClass: 'budget-healthy', text: 'Equilibrado' };
+  };
+
 
   return (
     <div className="dashboard-container">
@@ -117,10 +161,10 @@ const DashProyectos = () => {
             </Link>
           </nav>
             <div className="sidebar-footer">
-            <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
+            <button className="logout-btn" onClick={(e) => { e.preventDefault(); setMostrarModalCerrarSesion(true); }}>
             <LogOut size={20} />
             <span>Salir</span>
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -147,13 +191,14 @@ const DashProyectos = () => {
                     <th>LÍDER</th>
                     <th>DESCRIPCIÓN</th>
                     <th>PRESUPUESTO</th>
+                    <th>ESTADO</th>
                     <th>ACCIONES</th>
                   </tr>
                 </thead>
                 <tbody>
                   {proyectos.length === 0 ? (
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
                         No hay proyectos registrados aún.
                       </td>
                     </tr>
@@ -169,8 +214,38 @@ const DashProyectos = () => {
                           <td>{index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
-                          <td>{p.descripcion}</td>
-                          <td>{"$" + p.presupuesto}</td>
+                          <td>
+                            <div className="desc-cell" title={p.descripcion}>
+                              {p.descripcion}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="budget-cell-container">
+                              <span className="budget-amount">{"$" + Number(p.presupuesto).toLocaleString()}</span>
+                              {(() => {
+                                const status = calculateBudgetStatus(p.presupuesto, p.presupuestoInicial);
+                                return (
+                                  <>
+                                    <div className="budget-progress-outer">
+                                      <div 
+                                        className={`budget-progress-inner ${status.colorClass}`} 
+                                        style={{ width: `${Math.min(status.perc, 100)}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className={`budget-status-text ${status.colorClass.replace('budget-', 'text-')}`}>
+                                      {status.text} ({Math.round(status.perc)}%)
+                                    </span>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          </td>
+                          <td>
+                            {/*Agrego esto para poner el estado del Proyecto*/}
+                            <span className={`badge ${p.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}`}>
+                              {p.estado === 'ACTIVO' ? 'ACTIVO' : 'INACTIVO'}
+                            </span>
+                          </td>
                           <td>
                             <div className="dropdown-container">
                               <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
@@ -197,6 +272,7 @@ const DashProyectos = () => {
         <ModalRegistrarProyecto
           alCerrar={() => setMostrarModal(false)}
           alRegistrar={registrarProyecto}
+          setModalMensajes={setModalMensajes}
         />
       )}
 
@@ -214,6 +290,26 @@ const DashProyectos = () => {
           proyecto={proyectoSeleccionado}
           alCerrar={() => setMostrarModalEditar(false)}
           alActualizar={actualizarProyecto}
+          setModalMensajes={setModalMensajes}
+        />
+      )}
+
+      {/* Modal Cerrar Sesion */}
+      {mostrarModalCerrarSesion && (
+        <ModalCerrarSesion
+          alCancelar={() => setMostrarModalCerrarSesion(false)}
+          alAceptar={handleCerrarSesion}
+        />
+      )}
+
+
+        {mensajeModal && (
+        <ModalMensajes
+          titulo={mensajeModal.titulo}
+          mensaje={mensajeModal.mensaje}
+          tipo={mensajeModal.tipo}
+          onConfirm={() => setModalMensajes(null)}
+          onCancel={() => setModalMensajes(null)}
         />
       )}
     </div>

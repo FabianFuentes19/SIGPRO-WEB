@@ -22,20 +22,19 @@ import {
     Eye,
     History
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
+import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
+import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
 
 const BASE_URL = "http://localhost:8080";
 
 const DashboardLider = () => {
+    const navigate = useNavigate();
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [vistaActual, setVistaActual] = useState(localStorage.getItem("dashLiderVista") || 'proyecto');
-
-    const cambiarVista = (nuevaVista) => {
-        setVistaActual(nuevaVista);
-        localStorage.setItem("dashLiderVista", nuevaVista);
-    };
+    const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
+    const [vistaActual, setVistaActual] = useState('proyecto');
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
@@ -44,13 +43,26 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
-    const [cargandoProyecto, setCargandoProyecto] = useState(true);
+    const [mensajeModal, setMensajeModal] = useState(null);
 
-    // Cargar el proyecto del líder
-    const cargarProyecto = async () => {
+    // rastrea el presupuesto anterior y evitar alertas repetitivas al navegar
+    const lastBudgetRef = useRef(null);
+
+    // Función para calcular el estado presupuesto
+    const calculateBudgetStatus = (actual, inicial) => {
+        if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
+        const perc = (actual / inicial) * 100;
+        
+        if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'CRITICAL', text: 'Presupuesto Agotado' };
+        if (perc <= 10) return { perc, colorClass: 'budget-critical', status: 'CRITICAL', text: 'Presupuesto rítico' };
+        if (perc <= 20) return { perc, colorClass: 'budget-warning', status: 'WARNING', text: 'Presupuesto en riesgo' };
+        return { perc, colorClass: 'budget-healthy', status: 'OK', text: 'Equilibrado' };
+    };
+
+
+    const cargarProyecto = async (triggerAlert = false) => {
         const token = localStorage.getItem("token");
         if (!token) return;
-        setCargandoProyecto(true);
         try {
             const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
                 headers: {
@@ -58,31 +70,27 @@ const DashboardLider = () => {
                     "Authorization": `Bearer ${token}`
                 }
             });
-
-            if (response.status === 404 || response.status === 204 || response.status === 200 && response.headers.get("content-length") === "0") {
-                setProyecto(null);
-                setProyectoId(null);
-                return;
-            }
-
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
+            const data = await response.json();
+            
+            // verifica si al insertar un gasto el presupuesto entra en riesgo
+            if (triggerAlert && lastBudgetRef.current !== null && lastBudgetRef.current !== data.presupuesto) {
+                const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoInicial);
+                if (statusInfo.status !== 'OK') {
+                    setMensajeModal({
+                        titulo: statusInfo.status === 'CRITICAL' ? "¡ALERTA CRÍTICA!" : "Advertencia de Presupuesto",
+                        mensaje: statusInfo.text,
+                        tipo: statusInfo.status === 'CRITICAL' ? "error" : "advertencia"
+                    });
+                }
 
-            const text = await response.text();
-            if (!text) {
-                setProyecto(null);
-                setProyectoId(null);
-                return;
             }
-
-            const data = JSON.parse(text);
-            console.log("Proyecto del líder:", data);
+            
+            lastBudgetRef.current = data.presupuesto;
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
             console.error("Error al cargar proyecto:", error);
-            setProyecto(null);
-        } finally {
-            setCargandoProyecto(false);
         }
     };
 
@@ -123,7 +131,11 @@ const DashboardLider = () => {
     const registrarMiembro = async (datos) => {
         try {
             if (!proyectoId) {
-                alert("No se encontró el proyecto del líder. Recarga la página.");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: "No se encontró el proyecto del líder. Recarga la página.",
+                    tipo: "error"
+                });
                 return;
             }
             const token = localStorage.getItem("token");
@@ -133,20 +145,26 @@ const DashboardLider = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify(datos)
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || "Error al registrar miembro");
+                            body: JSON.stringify(datos)
+                        });
+                        const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Error al registrar miembro");
+
+                setMostrarModal(false);
+                setMensajeModal({
+                titulo: "Registro Exitoso",
+                mensaje: "Miembro registrado correctamente",
+                tipo: "exito"
+                });
+                await cargarMiembros();
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al registrar miembro",
+                tipo: "error"
+                });
             }
-            setMostrarModal(false);
-            alert("Miembro registrado correctamente");
-            await cargarMiembros();
-        } catch (error) {
-            console.error("Error al registrar miembro:", error);
-            alert(error.message || "Error al registrar miembro");
-        }
-    }
+            };
 
     const actualizarMiembro = async (datosActualizados) => {
         try {
@@ -160,19 +178,34 @@ const DashboardLider = () => {
                 body: JSON.stringify(datosActualizados),
             });
 
-            if (response.ok) {
-                alert("Miembro actualizado correctamente");
-                setModalActivo(null);
-                await cargarMiembros();
-            } else {
+           if (response.ok) {
+                    const updatedData = await response.json(); // Esto recibe el objeto actualizado del backend
+                    setUsuarioSeleccionado(updatedData);       // Este es para que refresque el modal de detalles
+                    setMensajeModal({
+                        titulo: "Actualización Exitosa",
+                        mensaje: "Miembro actualizado correctamente",
+                        tipo: "exito"
+                    });
+                    setModalActivo(null);
+                    await cargarMiembros(); // refresca la lista completa
+                }
+
+                    else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar miembro");
+                setMensajeModal({
+                    titulo: "Error",
+                    mensaje: errorData.error || "Error al actualizar miembro",
+                    tipo: "error"
+                });
+                }
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: "Error de conexión con el servidor",
+                tipo: "error"
+                });
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error de conexión con el servidor");
-        }
-    };
+            };
 
     const eliminarMiembro = async (mat) => {
         try {
@@ -187,15 +220,22 @@ const DashboardLider = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Error al desactivar miembro");
+                }
+                setMensajeModal({
+                titulo: "Eliminación Exitosa",
+                mensaje: "Miembro eliminado correctamente",
+                tipo: "exito"
+                });
+                setModalActivo(null);
+                await cargarMiembros();
+            } catch (error) {
+                setMensajeModal({
+                titulo: "Error",
+                mensaje: error.message || "Error al desactivar miembro",
+                tipo: "error"
+                });
             }
-            alert("Miembro eliminado correctamente");
-            setModalActivo(null);
-            await cargarMiembros();
-        } catch (error) {
-            console.error("Error al desactivar miembro:", error);
-            alert(error.message || "Error al desactivar miembro");
-        }
-    }
+            };
 
     useEffect(() => {
         cargarProyecto();
@@ -228,9 +268,10 @@ const DashboardLider = () => {
                 <div className="header-brand">Panel Líder</div>
                 <div className="header-title">
                     {vistaActual === 'proyecto' ? 'Proyecto' :
-                        vistaActual === 'materiales' ? 'Materiales' : 'Nóminas'}
+                        vistaActual === 'materiales' ? 'Materiales' :
+                        vistaActual === 'perfil' ? 'Perfil' : 'Nóminas'}
                 </div>
-                <div className="header-user" onClick={() => setVistaActual('perfil')}>
+                <div className="header-user" onClick={() => setVistaActual('perfil')} style={{ cursor: 'pointer' }}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
                 </div>
 
@@ -241,38 +282,38 @@ const DashboardLider = () => {
                     <nav className="sidebar-nav">
                         <div
                             className={`nav-item ${vistaActual === 'proyecto' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('proyecto')}
+                            onClick={() => setVistaActual('proyecto')}
                         >
                             <LayoutDashboard size={20} />
                             <span>Proyecto</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'materiales' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('materiales')}
+                            onClick={() => setVistaActual('materiales')}
                         >
                             <Box size={20} />
                             <span>Materiales</span>
                         </div>
                         <div
                             className={`nav-item ${vistaActual === 'nominas' ? 'active' : ''}`}
-                            onClick={() => cambiarVista('nominas')}
+                            onClick={() => setVistaActual('nominas')}
                         >
                             <Wallet size={20} />
                             <span>Nóminas</span>
                         </div>
                     </nav>
                     <div className="sidebar-footer">
-                        <Link to="/login" className="logout-btn" onClick={() => localStorage.clear()}>
-                            <LogOut size={20} />
-                            <span>Salir</span>
-                        </Link>
+                        <button className="logout-btn" onClick={() => setMostrarCerrarSesion(true)}>
+                        <LogOut size={20} />
+                        <span>Salir</span>
+                        </button>
                     </div>
                 </aside>
 
                 <main className="main-content">
                     {vistaActual === 'proyecto' && (
                         <>
-                            {proyecto && proyecto.id ? (
+                            {proyecto ? (
                                 <div className="project-card">
                                     <div className="project-header-section">
                                         <h2>{proyecto.nombre}</h2>
@@ -298,47 +339,43 @@ const DashboardLider = () => {
 
                                     <div className="budget-section-left">
                                         <span className="budget-label">Presupuesto Total</span>
-                                        <h3 className="budget-value">${proyecto.presupuesto}</h3>
+                                        <h3 className="budget-value">${proyecto.presupuesto.toLocaleString()}</h3>
                                     </div>
 
                                     <div className="progress-section-bottom">
-                                        <div className="progress-info-row">
-                                            <span>Progreso Del Proyecto</span>
-                                            <span className="progress-perc">0%</span>
-                                        </div>
-                                        <div className="progress-bar-outer">
-                                            <div className="progress-bar-inner-fill" style={{ width: '0%' }}></div>
-                                        </div>
+                                        {(() => {
+                                            const status = calculateBudgetStatus(proyecto.presupuesto, proyecto.presupuestoInicial);
+                                            return (
+                                                <>
+                                                    <div className="progress-info-row">
+                                                        <span>Estado del presupuesto</span>
+                                                        <span className={`progress-perc ${status.colorClass.replace('budget-', 'text-')}`}>
+                                                            {Math.round(status.perc)}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="budget-progress-outer">
+                                                        <div 
+                                                            className={`budget-progress-inner ${status.colorClass}`} 
+                                                            style={{ width: `${Math.min(status.perc, 100)}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <div className="budget-summary-row">
+                                                        <span className={status.colorClass.replace('budget-', 'text-')}>{status.text}</span>
+                                                        <span>Consumido: ${ (proyecto.presupuestoInicial - proyecto.presupuesto).toLocaleString() }</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
-                            ) : !cargandoProyecto ? (
-                                <div className="no-project-alert" style={{
-                                    padding: '40px',
-                                    textAlign: 'center',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    borderRadius: '12px',
-                                    border: '1px dashed rgba(255,255,255,0.2)',
-                                    marginBottom: '30px'
-                                }}>
-                                    <h3 style={{ color: '#d4af37', marginBottom: '10px' }}>Sin Proyecto Asignado</h3>
-                                    <p style={{ color: '#ccc' }}>
-                                        Actualmente no tienes un proyecto asignado.
-                                        Por favor, contacta al administrador para que se te asigne uno y puedas comenzar a gestionar miembros y materiales.
-                                    </p>
-                                </div>
                             ) : (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>Cargando información del proyecto...</p>
+                                <p>Cargando proyecto...</p>
                             )}
 
                             <div className="members-section">
                                 <div className="members-top-row">
                                     <h2>Miembros</h2>
-                                    <button
-                                        className={`gold-add-btn ${!proyectoId ? 'disabled' : ''}`}
-                                        onClick={() => proyectoId ? setMostrarModal(true) : alert("Debes tener un proyecto asignado para agregar miembros")}
-                                        disabled={!proyectoId}
-                                        style={!proyectoId ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-                                    >
+                                    <button className="gold-add-btn" onClick={() => setMostrarModal(true)}>
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
                                     </button>
@@ -382,8 +419,8 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} />}
-                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={cargarProyecto} />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={() => cargarProyecto(true)} />}
+                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={() => cargarProyecto(true)} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 
                 </main>
@@ -430,6 +467,27 @@ const DashboardLider = () => {
                     alCerrar={() => setModalActivo(null)}
                 />
             )}
+
+            {/* Este es el modal para cerrar sesión*/}
+            {mostrarCerrarSesion && (
+                <ModalCerrarSesion
+                    alCancelar={() => setMostrarCerrarSesion(false)}
+                    alAceptar={() => {
+                        localStorage.clear();
+                        navigate('/login');
+                    }}
+                />
+            )}
+
+                {mensajeModal && (
+                <ModalMensajes
+                    titulo={mensajeModal.titulo}
+                    mensaje={mensajeModal.mensaje}
+                    tipo={mensajeModal.tipo}
+                    onConfirm={() => setMensajeModal(null)}
+                />
+                )}
+
         </div>
     );
 };
