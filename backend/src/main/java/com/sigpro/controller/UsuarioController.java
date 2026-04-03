@@ -113,9 +113,45 @@ public class UsuarioController {
         }
     }
 
+
+
+    @PutMapping("/{matricula}/cambiar-contrasena")
+    public ResponseEntity<?> cambiarContrasena(
+            @PathVariable String matricula,
+            @RequestBody Map<String, String> request) {
+        try {
+            String actual = request.get("actual");
+            String nueva = request.get("nueva");
+
+            if (nueva == null || nueva.trim().isEmpty()) {
+                throw new IllegalArgumentException("La nueva contraseña no puede estar vacía");
+            }
+
+            usuarioService.cambiarPassword(matricula, actual, nueva);
+
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Contraseña actualizada correctamente.");
+            return ResponseEntity.ok(respuesta);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "No fue posible cambiar la contraseña");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+
+
+
+
     @GetMapping("lideres/sin-proyecto")
     public ResponseEntity<List<UsuarioResponseDTO>> listarLideresSinProyecto(){
         List<UsuarioResponseDTO> lideres = usuarioService.consultarLideresSinProyecto();
         return ResponseEntity.ok(lideres);
     }
+
 }

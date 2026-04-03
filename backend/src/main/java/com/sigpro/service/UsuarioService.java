@@ -199,4 +199,22 @@ public class UsuarioService {
     private static String safeTrim(String v) {
         return v == null ? null : v.trim();
     }
+
+
+    public void cambiarPassword(String matricula, String actual, String nueva) {
+        Usuario usuario = usuarioRepository.findByMatricula(matricula)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+
+        if (!passwordEncoder.matches(actual, usuario.getContrasena())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+
+        usuario.setContrasena(passwordEncoder.encode(nueva));
+        usuarioRepository.save(usuario);
+    }
+
+
+
 }

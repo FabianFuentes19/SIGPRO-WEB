@@ -8,6 +8,8 @@ import LiderRoute from "./components/LiderRoute";
 
 import RecuperarContrasena from "./components/RecuperarContrasena";
 import RestablecerContrasena from "./components/RestablecerContrasena";
+import CambioContrasena from "./pages/CambioContrasena";
+
 
 function App() {
   return (
@@ -41,6 +43,15 @@ function App() {
             <DashboardLider />
           </LiderRoute>
         } />
+
+
+        <Route path="/PerfilLider/cambiar-contrasena" element={
+          <LiderRoute>
+            <CambioContrasena />
+          </LiderRoute>
+        } />
+
+
       </Routes>
     </Router>
   );

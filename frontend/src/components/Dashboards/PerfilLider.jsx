@@ -3,6 +3,7 @@ import {
   LayoutGrid, Users, Wallet, Info, History, LogOut, UserCircle 
 } from "lucide-react";
 import "./PerfilLider.css";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -11,6 +12,7 @@ const PerfilLider = () => {
   const [usuario, setUsuario] = useState(null);
   const [listaPagos, setListaPagos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
 
   //Carga los datos al iniciar 
   useEffect(() => {
@@ -171,6 +173,32 @@ const PerfilLider = () => {
               )}
             </div>
           </section>
+
+                {/*Agregue esto para el cambio de contraseña*/}
+                <section className="seccion-info">
+              <div className="encabezado-bloque">
+                <UserCircle size={18} className="color-teal" /> 
+                <span>Seguridad</span>
+              </div>
+              <div className="tarjeta-datos">
+                <p className="texto-info">
+                  Actualiza tu contraseña en cualquier momento. 
+                  Mantener tu cuenta protegida y bajo tu control.
+                </p>
+                <center>
+                <button 
+                  className="btn-cambiar-contrasena"
+                  onClick={() => navigate("/PerfilLider/cambiar-contrasena")}
+
+                >
+                  Cambiar Contraseña
+                </button>
+                </center>
+              </div>
+            </section>
+
+
+
         </main>
       </div>
     </div>
