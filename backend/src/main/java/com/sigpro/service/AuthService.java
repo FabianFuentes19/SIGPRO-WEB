@@ -120,4 +120,20 @@ public class AuthService {
         tokenRepository.delete(resetToken);
         System.out.println("Contraseña restablecida correctamente para la matricula: " + matricula);
     }
+
+    @Transactional(readOnly = true)
+    public void validarCodigo(String matricula, String token) throws Exception {
+        // se vuelve a verificar que realmente el usaurio exista
+        Usuario usuario = usuarioRepository.findByMatricula(matricula)
+                .orElseThrow(() -> new Exception("Usuario no encontrado"));
+
+        // se verifica que en la tabla del token este el código ingresado
+        PasswordResetToken resetToken = tokenRepository.findByTokenAndUsuario(token, usuario)
+                .orElseThrow(() -> new Exception("El código es inválido"));
+
+        // se valida si no ha expirado el tiempo de vida
+        if (resetToken.isExpired()) {
+            throw new Exception("El código ha expirado, por favor solicita uno nuevo");
+        }
+    }
 }

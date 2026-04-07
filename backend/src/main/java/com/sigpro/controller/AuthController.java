@@ -144,4 +144,26 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
+
+    @PostMapping("/verificar-codigo")
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> request) {
+        try {
+            String matricula = request.get("matricula");
+            String token = request.get("token");
+
+            if (matricula == null || token == null) {
+                throw new Exception("Matrícula y código son requeridos.");
+            }
+
+            authService.validarCodigo(matricula, token);
+
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Código validado correctamente.");
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
 }

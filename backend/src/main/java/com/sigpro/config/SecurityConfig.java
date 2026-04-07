@@ -45,8 +45,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll() // login publico
-                        .anyRequest().authenticated() // todo lo demas requiere token
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated() 
                 )
                 // no se gurda sesión en el servidor
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

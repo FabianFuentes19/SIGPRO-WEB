@@ -37,7 +37,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
   const guardarProyecto = (e) => {
     e.preventDefault();
 
-    // Forzamos la validacion visual de los campos editables al intentar guardar
+    // se valida los input antes de registrar
     setTouched({
       nombre: true,
       objetivoGeneral: true,

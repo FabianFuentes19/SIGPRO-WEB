@@ -31,20 +31,47 @@ function RestablecerContraseña() {
     }
   };
 
-  const irAPaso2 = (e) => {
+  const irAPaso2 = async (e) => {
     e.preventDefault();
     const codigoCompleto = codigo.join("");
+
     if (codigoCompleto.length < 6) {
       setMensaje("Debes ingresar los 6 dígitos del código enviado.");
       return;
     }
+
+    setCargando(true);
     setMensaje("");
-    setPaso(2);
+
+    try {
+      const response = await fetch(`${BASE_URL}/auth/verificar-codigo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matricula: matricula.trim(),
+          token: codigoCompleto
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        setMensaje("");
+        setPaso(2);
+      } else {
+        setMensaje(data.error || "Código inválido o expirado. Inténtalo de nuevo.");
+      }
+    } catch (error) {
+      //console.error("Error al verificar código:", error);
+      setMensaje("Error de conexión con el servidor.");
+    } finally {
+      setCargando(false);
+    }
   };
 
   const handleReset = async (e) => {
     e.preventDefault();
-    
+
     if (nuevaContrasena !== confirmarContrasena) {
       setMensaje("Las contraseñas no coinciden.");
       return;
@@ -132,7 +159,9 @@ function RestablecerContraseña() {
                 />
               ))}
             </div>
-            <button type="submit" className="btn-verificar">CONTINUAR</button>
+            <button type="submit" className="btn-verificar" disabled={cargando}>
+              {cargando ? <Loader2 className="animate-spin" /> : "CONTINUAR"}
+            </button>
           </form>
         </>
       ) : (
@@ -170,10 +199,10 @@ function RestablecerContraseña() {
             </div>
 
             <button type="submit" className="btn-verificar" disabled={cargando}>
-                {cargando ? <Loader2 className="animate-spin" /> : "RESTABLECER CONTRASEÑA"}
+              {cargando ? <Loader2 className="animate-spin" /> : "RESTABLECER CONTRASEÑA"}
             </button>
             <button type="button" className="btn-back" onClick={() => setPaso(1)}>
-               <ArrowLeft size={16} /> Volver al código
+              <ArrowLeft size={16} /> Volver al código
             </button>
           </form>
         </>
