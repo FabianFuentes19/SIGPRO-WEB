@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 import java.util.List;
@@ -37,10 +40,22 @@ public class ProyectoService {
     @Autowired
     private UsuarioService usuarioService;
 
-    public List<ProyectoResponseDTO> consultarTodos(Authentication auth){
+    public PaginatedResponse<ProyectoResponseDTO> consultarTodos(int page, int size, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
-        return proyectoRepository.findAll().stream()
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Proyecto> pageResult = proyectoRepository.findAllByLiderEstado(ESTADO_ACTIVO, pageable);
+
+        List<ProyectoResponseDTO> content = pageResult.getContent().stream()
                 .map(ProyectoMapper::toResponseDto).toList();
+
+        return PaginatedResponse.<ProyectoResponseDTO>builder()
+                .content(content)
+                .pageNumber(pageResult.getNumber())
+                .pageSize(pageResult.getSize())
+                .totalElements(pageResult.getTotalElements())
+                .totalPages(pageResult.getTotalPages())
+                .last(pageResult.isLast())
+                .build();
     }
 
     public List<ProyectoResponseDTO> buscarPorNombre(String nombre, Authentication auth){
@@ -75,7 +90,7 @@ public class ProyectoService {
 
         String rolLider = lider.getRol() != null ? lider.getRol().getNombre() : null;
         String rolUpper = rolLider == null ? "" : rolLider.toUpperCase();
-        if (!(rolUpper.equals("LIDER") || rolUpper.equals("LIDER_PROYECTO") || rolUpper.equals("ROLE_LIDER"))) {
+        if (!rolUpper.equals("LIDER")) {
             throw new IllegalArgumentException("El usuario seleccionado no tiene rol de LÍDER");
         }
 
@@ -122,6 +137,8 @@ public class ProyectoService {
         }
         if (dto.getPresupuesto() != null) {
             proyecto.setPresupuesto(dto.getPresupuesto());
+            // Sincronizamos el inicial para mantener consistencia en la barra de progreso
+            proyecto.setPresupuestoInicial(dto.getPresupuesto());
         }
 
         return ProyectoMapper.toResponseDto(proyectoRepository.save(proyecto));

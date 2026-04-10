@@ -13,4 +13,7 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
 
     // proyecto por líder
     Proyecto findByLiderId(Long liderId);
+
+    // proyectos por estado del líder
+    org.springframework.data.domain.Page<Proyecto> findAllByLiderEstado(String estado, org.springframework.data.domain.Pageable pageable);
 }

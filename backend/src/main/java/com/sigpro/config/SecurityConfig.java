@@ -45,7 +45,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/forgot-password",
+                                "/auth/verificar-codigo",
+                                "/auth/reset-password"
+                        ).permitAll()
                         .anyRequest().authenticated() 
                 )
                 // no se gurda sesión en el servidor

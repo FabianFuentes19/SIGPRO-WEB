@@ -43,8 +43,6 @@ const CambioContrasena = () => {
     const tieneNumero = /[0-9]/.test(password);
     const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
 
-    const [mostrarModal, setMostrarModal] = useState(false);
-
     return (
       tieneLongitud &&
       tieneMayuscula &&

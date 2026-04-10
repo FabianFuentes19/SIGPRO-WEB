@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../css/GestionUsuario.css';
 
-const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario" }) => {
+const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario", onError }) => {
     const [datosFormulario, setDatosFormulario] = useState({
         nombreCompleto: '',
         matricula: '',
@@ -54,6 +54,24 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario" }) => {
         puesto: true,
         salarioQuincenal: true
     });
+
+    // Validar campos obligatorios
+    const camposVacios = [];
+    if (!datosFormulario.nombreCompleto.trim()) camposVacios.push("Nombre completo");
+    if (!datosFormulario.carrera) camposVacios.push("Carrera");
+    if (!datosFormulario.cuatrimestre) camposVacios.push("Cuatrimestre");
+    if (!datosFormulario.grupo) camposVacios.push("Grupo");
+
+    if (camposVacios.length > 0) {
+        if (onError) {
+            onError({
+                titulo: "Datos incompletos",
+                mensaje: `Faltan campos obligatorios: ${camposVacios.join(", ")}`,
+                tipo: "error"
+            });
+        }
+        return;
+    }
 
     const payload = {
       nombreCompleto: datosFormulario.nombreCompleto,

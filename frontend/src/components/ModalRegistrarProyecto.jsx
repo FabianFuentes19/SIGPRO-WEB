@@ -71,6 +71,25 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
       presupuesto: true
     });
 
+    // Validar campos obligatorios antes de enviar al backend
+    const camposVacios = [];
+    if (!datosFormulario.nombre.trim()) camposVacios.push("Nombre");
+    if (!datosFormulario.objetivoGeneral.trim()) camposVacios.push("Objetivo");
+    if (!datosFormulario.descripcion.trim()) camposVacios.push("Descripción");
+    if (!datosFormulario.fechaInicio) camposVacios.push("Fecha inicio");
+    if (!datosFormulario.fechaFin) camposVacios.push("Fecha fin");
+    if (!datosFormulario.liderId) camposVacios.push("Líder");
+    if (!datosFormulario.presupuesto) camposVacios.push("Presupuesto");
+
+    if (camposVacios.length > 0) {
+      setModalMensajes({
+        titulo: "Datos incompletos",
+        mensaje: `Faltan campos obligatorios: ${camposVacios.join(", ")}`,
+        tipo: "error"
+      });
+      return;
+    }
+
     // valida que la fecha de fin no sea anterior a la de inicio
     if (datosFormulario.fechaInicio && datosFormulario.fechaFin) {
       const inicio = new Date(datosFormulario.fechaInicio);
@@ -124,7 +143,6 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
               value={datosFormulario.nombre}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, nombre: true })}
-              required
             />
           </div>
 
@@ -139,7 +157,6 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
               value={datosFormulario.objetivoGeneral}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, objetivoGeneral: true })}
-              required
             />
           </div>
 
@@ -153,7 +170,6 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
               value={datosFormulario.descripcion}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, descripcion: true })}
-              required
             />
           </div>
 
@@ -169,7 +185,6 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
                 onChange={cambiarValor}
                 onBlur={() => setTouched({ ...touched, fechaInicio: true })}
                 min={new Date().toISOString().split('T')[0]}
-                required
               />
             </div>
             <div className="form-group">
@@ -182,44 +197,43 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
                 value={datosFormulario.fechaFin}
                 onChange={cambiarValor}
                 onBlur={() => setTouched({ ...touched, fechaFin: true })}
-                required
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Líder*</label>
-            <select
-              name="liderId"
-              className={`form-control ${!touched.liderId ? "" : datosFormulario.liderId === "" ? "invalido" : "valido"
-                }`}
-              value={datosFormulario.liderId}
-              onChange={cambiarValor}
-              onBlur={() => setTouched({ ...touched, liderId: true })}
-              required
-            >
-              <option value="" disabled>Selecciona al líder</option>
-              {lideres.map((l) => (
-                <option key={l.id || l.matricula} value={l.id}>
-                  {l.nombreCompleto} ({l.matricula})
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="form-row-2-col">
+            <div className="form-group">
+              <label>Líder*</label>
+              <select
+                name="liderId"
+                className={`form-control ${!touched.liderId ? "" : datosFormulario.liderId === "" ? "invalido" : "valido"
+                  }`}
+                value={datosFormulario.liderId}
+                onChange={cambiarValor}
+                onBlur={() => setTouched({ ...touched, liderId: true })}
+              >
+                <option value="" disabled>Selecciona al líder</option>
+                {lideres.map((l) => (
+                  <option key={l.id || l.matricula} value={l.id}>
+                    {l.nombreCompleto} ({l.matricula})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="form-group">
-            <label>Presupuesto*</label>
-            <input
-              type="number"
-              name="presupuesto"
-              className={`form-control ${!touched.presupuesto ? "" : String(datosFormulario.presupuesto).trim() === "" ? "invalido" : "valido"
-                }`}
-              placeholder="10,000"
-              value={datosFormulario.presupuesto}
-              onChange={cambiarValor}
-              onBlur={() => setTouched({ ...touched, presupuesto: true })}
-              required
-            />
+            <div className="form-group">
+              <label>Presupuesto*</label>
+              <input
+                type="number"
+                name="presupuesto"
+                className={`form-control ${!touched.presupuesto ? "" : String(datosFormulario.presupuesto).trim() === "" ? "invalido" : "valido"
+                  }`}
+                placeholder="10,000"
+                value={datosFormulario.presupuesto}
+                onChange={cambiarValor}
+                onBlur={() => setTouched({ ...touched, presupuesto: true })}
+              />
+            </div>
           </div>
 
           <div className="modal-actions">

@@ -563,11 +563,13 @@ input::-webkit-inner-spin-button {
   width: 100%;
 }
 
-.form-control.valido {
+.form-control.valido,
+.modal-form .form-control.valido {
   border: 2px solid green;
 }
 
-.form-control.invalido {
+.form-control.invalido,
+.modal-form .form-control.invalido {
   border: 2px solid red;
 }
 

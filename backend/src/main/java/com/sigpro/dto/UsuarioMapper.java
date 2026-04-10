@@ -41,7 +41,6 @@ public class UsuarioMapper {
         dto.setEstado(usuario.getEstado());
         dto.setRolId(usuario.getRol() != null ? usuario.getRol().getId() : null);
         dto.setRolNombre(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
-        dto.setContrasena(null);
         return dto;
     }
 }

@@ -7,6 +7,8 @@ import ModalEditarProyecto from '../components/ModalEditarProyecto';
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import { Eye, LogOut, Pencil } from 'lucide-react';
 import ModalMensajes from '../components/Usuarios/ModalMensajes'
+import Pagination from '../components/Pagination';
+import '../css/Pagination.css';
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -17,8 +19,12 @@ const DashProyectos = () => {
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mensajeModal, setModalMensajes] = useState(null);
 
-  // Estado para guardar la lista de proyectos
+  // Estado para guardar la lista de proyectos y paginación
   const [proyectos, setProyectos] = useState([]);
+  const [paginaActual, setPaginaActual] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0);
+  const [tamanoPagina] = useState(10);
+
   // Estado para búsqueda
   const [busqueda, setBusqueda] = useState("");
 
@@ -26,27 +32,29 @@ const DashProyectos = () => {
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
   // Función para traer proyectos desde el backend
-  const fetchProjects = async () => {
+  const fetchProjects = async (page = 0) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/proyectos", {
+      const response = await fetch(`http://localhost:8080/proyectos?page=${page}&size=${tamanoPagina}`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
       if (response.ok) {
         const data = await response.json();
-        setProyectos(data);
+        setProyectos(data.content || []);
+        setTotalPaginas(data.totalPages || 0);
+        setPaginaActual(data.pageNumber || 0);
       }
     } catch (error) {
       console.error("Error al cargar proyectos:", error);
     }
   };
 
-  // Cargar proyectos al montar el componente
+  // Cargar proyectos al montar el componente o al cambiar de página
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchProjects(paginaActual);
+  }, [paginaActual]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
@@ -131,7 +139,7 @@ const DashProyectos = () => {
   const calculateBudgetStatus = (actual, inicial) => {
     if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: '' };
     const perc = (actual / inicial) * 100;
-    
+
     if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: 'Agotado' };
     if (perc <= 10) return { perc, colorClass: 'budget-critical', text: 'Crítico' };
     if (perc <= 20) return { perc, colorClass: 'budget-warning', text: 'En riesgo' };
@@ -160,10 +168,10 @@ const DashProyectos = () => {
               <span>Proyectos</span>
             </Link>
           </nav>
-            <div className="sidebar-footer">
+          <div className="sidebar-footer">
             <button className="logout-btn" onClick={(e) => { e.preventDefault(); setMostrarModalCerrarSesion(true); }}>
-            <LogOut size={20} />
-            <span>Salir</span>
+              <LogOut size={20} />
+              <span>Salir</span>
             </button>
           </div>
         </aside>
@@ -205,9 +213,9 @@ const DashProyectos = () => {
                   ) : (
                     proyectos
                       .filter((p) =>
-                        p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        p.liderNombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        p.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+                        (p.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+                        (p.liderNombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+                        (p.descripcion || "").toLowerCase().includes(busqueda.toLowerCase())
                       )
                       .map((p, index) => (
                         <tr key={p.id}>
@@ -227,8 +235,8 @@ const DashProyectos = () => {
                                 return (
                                   <>
                                     <div className="budget-progress-outer">
-                                      <div 
-                                        className={`budget-progress-inner ${status.colorClass}`} 
+                                      <div
+                                        className={`budget-progress-inner ${status.colorClass}`}
                                         style={{ width: `${Math.min(status.perc, 100)}%` }}
                                       ></div>
                                     </div>
@@ -264,6 +272,11 @@ const DashProyectos = () => {
               </table>
             </div>
           </div>
+          <Pagination
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
+            onPageChange={(p) => setPaginaActual(p)}
+          />
         </main>
       </div>
 
@@ -303,7 +316,7 @@ const DashProyectos = () => {
       )}
 
 
-        {mensajeModal && (
+      {mensajeModal && (
         <ModalMensajes
           titulo={mensajeModal.titulo}
           mensaje={mensajeModal.mensaje}

@@ -45,7 +45,7 @@ export async function login(matricula, contrasena) {
  * @returns {Promise<Object>}
  */
 export async function registrarUsuario(datos) {
-  const response = await apiFetch("/auth/register", {
+  const response = await apiFetch("/usuarios/registrar", {
     method: "POST",
     body: JSON.stringify(datos),
   });
@@ -62,7 +62,7 @@ export async function registrarUsuario(datos) {
  * @returns {Promise<Object>}
  */
 export async function registrarMiembro(datos) {
-  const response = await apiFetch("/auth/register/miembro", {
+  const response = await apiFetch("/usuarios/registrar/miembro", {
     method: "POST",
     body: JSON.stringify(datos),
   });
@@ -75,10 +75,15 @@ export async function registrarMiembro(datos) {
 
 /**
  * Obtiene la lista de usuarios (requiere token).
- * @returns {Promise<Array>}
+ * @param {string} rol - Nombre del rol a filtrar
+ * @param {number} page - Número de página (0-indexed)
+ * @param {number} size - Cantidad de registros por página
+ * @returns {Promise<Object>}
  */
-export async function obtenerUsuarios(rol) {
-  const endpoint = rol ? `/usuarios/rol/${encodeURIComponent(rol)}` : "/usuarios";
+export async function obtenerUsuarios(rol, page = 0, size = 10) {
+  const endpoint = rol 
+    ? `/usuarios/rol/${encodeURIComponent(rol)}?page=${page}&size=${size}` 
+    : `/usuarios?page=${page}&size=${size}`;
   const response = await apiFetch(endpoint);
   const data = await response.json();
   if (!response.ok) {

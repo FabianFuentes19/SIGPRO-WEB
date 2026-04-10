@@ -431,6 +431,7 @@ const DashboardLider = () => {
                     tipo="Miembro"
                     alCerrar={() => setMostrarModal(false)}
                     alRegistrar={registrarMiembro}
+                    onError={setMensajeModal}
                 />
             )}
 
@@ -440,6 +441,7 @@ const DashboardLider = () => {
                     usuario={usuarioSeleccionado}
                     alCerrar={() => setModalActivo(null)}
                     alGuardar={actualizarMiembro}
+                    onError={setMensajeModal}
                 />
             )}
 

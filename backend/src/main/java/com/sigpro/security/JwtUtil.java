@@ -57,10 +57,18 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    // método para validar el token
+    // método para validar el token (firma + expiración + matrícula)
     public boolean validarToken(String token, String matricula){
-        final String extract = extractMatricula(token);
-        return (extract.equals(matricula));
+        try {
+            var claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject().equals(matricula);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

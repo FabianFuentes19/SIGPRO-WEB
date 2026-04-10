@@ -9,6 +9,8 @@ import { Eye, LogOut, Pencil, Trash2 } from 'lucide-react';
 import BorrarUsuario from '../components/BorrarUsuario';
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import ModalMensajes from '../components/Usuarios/ModalMensajes';
+import Pagination from '../components/Pagination';
+import '../css/Pagination.css';
 
 
 const DashLideres = () => {
@@ -20,28 +22,30 @@ const DashLideres = () => {
   const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
 
   const [lideres, setLideres] = useState([]);
+  const [paginaActual, setPaginaActual] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0);
+  const [tamanoPagina] = useState(10);
+
   const [liderSeleccionado, setLiderSeleccionado] = useState(null);
   const [busqueda, setBusqueda] = useState("");
 
   const [mensajeModal, setMensajeModal] = useState(null);
 
-
-
   useEffect(() => {
-    fetchLideres();
-  }, []);
+    fetchLideres(paginaActual);
+  }, [paginaActual]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
     navigate('/login');
   };
 
-  const fetchLideres = async () => {
+  const fetchLideres = async (page = 0) => {
     try {
-      const data = await obtenerUsuarios("LIDER");
-      const activos = Array.isArray(data) ? data.filter(l => l.estado === "ACTIVO") : [];
-      setLideres(activos);
-      //setLideres(Array.isArray(data) ? data : []);
+      const data = await obtenerUsuarios("LIDER", page, tamanoPagina);
+      setLideres(data.content || []);
+      setTotalPaginas(data.totalPages || 0);
+      setPaginaActual(data.pageNumber || 0);
     } catch (error) {
       console.error("Error al cargar líderes:", error);
     }
@@ -50,7 +54,7 @@ const DashLideres = () => {
   const registrarLider = async (nuevoLider) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/auth/register/lider", {
+      const response = await fetch("http://localhost:8080/usuarios/registrar/lider", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,31 +63,31 @@ const DashLideres = () => {
         body: JSON.stringify(nuevoLider),
       });
 
-              if (response.ok) {
-              const data = await response.json();
-              setMensajeModal({
-                titulo: "Registro Exitoso",
-                mensaje: data.mensaje || "Líder agregado correctamente",
-                tipo: "exito"
-              });
-              setMostrarModal(false);
-              fetchLideres();
-            } else {
-              const errorData = await response.json();
-              setMensajeModal({
-                titulo: "Error",
-                mensaje: errorData.error || "Error al agregar líder",
-                tipo: "error"
-              });
-            }
-          } catch (error) {
-            console.error("Error:", error);
-            setMensajeModal({
-              titulo: "Error",
-              mensaje: "Error de conexión con el servidor",
-              tipo: "error"
-            });
-          }
+      if (response.ok) {
+        const data = await response.json();
+        setMensajeModal({
+          titulo: "Registro Exitoso",
+          mensaje: data.mensaje || "Líder agregado correctamente",
+          tipo: "exito"
+        });
+        setMostrarModal(false);
+        fetchLideres();
+      } else {
+        const errorData = await response.json();
+        setMensajeModal({
+          titulo: "Error",
+          mensaje: errorData.error || "Error al agregar líder",
+          tipo: "error"
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMensajeModal({
+        titulo: "Error",
+        mensaje: "Error de conexión con el servidor",
+        tipo: "error"
+      });
+    }
   };
 
   const actualizarLider = async (datosActualizados) => {
@@ -99,28 +103,28 @@ const DashLideres = () => {
       });
 
       if (response.ok) {
-      setMensajeModal({
-        titulo: "Actualización Exitosa",
-        mensaje: "Líder actualizado correctamente",
-        tipo: "exito"
-      });
-      setMostrarModalEditar(false);
-      fetchLideres();
-    } else {
-      const errorData = await response.json();
+        setMensajeModal({
+          titulo: "Actualización Exitosa",
+          mensaje: "Líder actualizado correctamente",
+          tipo: "exito"
+        });
+        setMostrarModalEditar(false);
+        fetchLideres();
+      } else {
+        const errorData = await response.json();
+        setMensajeModal({
+          titulo: "Error",
+          mensaje: errorData.error || "Error al actualizar líder",
+          tipo: "error"
+        });
+      }
+    } catch (error) {
       setMensajeModal({
         titulo: "Error",
-        mensaje: errorData.error || "Error al actualizar líder",
+        mensaje: "Error de conexión con el servidor",
         tipo: "error"
       });
     }
-  } catch (error) {
-    setMensajeModal({
-      titulo: "Error",
-      mensaje: "Error de conexión con el servidor",
-      tipo: "error"
-    });
-  }
   };
 
   const eliminarLider = async (matricula) => {
@@ -132,30 +136,30 @@ const DashLideres = () => {
           "Authorization": `Bearer ${token}`
         }
       });
-       if (response.ok) {
-      setMostrarModalEliminar(false);
-      setMensajeModal({
-        titulo: "Eliminación Exitosa",
-        mensaje: "Líder desactivado correctamente",
-        tipo: "exito"
-      });
-      fetchLideres();
-    } else {
-      const errorData = await response.json();
+      if (response.ok) {
+        setMostrarModalEliminar(false);
+        setMensajeModal({
+          titulo: "Eliminación Exitosa",
+          mensaje: "Líder desactivado correctamente",
+          tipo: "exito"
+        });
+        fetchLideres();
+      } else {
+        const errorData = await response.json();
+        setMensajeModal({
+          titulo: "Error",
+          mensaje: errorData.error || "No se pudo desactivar el líder",
+          tipo: "error"
+        });
+      }
+    } catch (error) {
+      console.error("Error al desactivar:", error);
       setMensajeModal({
         titulo: "Error",
-        mensaje: errorData.error || "No se pudo desactivar el líder",
+        mensaje: "Error de conexión con el servidor",
         tipo: "error"
       });
     }
-  } catch (error) {
-    console.error("Error al desactivar:", error);
-    setMensajeModal({
-      titulo: "Error",
-      mensaje: "Error de conexión con el servidor",
-      tipo: "error"
-    });
-  }
   };
 
   return (
@@ -181,8 +185,8 @@ const DashLideres = () => {
           </nav>
           <div className="sidebar-footer">
             <button className="logout-btn" onClick={(e) => { e.preventDefault(); setMostrarModalCerrarSesion(true); }}>
-            <LogOut size={20} />
-            <span>Salir</span>
+              <LogOut size={20} />
+              <span>Salir</span>
             </button>
           </div>
         </aside>
@@ -248,7 +252,7 @@ const DashLideres = () => {
                                 <Trash2 size={14} />
                               </div>}
 
-                                 {/* <label className="switch">
+                              {/* <label className="switch">
                                   <input
                                     type="checkbox"
                                     checked={l.estado === "ACTIVO"}
@@ -273,6 +277,11 @@ const DashLideres = () => {
               </table>
             </div>
           </div>
+          <Pagination
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
+            onPageChange={(p) => setPaginaActual(p)}
+          />
         </main>
       </div>
 
@@ -282,6 +291,7 @@ const DashLideres = () => {
           tipo="Líder"
           alCerrar={() => setMostrarModal(false)}
           alRegistrar={registrarLider}
+          onError={setMensajeModal}
         />
       )}
 
@@ -291,6 +301,7 @@ const DashLideres = () => {
           usuario={liderSeleccionado}
           alCerrar={() => setMostrarModalEditar(false)}
           alGuardar={actualizarLider}
+          onError={setMensajeModal}
         />
       )}
 
@@ -319,14 +330,14 @@ const DashLideres = () => {
         />
       )}
 
-          {mensajeModal && (
-      <ModalMensajes
-        titulo={mensajeModal.titulo}
-        mensaje={mensajeModal.mensaje}
-        tipo={mensajeModal.tipo}
-        onConfirm={() => setMensajeModal(null)}
-      />
-    )}
+      {mensajeModal && (
+        <ModalMensajes
+          titulo={mensajeModal.titulo}
+          mensaje={mensajeModal.mensaje}
+          tipo={mensajeModal.tipo}
+          onConfirm={() => setMensajeModal(null)}
+        />
+      )}
 
     </div>
   );

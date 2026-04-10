@@ -45,6 +45,22 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
       presupuesto: true
     });
 
+    // Validar campos obligatorios antes de enviar
+    const camposVacios = [];
+    if (!(datosFormulario.nombre || '').trim()) camposVacios.push("Nombre");
+    if (!(datosFormulario.objetivoGeneral || '').trim()) camposVacios.push("Objetivo");
+    if (!(datosFormulario.descripcion || '').trim()) camposVacios.push("Descripción");
+    if (!datosFormulario.presupuesto && datosFormulario.presupuesto !== 0) camposVacios.push("Presupuesto");
+
+    if (camposVacios.length > 0) {
+      setModalMensajes({
+        titulo: "Datos incompletos",
+        mensaje: `Faltan campos obligatorios: ${camposVacios.join(", ")}`,
+        tipo: "error"
+      });
+      return;
+    }
+
     // valida que la fecha de fin no sea anterior a la de inicio
     if (datosFormulario.fechaInicio && datosFormulario.fechaFin) {
       const inicio = new Date(datosFormulario.fechaInicio);
@@ -79,7 +95,6 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
               value={datosFormulario.nombre || ''}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, nombre: true })}
-              required
             />
           </div>
 
@@ -93,7 +108,6 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
               value={datosFormulario.objetivoGeneral || ''}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, objetivoGeneral: true })}
-              required
             />
           </div>
 
@@ -107,39 +121,39 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
               value={datosFormulario.descripcion || ''}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, descripcion: true })}
-              required
             />
           </div>
 
           <div className="form-row-2-col">
             <div className="form-group">
               <label>Fecha Inicio *</label>
-              <input type="date" name="fechaInicio" className="form-control" value={datosFormulario.fechaInicio || ''} onChange={cambiarValor} disabled required />
+              <input type="date" name="fechaInicio" className="form-control" value={datosFormulario.fechaInicio || ''} onChange={cambiarValor} disabled  />
             </div>
             <div className="form-group">
               <label>Fecha Fin *</label>
-              <input type="date" name="fechaFin" className="form-control" value={datosFormulario.fechaFin || ''} onChange={cambiarValor} disabled required />
+              <input type="date" name="fechaFin" className="form-control" value={datosFormulario.fechaFin || ''} onChange={cambiarValor} disabled  />
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Líder *</label>
-            <input type="text" name="liderNombre" className="form-control" value={datosFormulario.liderNombre || ''} onChange={cambiarValor} disabled required />
-          </div>
+          <div className="form-row-2-col">
+            <div className="form-group">
+              <label>Líder *</label>
+              <input type="text" name="liderNombre" className="form-control" value={datosFormulario.liderNombre || ''} onChange={cambiarValor} disabled  />
+            </div>
 
-          <div className="form-group">
-            <label>Presupuesto *</label>
-            <div className={`input-money-wrapper form-control ${!touched.presupuesto ? "" : String(datosFormulario.presupuesto).trim() === "" ? "invalido" : "valido"
-              }`}>
-              <span className="currency-symbol">$</span>
-              <input
-                type="text"
-                name="presupuesto"
-                value={datosFormulario.presupuesto || ''}
-                onChange={cambiarValor}
-                onBlur={() => setTouched({ ...touched, presupuesto: true })}
-                required
-              />
+            <div className="form-group">
+              <label>Presupuesto *</label>
+              <div className={`input-money-wrapper form-control ${!touched.presupuesto ? "" : String(datosFormulario.presupuesto).trim() === "" ? "invalido" : "valido"
+                }`}>
+                <span className="currency-symbol">$</span>
+                <input
+                  type="text"
+                  name="presupuesto"
+                  value={datosFormulario.presupuesto || ''}
+                  onChange={cambiarValor}
+                  onBlur={() => setTouched({ ...touched, presupuesto: true })}
+                />
+              </div>
             </div>
           </div>
 

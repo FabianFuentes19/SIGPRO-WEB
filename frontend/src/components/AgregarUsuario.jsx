@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../css/GestionUsuario.css';
 import { Eye, EyeOff } from 'lucide-react';
 
-const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
+const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario", onError }) => {
 
     const [datosFormulario, setDatosFormulario] = useState({
         nombreCompleto: '',
@@ -34,6 +34,37 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
             puesto: true,
             salarioQuincenal: true
         });
+
+        // Validar campos obligatorios antes de enviar
+        const camposVacios = [];
+        if (!datosFormulario.nombreCompleto.trim()) camposVacios.push("Nombre completo");
+        if (!datosFormulario.matricula.trim()) camposVacios.push("Matrícula");
+        if (!datosFormulario.contrasena.trim()) camposVacios.push("Contraseña");
+        if (!datosFormulario.carrera) camposVacios.push("Carrera");
+        if (!datosFormulario.cuatrimestre) camposVacios.push("Cuatrimestre");
+        if (!datosFormulario.grupo) camposVacios.push("Grupo");
+
+        if (camposVacios.length > 0) {
+            if (onError) {
+                onError({
+                    titulo: "Campos incompletos",
+                    mensaje: `Faltan campos obligatorios: ${camposVacios.join(", ")}`,
+                    tipo: "error"
+                });
+            }
+            return;
+        }
+
+        if (!PASSWORD_PATTERN.test(datosFormulario.contrasena)) {
+            if (onError) {
+                onError({
+                    titulo: "Contraseña inválida",
+                    mensaje: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial",
+                    tipo: "error"
+                });
+            }
+            return;
+        }
 
         const payload = {
             ...datosFormulario,
@@ -77,7 +108,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                             value={datosFormulario.nombreCompleto}
                             onChange={cambiarValor}
                             onBlur={() => setTouched({...touched, nombreCompleto: true})}
-                            required
                         />
                     </div>
 
@@ -94,7 +124,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 value={datosFormulario.matricula}
                                 onChange={cambiarValor}
                                 onBlur={() => setTouched({...touched, matricula: true})}
-                                required
                             />
                         </div>
                         <div className="form-group">
@@ -131,7 +160,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                             value={datosFormulario.carrera} 
                             onChange={cambiarValor} 
                             onBlur={() => setTouched({...touched, carrera: true})}
-                            required
                         >
                             <option value="" disabled hidden>Seleccionar</option>
                             <option value="DS">Desarrollo de software</option>
@@ -150,7 +178,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 value={datosFormulario.cuatrimestre} 
                                 onChange={cambiarValor} 
                                 onBlur={() => setTouched({...touched, cuatrimestre: true})}
-                                required
                             >
                                 <option value="" disabled hidden>Seleccionar</option>
                                 {[1,2,3,4,5,6,7,8,9,10,11].map(n => <option key={n} value={n}>{n}°</option>)}
@@ -166,7 +193,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 value={datosFormulario.grupo} 
                                 onChange={cambiarValor} 
                                 onBlur={() => setTouched({...touched, grupo: true})}
-                                required
                             >
                                 <option value="" disabled hidden>Seleccionar</option>
                                 {['A','B','C','D','E','F'].map(g => <option key={g} value={g}>{g}</option>)}
@@ -187,7 +213,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 value={datosFormulario.puesto}
                                 onChange={cambiarValor}
                                 onBlur={() => setTouched({...touched, puesto: true})}
-                                required
                             />
                         </div>
                         <div className="form-group">
@@ -202,7 +227,6 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario" }) => {
                                 value={datosFormulario.salarioQuincenal}
                                 onChange={cambiarValor}
                                 onBlur={() => setTouched({...touched, salarioQuincenal: true})}
-                                required
                             />
                         </div>
                     </div>

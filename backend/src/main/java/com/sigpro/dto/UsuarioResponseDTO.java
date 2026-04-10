@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 public class UsuarioResponseDTO {
     private Long id;
     private String nombreCompleto;
-    private String contrasena;
     private String grupo;
     private String matricula;
     private String carrera;

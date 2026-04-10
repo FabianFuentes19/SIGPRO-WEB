@@ -1,5 +1,6 @@
 package com.sigpro.service;
 
+import com.sigpro.dto.PaginatedResponse;
 import com.sigpro.dto.UsuarioRequestDTO;
 import com.sigpro.dto.UsuarioResponseDTO;
 import com.sigpro.dto.UsuarioMapper;
@@ -15,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -110,13 +114,25 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    public List<UsuarioResponseDTO> obtenerUsuariosPorRol(String rolNombre) {
+    public PaginatedResponse<UsuarioResponseDTO> obtenerUsuariosPorRol(String rolNombre, int page, int size) {
         if (rolNombre == null || rolNombre.isBlank()) {
-            return List.of();
+            return new PaginatedResponse<>();
         }
-        return usuarioRepository.findByRolNombre(rolNombre).stream()
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Usuario> pageResult = usuarioRepository.findByRolNombre(rolNombre, pageable);
+
+        List<UsuarioResponseDTO> content = pageResult.getContent().stream()
                 .map(UsuarioMapper::toResponseDto)
                 .collect(Collectors.toList());
+
+        return PaginatedResponse.<UsuarioResponseDTO>builder()
+                .content(content)
+                .pageNumber(pageResult.getNumber())
+                .pageSize(pageResult.getSize())
+                .totalElements(pageResult.getTotalElements())
+                .totalPages(pageResult.getTotalPages())
+                .last(pageResult.isLast())
+                .build();
     }
 
     public UsuarioResponseDTO obtenerDetallePorMatricula(String matricula) {
@@ -205,11 +221,16 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-
         if (!passwordEncoder.matches(actual, usuario.getContrasena())) {
             throw new IllegalArgumentException("La contraseña actual es incorrecta");
         }
 
+        if (!PASSWORD_PATTERN.matcher(nueva).matches()) {
+            throw new IllegalArgumentException(
+                    "La nueva contraseña no cumple con los criterios de seguridad: " +
+                    "mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"
+            );
+        }
 
         usuario.setContrasena(passwordEncoder.encode(nueva));
         usuarioRepository.save(usuario);

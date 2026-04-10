@@ -1,5 +1,6 @@
 package com.sigpro.controller;
 
+import com.sigpro.dto.PaginatedResponse;
 import com.sigpro.dto.ProyectoRequestDTO;
 import com.sigpro.dto.ProyectoResponseDTO;
 import com.sigpro.dto.UsuarioRequestDTO;
@@ -19,17 +20,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/proyectos")
-@CrossOrigin(origins = "*") 
 public class ProyectoController {
 
     @Autowired
     private ProyectoService proyectoService;
 
     @GetMapping
-    public ResponseEntity<?> consultarTodos(Authentication auth) {
+    public ResponseEntity<?> consultarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication auth) {
         try {
-            List<ProyectoResponseDTO> proyectos = proyectoService.consultarTodos(auth);
-            return ResponseEntity.ok(proyectos);
+            PaginatedResponse<ProyectoResponseDTO> respuesta = proyectoService.consultarTodos(page, size, auth);
+            return ResponseEntity.ok(respuesta);
         } catch (SecurityException e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());

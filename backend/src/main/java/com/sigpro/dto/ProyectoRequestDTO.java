@@ -25,11 +25,9 @@ public class ProyectoRequestDTO {
     private BigDecimal presupuesto;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
-    @FutureOrPresent(message = "La fecha de inicio no puede ser anterior a la fecha actual")
     private LocalDate fechaInicio;
 
     @NotNull(message = "La fecha de fin es obligatoria")
-    @Future(message = "La fecha de fin debe ser posterior a la fecha actual")
     private LocalDate fechaFin;
 
     private String liderMatricula;
