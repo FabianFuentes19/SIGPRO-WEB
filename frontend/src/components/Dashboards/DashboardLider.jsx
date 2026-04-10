@@ -22,7 +22,7 @@ import {
     Eye,
     History
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { registrarMiembro } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
 import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
@@ -32,9 +32,10 @@ const BASE_URL = "http://localhost:8080";
 
 const DashboardLider = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [mostrarModal, setMostrarModal] = useState(false);
     const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
-    const [vistaActual, setVistaActual] = useState('proyecto');
+    const [vistaActual, setVistaActual] = useState(location.state?.vista || 'proyecto');
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);
