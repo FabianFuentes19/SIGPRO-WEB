@@ -3,6 +3,7 @@ import "../css/CambioContrasena.css";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
+import ModalExitoCambio from '../components/Usuarios/ModalExitoCambio';
 
 
 
@@ -18,7 +19,7 @@ const CambioContrasena = () => {
   const navigate = useNavigate();
 
     const iraperfil = () => {
-    navigate("/perfil"); 
+        navigate("/dashboard-lider", { state: { vista: 'perfil' } }); 
     };
 
     const iralinicio = () => {
@@ -34,6 +35,7 @@ const CambioContrasena = () => {
   const [showConfirmar, setShowConfirmar] = useState(false);
 
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalExito, setMostrarModalExito] = useState(false);
 
   // Función para validar reglas de contraseña
   const validarContrasena = (password) => {
@@ -78,8 +80,8 @@ const CambioContrasena = () => {
       });
 
       if (res.ok) {
-        setMensaje("Contraseña actualizada correctamente.");
         setActual(""); setNueva(""); setConfirmar("");
+        setMostrarModalExito(true);
       } else {
         const errorData = await res.json();
         setMensaje(errorData.error || "Error al cambiar la contraseña.");
@@ -93,7 +95,7 @@ const CambioContrasena = () => {
     <div className="main-container">
       <header className="navbar">
         <span className="brand">Sistema de Gestión de Proyectos | SIGPRO</span>
-       <span className="back-icon" onClick={() => setMostrarModal(true)}>
+        <span className="back-icon" onClick={iraperfil}>
         <ArrowLeft size={24} />
         </span>
 
@@ -202,6 +204,19 @@ const CambioContrasena = () => {
                 localStorage.clear();
                 navigate("/login");
                 }} 
+            />
+            )}
+
+            {mostrarModalExito && (
+            <ModalExitoCambio 
+                alPerfil={() => {
+                  setMostrarModalExito(false);
+                  iraperfil();
+                }}
+                alInicio={() => {
+                  setMostrarModalExito(false);
+                  iralinicio();
+                }}
             />
             )}
 
