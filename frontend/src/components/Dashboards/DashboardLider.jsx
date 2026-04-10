@@ -52,10 +52,10 @@ const DashboardLider = () => {
     const calculateBudgetStatus = (actual, inicial) => {
         if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
         const perc = (actual / inicial) * 100;
-        
+
         if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'CRITICAL', text: 'Presupuesto Agotado' };
-        if (perc <= 10) return { perc, colorClass: 'budget-critical', status: 'CRITICAL', text: 'Presupuesto rítico' };
-        if (perc <= 20) return { perc, colorClass: 'budget-warning', status: 'WARNING', text: 'Presupuesto en riesgo' };
+        if (perc <= 10) return { perc, colorClass: 'budget-critical', status: 'CRITICAL', text: 'Te queda menos del 10% de presupuesto' };
+        if (perc <= 20) return { perc, colorClass: 'budget-warning', status: 'WARNING', text: 'Te queda menos del 20% de presupuesto' };
         return { perc, colorClass: 'budget-healthy', status: 'OK', text: 'Equilibrado' };
     };
 
@@ -72,20 +72,20 @@ const DashboardLider = () => {
             });
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
             const data = await response.json();
-            
+
             // verifica si al insertar un gasto el presupuesto entra en riesgo
             if (triggerAlert && lastBudgetRef.current !== null && lastBudgetRef.current !== data.presupuesto) {
                 const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoInicial);
                 if (statusInfo.status !== 'OK') {
                     setMensajeModal({
-                        titulo: statusInfo.status === 'CRITICAL' ? "¡ALERTA CRÍTICA!" : "Advertencia de Presupuesto",
+                        titulo: "ALERTA",
                         mensaje: statusInfo.text,
                         tipo: statusInfo.status === 'CRITICAL' ? "error" : "advertencia"
                     });
                 }
 
             }
-            
+
             lastBudgetRef.current = data.presupuesto;
             setProyecto(data);
             setProyectoId(data.id);
@@ -145,26 +145,26 @@ const DashboardLider = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                            body: JSON.stringify(datos)
-                        });
-                        const data = await response.json();
-                if (!response.ok) throw new Error(data.error || "Error al registrar miembro");
+                body: JSON.stringify(datos)
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Error al registrar miembro");
 
-                setMostrarModal(false);
-                setMensajeModal({
+            setMostrarModal(false);
+            setMensajeModal({
                 titulo: "Registro Exitoso",
                 mensaje: "Miembro registrado correctamente",
                 tipo: "exito"
-                });
-                await cargarMiembros();
-            } catch (error) {
-                setMensajeModal({
+            });
+            await cargarMiembros();
+        } catch (error) {
+            setMensajeModal({
                 titulo: "Error",
                 mensaje: error.message || "Error al registrar miembro",
                 tipo: "error"
-                });
-            }
-            };
+            });
+        }
+    };
 
     const actualizarMiembro = async (datosActualizados) => {
         try {
@@ -178,34 +178,34 @@ const DashboardLider = () => {
                 body: JSON.stringify(datosActualizados),
             });
 
-           if (response.ok) {
-                    const updatedData = await response.json(); // Esto recibe el objeto actualizado del backend
-                    setUsuarioSeleccionado(updatedData);       // Este es para que refresque el modal de detalles
-                    setMensajeModal({
-                        titulo: "Actualización Exitosa",
-                        mensaje: "Miembro actualizado correctamente",
-                        tipo: "exito"
-                    });
-                    setModalActivo(null);
-                    await cargarMiembros(); // refresca la lista completa
-                }
+            if (response.ok) {
+                const updatedData = await response.json(); // Esto recibe el objeto actualizado del backend
+                setUsuarioSeleccionado(updatedData);       // Este es para que refresque el modal de detalles
+                setMensajeModal({
+                    titulo: "Actualización Exitosa",
+                    mensaje: "Miembro actualizado correctamente",
+                    tipo: "exito"
+                });
+                setModalActivo(null);
+                await cargarMiembros(); // refresca la lista completa
+            }
 
-                    else {
+            else {
                 const errorData = await response.json();
                 setMensajeModal({
                     titulo: "Error",
                     mensaje: errorData.error || "Error al actualizar miembro",
                     tipo: "error"
                 });
-                }
-            } catch (error) {
-                setMensajeModal({
+            }
+        } catch (error) {
+            setMensajeModal({
                 titulo: "Error",
                 mensaje: "Error de conexión con el servidor",
                 tipo: "error"
-                });
-            }
-            };
+            });
+        }
+    };
 
     const eliminarMiembro = async (mat) => {
         try {
@@ -220,22 +220,22 @@ const DashboardLider = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Error al desactivar miembro");
-                }
-                setMensajeModal({
+            }
+            setMensajeModal({
                 titulo: "Eliminación Exitosa",
                 mensaje: "Miembro eliminado correctamente",
                 tipo: "exito"
-                });
-                setModalActivo(null);
-                await cargarMiembros();
-            } catch (error) {
-                setMensajeModal({
+            });
+            setModalActivo(null);
+            await cargarMiembros();
+        } catch (error) {
+            setMensajeModal({
                 titulo: "Error",
                 mensaje: error.message || "Error al desactivar miembro",
                 tipo: "error"
-                });
-            }
-            };
+            });
+        }
+    };
 
     useEffect(() => {
         cargarProyecto();
@@ -269,7 +269,7 @@ const DashboardLider = () => {
                 <div className="header-title">
                     {vistaActual === 'proyecto' ? 'Proyecto' :
                         vistaActual === 'materiales' ? 'Materiales' :
-                        vistaActual === 'perfil' ? 'Perfil' : 'Nóminas'}
+                            vistaActual === 'perfil' ? 'Perfil' : 'Nóminas'}
                 </div>
                 <div className="header-user" onClick={() => setVistaActual('perfil')} style={{ cursor: 'pointer' }}>
                     <CircleUserRound size={30} strokeWidth={1.5} />
@@ -304,8 +304,8 @@ const DashboardLider = () => {
                     </nav>
                     <div className="sidebar-footer">
                         <button className="logout-btn" onClick={() => setMostrarCerrarSesion(true)}>
-                        <LogOut size={20} />
-                        <span>Salir</span>
+                            <LogOut size={20} />
+                            <span>Salir</span>
                         </button>
                     </div>
                 </aside>
@@ -354,14 +354,14 @@ const DashboardLider = () => {
                                                         </span>
                                                     </div>
                                                     <div className="budget-progress-outer">
-                                                        <div 
-                                                            className={`budget-progress-inner ${status.colorClass}`} 
+                                                        <div
+                                                            className={`budget-progress-inner ${status.colorClass}`}
                                                             style={{ width: `${Math.min(status.perc, 100)}%` }}
                                                         ></div>
                                                     </div>
                                                     <div className="budget-summary-row">
                                                         <span className={status.colorClass.replace('budget-', 'text-')}>{status.text}</span>
-                                                        <span>Consumido: ${ (proyecto.presupuestoInicial - proyecto.presupuesto).toLocaleString() }</span>
+                                                        <span>Consumido: ${(proyecto.presupuestoInicial - proyecto.presupuesto).toLocaleString()}</span>
                                                     </div>
                                                 </>
                                             );
@@ -481,14 +481,14 @@ const DashboardLider = () => {
                 />
             )}
 
-                {mensajeModal && (
+            {mensajeModal && (
                 <ModalMensajes
                     titulo={mensajeModal.titulo}
                     mensaje={mensajeModal.mensaje}
                     tipo={mensajeModal.tipo}
                     onConfirm={() => setMensajeModal(null)}
                 />
-                )}
+            )}
 
         </div>
     );

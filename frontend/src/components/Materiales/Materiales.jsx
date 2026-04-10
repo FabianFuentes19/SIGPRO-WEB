@@ -19,7 +19,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
         }
         setCargando(true);
         try {
-            const data = await obtenerMaterialesPorProyecto(proyectoId);
+            const data = await obtenerMaterialesPorProyecto(proyectoId, busqueda);
             setMateriales(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error(e);
@@ -32,7 +32,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
     useEffect(() => {
         cargarMateriales();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [proyectoId]);
+    }, [proyectoId, busqueda]);
 
     const materialesFiltrados = useMemo(() => {
         const q = busqueda.trim().toLowerCase();
@@ -120,7 +120,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
                             <span>Consultando materiales</span>
                         </div>
                     </div>
-                ) : materialesFiltrados.map((m) => (
+                ) : materiales.map((m) => (
                     <div key={m.id} className="member-card-item">
                         <div className="member-data">
                             <strong>{m.nombre}</strong>

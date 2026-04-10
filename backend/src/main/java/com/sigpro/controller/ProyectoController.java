@@ -27,11 +27,12 @@ public class ProyectoController {
 
     @GetMapping
     public ResponseEntity<?> consultarTodos(
+            @RequestParam(required = false) String buscar,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Authentication auth) {
         try {
-            PaginatedResponse<ProyectoResponseDTO> respuesta = proyectoService.consultarTodos(page, size, auth);
+            PaginatedResponse<ProyectoResponseDTO> respuesta = proyectoService.consultarTodos(page, size, buscar, auth);
             return ResponseEntity.ok(respuesta);
         } catch (SecurityException e) {
             Map<String, String> error = new HashMap<>();

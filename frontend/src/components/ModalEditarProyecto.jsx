@@ -9,7 +9,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     fechaInicio: '',
     fechaFin: '',
     liderNombre: '',
-    presupuesto: ''
+    presupuestoInicial: ''
   });
 
   // Estados para validación de inputs
@@ -17,7 +17,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     nombre: false,
     objetivoGeneral: false,
     descripcion: false,
-    presupuesto: false
+    presupuestoInicial: false
   });
 
   // Cargar los datos del proyecto al abrir el modal, use useEffect, para cargar los datos
@@ -42,7 +42,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
       nombre: true,
       objetivoGeneral: true,
       descripcion: true,
-      presupuesto: true
+      presupuestoInicial: true
     });
 
     // Validar campos obligatorios antes de enviar
@@ -50,7 +50,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     if (!(datosFormulario.nombre || '').trim()) camposVacios.push("Nombre");
     if (!(datosFormulario.objetivoGeneral || '').trim()) camposVacios.push("Objetivo");
     if (!(datosFormulario.descripcion || '').trim()) camposVacios.push("Descripción");
-    if (!datosFormulario.presupuesto && datosFormulario.presupuesto !== 0) camposVacios.push("Presupuesto");
+    if (!datosFormulario.presupuestoInicial && datosFormulario.presupuestoInicial !== 0) camposVacios.push("Presupuesto");
 
     if (camposVacios.length > 0) {
       setModalMensajes({
@@ -75,7 +75,11 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
       }
     }
 
-    alActualizar(datosFormulario);
+    // Enviamos el presupuestoInicial como 'presupuesto' para el DTO
+    alActualizar({
+      ...datosFormulario,
+      presupuesto: datosFormulario.presupuestoInicial
+    });
     alCerrar();
   };
 
@@ -142,16 +146,16 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
             </div>
 
             <div className="form-group">
-              <label>Presupuesto *</label>
-              <div className={`input-money-wrapper form-control ${!touched.presupuesto ? "" : String(datosFormulario.presupuesto).trim() === "" ? "invalido" : "valido"
+              <label>Presupuesto Total *</label>
+              <div className={`input-money-wrapper form-control ${!touched.presupuestoInicial ? "" : String(datosFormulario.presupuestoInicial).trim() === "" ? "invalido" : "valido"
                 }`}>
                 <span className="currency-symbol">$</span>
                 <input
                   type="text"
-                  name="presupuesto"
-                  value={datosFormulario.presupuesto || ''}
+                  name="presupuestoInicial"
+                  value={datosFormulario.presupuestoInicial || ''}
                   onChange={cambiarValor}
-                  onBlur={() => setTouched({ ...touched, presupuesto: true })}
+                  onBlur={() => setTouched({ ...touched, presupuestoInicial: true })}
                 />
               </div>
             </div>

@@ -95,7 +95,7 @@ const DashProyectos = () => {
 
     } catch (error) {
       console.error("Error:", error);
-      alert("Error de conexión con el servidor");
+      //alert("Error de conexión con el servidor");
     }
   };
 
@@ -197,8 +197,9 @@ const DashProyectos = () => {
                     <th>NO.</th>
                     <th>NOMBRE</th>
                     <th>LÍDER</th>
-                    <th>DESCRIPCIÓN</th>
-                    <th>PRESUPUESTO</th>
+                    <th>PRESUPUESTO INICIAL</th>
+                    <th>RESTANTE</th>
+                    <th>PROGRESO</th>
                     <th>ESTADO</th>
                     <th>ACCIONES</th>
                   </tr>
@@ -222,14 +223,14 @@ const DashProyectos = () => {
                           <td>{index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
-                          <td>
-                            <div className="desc-cell" title={p.descripcion}>
-                              {p.descripcion}
-                            </div>
+                          <td className="text-right">
+                            {"$" + Number(p.presupuestoInicial).toLocaleString()}
+                          </td>
+                          <td className="text-right">
+                            {"$" + Number(p.presupuesto).toLocaleString()}
                           </td>
                           <td>
                             <div className="budget-cell-container">
-                              <span className="budget-amount">{"$" + Number(p.presupuesto).toLocaleString()}</span>
                               {(() => {
                                 const status = calculateBudgetStatus(p.presupuesto, p.presupuestoInicial);
                                 return (
@@ -241,7 +242,7 @@ const DashProyectos = () => {
                                       ></div>
                                     </div>
                                     <span className={`budget-status-text ${status.colorClass.replace('budget-', 'text-')}`}>
-                                      {status.text} ({Math.round(status.perc)}%)
+                                      {Math.round(status.perc)}%
                                     </span>
                                   </>
                                 );

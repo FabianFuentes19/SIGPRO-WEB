@@ -167,6 +167,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
               name="descripcion"
               className={`form-control ${!touched.descripcion ? "" : datosFormulario.descripcion.trim() === "" ? "invalido" : "valido"
                 }`}
+              placeholder="Ej. Este proyecto trata de  . . ."
               value={datosFormulario.descripcion}
               onChange={cambiarValor}
               onBlur={() => setTouched({ ...touched, descripcion: true })}

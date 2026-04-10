@@ -13,11 +13,14 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByMatricula(String matricula);
 
-    @Query("select u from Usuario u where upper(u.rol.nombre) = upper(:rolNombre)")
-    Page<Usuario> findByRolNombre(@Param("rolNombre") String rolNombre, Pageable pageable);
+    @Query("SELECT u FROM Usuario u " +
+            "WHERE UPPER(u.rol.nombre) = UPPER(:rolNombre) " +
+            "AND (UPPER(u.nombreCompleto) LIKE UPPER(CONCAT('%', :buscar, '%')) " +
+            "OR UPPER(u.matricula) LIKE UPPER(CONCAT('%', :buscar, '%')))")
+    Page<Usuario> findByRolNombreConBusqueda(@Param("rolNombre") String rolNombre, @Param("buscar") String buscar, Pageable pageable);
 
     @Query("SELECT u FROM Usuario u " +
-            "WHERE UPPER(u.rol.nombre) = 'Lider' " +
+            "WHERE UPPER(u.rol.nombre) = 'LIDER' " +
             "AND UPPER(u.estado) = 'ACTIVO' " +
             "AND u.id NOT IN (SELECT p.lider.id FROM Proyecto p)")
     List<Usuario> findLideresSinProyecto();

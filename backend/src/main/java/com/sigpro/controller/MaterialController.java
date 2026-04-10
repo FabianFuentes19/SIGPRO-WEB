@@ -10,12 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.constraints.Positive;
 import java.util.List;
@@ -37,8 +32,9 @@ public class MaterialController {
 
     @GetMapping("/proyecto/{proyectoId}")
     public ResponseEntity<List<MaterialResponseDTO>> listarPorProyecto(
-            @PathVariable @Positive(message = "El identificador del proyecto debe ser mayor que cero") Long proyectoId) {
-        List<MaterialResponseDTO> lista = materialService.listarMaterialesPorProyecto(proyectoId);
+            @PathVariable @Positive(message = "El identificador del proyecto debe ser mayor que cero") Long proyectoId,
+            @RequestParam(required = false) String nombre) {
+        List<MaterialResponseDTO> lista = materialService.listarMaterialesPorProyecto(proyectoId, nombre);
         return ResponseEntity.ok(lista);
     }
 }

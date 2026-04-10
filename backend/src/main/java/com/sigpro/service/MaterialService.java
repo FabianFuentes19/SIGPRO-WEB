@@ -73,8 +73,14 @@ public class MaterialService {
      * Lista los materiales de un proyecto (solo lectura).
      */
     @Transactional(readOnly = true)
-    public List<MaterialResponseDTO> listarMaterialesPorProyecto(Long proyectoId) {
-        return materialRepository.findByProyectoId(proyectoId).stream()
+    public List<MaterialResponseDTO> listarMaterialesPorProyecto(Long proyectoId, String nombre) {
+        List<Material> lista;
+        if (nombre != null && !nombre.isBlank()) {
+            lista = materialRepository.findByProyectoIdAndNombreContainingIgnoreCase(proyectoId, nombre.trim());
+        } else {
+            lista = materialRepository.findByProyectoId(proyectoId);
+        }
+        return lista.stream()
                 .map(MaterialMapper::toResponseDto)
                 .collect(Collectors.toList());
     }

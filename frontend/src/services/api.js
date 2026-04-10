@@ -80,10 +80,15 @@ export async function registrarMiembro(datos) {
  * @param {number} size - Cantidad de registros por página
  * @returns {Promise<Object>}
  */
-export async function obtenerUsuarios(rol, page = 0, size = 10) {
-  const endpoint = rol 
+export async function obtenerUsuarios(rol, page = 0, size = 10, buscar = "") {
+  let endpoint = rol 
     ? `/usuarios/rol/${encodeURIComponent(rol)}?page=${page}&size=${size}` 
     : `/usuarios?page=${page}&size=${size}`;
+  
+  if (buscar) {
+    endpoint += `&buscar=${encodeURIComponent(buscar)}`;
+  }
+
   const response = await apiFetch(endpoint);
   const data = await response.json();
   if (!response.ok) {
@@ -170,16 +175,56 @@ async function obtenerDatosNominas(token, matriculaLider) {
 /**
  * Lista materiales de un proyecto (GET /api/materiales/proyecto/{proyectoId})
  * @param {number|string} proyectoId
+ * @param {string} nombre - Término de búsqueda opcional
  * @returns {Promise<Array>}
  */
-export async function obtenerMaterialesPorProyecto(proyectoId) {
+export async function obtenerMaterialesPorProyecto(proyectoId, nombre = "") {
   if (!proyectoId) return [];
-  const response = await apiFetch(`/api/materiales/proyecto/${encodeURIComponent(proyectoId)}`);
+  let endpoint = `/api/materiales/proyecto/${encodeURIComponent(proyectoId)}`;
+  if (nombre) {
+    endpoint += `?nombre=${encodeURIComponent(nombre)}`;
+  }
+  const response = await apiFetch(endpoint);
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.error || "Error al obtener materiales");
   }
   return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Obtiene la lista de proyectos (requiere token).
+ * @param {number} page - Número de página
+ * @param {number} size - Tamaño
+ * @param {string} buscar - Término de búsqueda opcional
+ * @returns {Promise<Object>}
+ */
+export async function obtenerProyectos(page = 0, size = 10, buscar = "") {
+  let endpoint = `/proyectos?page=${page}&size=${size}`;
+  if (buscar) {
+    endpoint += `&buscar=${encodeURIComponent(buscar)}`;
+  }
+  const response = await apiFetch(endpoint);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al obtener proyectos");
+  }
+  return data;
+}
+
+/**
+ * Obtiene el detalle de un proyecto por ID (incluye miembros).
+ * @param {number|string} id 
+ * @returns {Promise<Object>}
+ */
+export async function obtenerProyectoPorId(id) {
+  if (!id) return null;
+  const response = await apiFetch(`/proyectos/${id}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Error al obtener detalle del proyecto");
+  }
+  return data;
 }
 
 /**

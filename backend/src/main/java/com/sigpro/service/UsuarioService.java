@@ -108,18 +108,35 @@ public class UsuarioService {
         return UsuarioMapper.toResponseDto(actualizado);
     }
 
+    public UsuarioResponseDTO activarUsuario(String matricula) {
+        String m = safeTrim(matricula);
+        if (m == null || m.isEmpty()) {
+            throw new IllegalArgumentException("Matrícula obligatoria");
+        }
+
+        Usuario usuario = usuarioRepository.findByMatricula(m)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        usuario.setEstado(ESTADO_ACTIVO);
+        Usuario actualizado = usuarioRepository.save(usuario);
+        return UsuarioMapper.toResponseDto(actualizado);
+    }
+
     public List<UsuarioResponseDTO> listarUsuarios() {
         return usuarioRepository.findAll().stream()
                 .map(UsuarioMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public PaginatedResponse<UsuarioResponseDTO> obtenerUsuariosPorRol(String rolNombre, int page, int size) {
+    public PaginatedResponse<UsuarioResponseDTO> obtenerUsuariosPorRol(String rolNombre, String buscar, int page, int size) {
         if (rolNombre == null || rolNombre.isBlank()) {
             return new PaginatedResponse<>();
         }
         Pageable pageable = PageRequest.of(page, size);
-        Page<Usuario> pageResult = usuarioRepository.findByRolNombre(rolNombre, pageable);
+        
+        // Si no hay búsqueda, enviamos vacío para que el LIKE traiga todo
+        String termino = (buscar != null) ? buscar.trim() : "";
+        Page<Usuario> pageResult = usuarioRepository.findByRolNombreConBusqueda(rolNombre, termino, pageable);
 
         List<UsuarioResponseDTO> content = pageResult.getContent().stream()
                 .map(UsuarioMapper::toResponseDto)

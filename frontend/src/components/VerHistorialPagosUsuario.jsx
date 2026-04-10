@@ -7,10 +7,12 @@ const BASE_URL = "http://localhost:8080";
 const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
     const [pagos, setPagos] = useState([]);
     const [totalAcumulado, setTotalAcumulado] = useState(0);
+    const [cargando, setCargando] = useState(false);
 
     const obtenerPagos = async () => {
         if (!usuario?.matricula) return;
         const token = localStorage.getItem("token");
+        setCargando(true);
 
         try {
             const response = await fetch(`${BASE_URL}/pagos/miembro/${encodeURIComponent(usuario.matricula)}`, {

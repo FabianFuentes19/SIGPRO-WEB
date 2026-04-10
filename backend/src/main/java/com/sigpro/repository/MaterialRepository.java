@@ -16,6 +16,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
 
     List<Material> findByProyectoId(Long proyectoId);
 
+    List<Material> findByProyectoIdAndNombreContainingIgnoreCase(Long proyectoId, String nombre);
+
     @Query("select coalesce(sum(m.costoTotal), 0) from Material m where m.proyecto.id = :proyectoId")
     BigDecimal sumCostoTotalByProyectoId(@Param("proyectoId") Long proyectoId);
 }

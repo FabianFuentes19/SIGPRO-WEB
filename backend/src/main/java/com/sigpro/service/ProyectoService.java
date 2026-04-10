@@ -40,10 +40,16 @@ public class ProyectoService {
     @Autowired
     private UsuarioService usuarioService;
 
-    public PaginatedResponse<ProyectoResponseDTO> consultarTodos(int page, int size, Authentication auth){
+    public PaginatedResponse<ProyectoResponseDTO> consultarTodos(int page, int size, String buscar, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
         Pageable pageable = PageRequest.of(page, size);
-        Page<Proyecto> pageResult = proyectoRepository.findAllByLiderEstado(ESTADO_ACTIVO, pageable);
+        
+        Page<Proyecto> pageResult;
+        if (buscar != null && !buscar.isBlank()) {
+            pageResult = proyectoRepository.findByNombreConBusqueda(buscar.trim(), pageable);
+        } else {
+            pageResult = proyectoRepository.findAll(pageable);
+        }
 
         List<ProyectoResponseDTO> content = pageResult.getContent().stream()
                 .map(ProyectoMapper::toResponseDto).toList();
@@ -136,9 +142,17 @@ public class ProyectoService {
             proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
         }
         if (dto.getPresupuesto() != null) {
-            proyecto.setPresupuesto(dto.getPresupuesto());
-            // Sincronizamos el inicial para mantener consistencia en la barra de progreso
+            // Lógica inteligente de incremento/ajuste
+            java.math.BigDecimal gastadoHastaAhora = proyecto.getPresupuestoInicial().subtract(proyecto.getPresupuesto());
+            
+            // El nuevo presupuesto enviado en el DTO se considera el "Nuevo Total"
             proyecto.setPresupuestoInicial(dto.getPresupuesto());
+            
+            // El presupuesto actual será el Nuevo Total menos lo que ya se gastó
+            java.math.BigDecimal nuevoRestante = dto.getPresupuesto().subtract(gastadoHastaAhora);
+            
+            // Evitamos que el presupuesto restante sea negativo por error
+            proyecto.setPresupuesto(nuevoRestante.compareTo(java.math.BigDecimal.ZERO) < 0 ? java.math.BigDecimal.ZERO : nuevoRestante);
         }
 
         return ProyectoMapper.toResponseDto(proyectoRepository.save(proyecto));

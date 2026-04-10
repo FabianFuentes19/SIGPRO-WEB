@@ -33,7 +33,7 @@ const DashLideres = () => {
 
   useEffect(() => {
     fetchLideres(paginaActual);
-  }, [paginaActual]);
+  }, [paginaActual, busqueda]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
@@ -42,10 +42,10 @@ const DashLideres = () => {
 
   const fetchLideres = async (page = 0) => {
     try {
-      const data = await obtenerUsuarios("LIDER", page, tamanoPagina);
+      const data = await obtenerUsuarios("LIDER", page, tamanoPagina, busqueda);
       setLideres(data.content || []);
       setTotalPaginas(data.totalPages || 0);
-      setPaginaActual(data.pageNumber || 0);
+      // Importante: No forzar setPaginaActual aquí para evitar loops si ya estamos en esa página
     } catch (error) {
       console.error("Error al cargar líderes:", error);
     }
@@ -71,7 +71,7 @@ const DashLideres = () => {
           tipo: "exito"
         });
         setMostrarModal(false);
-        fetchLideres();
+        fetchLideres(paginaActual);
       } else {
         const errorData = await response.json();
         setMensajeModal({
@@ -109,7 +109,7 @@ const DashLideres = () => {
           tipo: "exito"
         });
         setMostrarModalEditar(false);
-        fetchLideres();
+        fetchLideres(paginaActual);
       } else {
         const errorData = await response.json();
         setMensajeModal({
@@ -143,7 +143,7 @@ const DashLideres = () => {
           mensaje: "Líder desactivado correctamente",
           tipo: "exito"
         });
-        fetchLideres();
+        fetchLideres(paginaActual);
       } else {
         const errorData = await response.json();
         setMensajeModal({
@@ -154,6 +154,40 @@ const DashLideres = () => {
       }
     } catch (error) {
       console.error("Error al desactivar:", error);
+      setMensajeModal({
+        titulo: "Error",
+        mensaje: "Error de conexión con el servidor",
+        tipo: "error"
+      });
+    }
+  };
+
+  const activarLider = async (matricula) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/usuarios/${matricula}/activar`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        setMensajeModal({
+          titulo: "Activación Exitosa",
+          mensaje: "Líder activado correctamente",
+          tipo: "exito"
+        });
+        fetchLideres(paginaActual);
+      } else {
+        const errorData = await response.json();
+        setMensajeModal({
+          titulo: "Error",
+          mensaje: errorData.error || "No se pudo activar el líder",
+          tipo: "error"
+        });
+      }
+    } catch (error) {
+      console.error("Error al activar:", error);
       setMensajeModal({
         titulo: "Error",
         mensaje: "Error de conexión con el servidor",
@@ -223,14 +257,9 @@ const DashLideres = () => {
                       </td>
                     </tr>
                   ) : (
-                    lideres
-                      .filter((l) =>
-                        l.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase()) ||
-                        l.matricula.toLowerCase().includes(busqueda.toLowerCase())
-                      )
-                      .map((l, index) => (
+                    lideres.map((l, index) => (
                         <tr key={l.matricula}>
-                          <td>{index + 1}</td>
+                          <td>{paginaActual * tamanoPagina + index + 1}</td>
                           <td>{l.nombreCompleto}</td>
                           <td>{l.matricula}</td>
                           <td>
@@ -252,21 +281,20 @@ const DashLideres = () => {
                                 <Trash2 size={14} />
                               </div>}
 
-                              {/* <label className="switch">
-                                  <input
-                                    type="checkbox"
-                                    checked={l.estado === "ACTIVO"}
-                                    onChange={() => {
-                                      setLiderSeleccionado(l);
-                                      if (l.estado === "ACTIVO") {
-                                        eliminarLider(l.matricula);
-                                      } else {
-                                        //falta implementar desactivar en back
-                                      }
-                                    }}
-                                  />
-                                  <span className="slider round"></span>
-                                </label>*/}
+                              {/*<label className="switch">
+                                <input
+                                  type="checkbox"
+                                  checked={l.estado === "ACTIVO"}
+                                  onChange={() => {
+                                    if (l.estado === "ACTIVO") {
+                                      eliminarLider(l.matricula);
+                                    } else {
+                                      activarLider(l.matricula);
+                                    }
+                                  }}
+                                />
+                                <span className="slider round"></span>
+                              </label> */}
 
                             </div>
                           </td>

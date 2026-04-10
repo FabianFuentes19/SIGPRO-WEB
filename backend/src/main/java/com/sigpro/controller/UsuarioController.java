@@ -41,10 +41,11 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> listarPorRol(
             @PathVariable String rolNombre,
+            @RequestParam(required = false) String buscar,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
-            PaginatedResponse<UsuarioResponseDTO> respuesta = usuarioService.obtenerUsuariosPorRol(rolNombre, page, size);
+            PaginatedResponse<UsuarioResponseDTO> respuesta = usuarioService.obtenerUsuariosPorRol(rolNombre, buscar, page, size);
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -158,6 +159,27 @@ public class UsuarioController {
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "No fue posible desactivar el usuario");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @PatchMapping("/{matricula}/activar")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> activar(@PathVariable String matricula) {
+        try {
+            UsuarioResponseDTO actualizado = usuarioService.activarUsuario(matricula);
+
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Usuario activado correctamente");
+            respuesta.put("usuario", actualizado);
+            return ResponseEntity.ok(respuesta);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "No fue posible activar el usuario");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
