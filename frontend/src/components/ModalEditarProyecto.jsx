@@ -9,7 +9,8 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     fechaInicio: '',
     fechaFin: '',
     liderNombre: '',
-    presupuestoInicial: ''
+    presupuestoInicial: '',
+    presupuestoAutorizado: ''
   });
 
   // Estados para validación de inputs
@@ -17,13 +18,17 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     nombre: false,
     objetivoGeneral: false,
     descripcion: false,
-    presupuestoInicial: false
+    presupuestoInicial: false,
+    presupuestoAutorizado: false
   });
 
   // Cargar los datos del proyecto al abrir el modal, use useEffect, para cargar los datos
   useEffect(() => {
     if (proyecto) {
-      setDatosFormulario(proyecto);
+      setDatosFormulario({
+        ...proyecto,
+        presupuestoAutorizado: proyecto.presupuestoAutorizado || proyecto.presupuestoInicial
+      });
     }
   }, [proyecto]);
 
@@ -50,7 +55,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     if (!(datosFormulario.nombre || '').trim()) camposVacios.push("Nombre");
     if (!(datosFormulario.objetivoGeneral || '').trim()) camposVacios.push("Objetivo");
     if (!(datosFormulario.descripcion || '').trim()) camposVacios.push("Descripción");
-    if (!datosFormulario.presupuestoInicial && datosFormulario.presupuestoInicial !== 0) camposVacios.push("Presupuesto");
+    if (!datosFormulario.presupuestoAutorizado && datosFormulario.presupuestoAutorizado !== 0) camposVacios.push("Presupuesto Autorizado");
 
     if (camposVacios.length > 0) {
       setModalMensajes({
@@ -78,7 +83,7 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
     // Enviamos el presupuestoInicial como 'presupuesto' para el DTO
     alActualizar({
       ...datosFormulario,
-      presupuesto: datosFormulario.presupuestoInicial
+      presupuesto: datosFormulario.presupuestoAutorizado
     });
     alCerrar();
   };
@@ -141,21 +146,29 @@ const ModalEditarProyecto = ({ proyecto, alCerrar, alActualizar, setModalMensaje
 
           <div className="form-row-2-col">
             <div className="form-group">
-              <label>Líder *</label>
-              <input type="text" name="liderNombre" className="form-control" value={datosFormulario.liderNombre || ''} onChange={cambiarValor} disabled  />
+              <label>Presupuesto Inicial (Histórico)</label>
+              <div className="input-money-wrapper form-control disabled-looking">
+                <span className="currency-symbol">$</span>
+                <input
+                  type="text"
+                  value={datosFormulario.presupuestoInicial || ''}
+                  disabled
+                  className="read-only-input"
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label>Presupuesto Total *</label>
-              <div className={`input-money-wrapper form-control ${!touched.presupuestoInicial ? "" : String(datosFormulario.presupuestoInicial).trim() === "" ? "invalido" : "valido"
+              <label>Presupuesto Autorizado *</label>
+              <div className={`input-money-wrapper form-control ${!touched.presupuestoAutorizado ? "" : String(datosFormulario.presupuestoAutorizado).trim() === "" ? "invalido" : "valido"
                 }`}>
                 <span className="currency-symbol">$</span>
                 <input
                   type="text"
-                  name="presupuestoInicial"
-                  value={datosFormulario.presupuestoInicial || ''}
+                  name="presupuestoAutorizado"
+                  value={datosFormulario.presupuestoAutorizado || ''}
                   onChange={cambiarValor}
-                  onBlur={() => setTouched({ ...touched, presupuestoInicial: true })}
+                  onBlur={() => setTouched({ ...touched, presupuestoAutorizado: true })}
                 />
               </div>
             </div>

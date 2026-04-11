@@ -135,7 +135,6 @@ public class PagoService {
 
         String estado = usuario.getEstado() != null ? usuario.getEstado().trim() : "";
         if (!"ACTIVO".equalsIgnoreCase(estado)) {
-            System.err.println("[DEBUG] Bloqueo de nómina: Usuario " + matricula + " tiene estado [" + estado + "]");
             throw new IllegalArgumentException("Cuenta inactiva (" + estado + ")");
         }
 

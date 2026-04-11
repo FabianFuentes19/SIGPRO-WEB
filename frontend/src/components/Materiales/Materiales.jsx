@@ -4,6 +4,7 @@ import { Search, Plus } from 'lucide-react';
 import AgregarMaterial from './AgregarMaterial.jsx';
 import { obtenerMaterialesPorProyecto, registrarMaterial } from '../../services/api.js';
 import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
+import { formatCurrencyWithSign } from '../../utils/formatters';
 
 const Materiales = ({ proyectoId, onMaterialSuccess }) => {
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -44,8 +45,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
         return materiales.reduce((acc, item) => acc + (Number(item?.costoTotal) || 0), 0);
     }, [materiales]);
 
-    const formatearMoneda = (v) =>
-        (Number(v) || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    const formatearMoneda = (v) => formatCurrencyWithSign(v);
 
     const onRegistrar = async (datos) => {
         if (!proyectoId) {

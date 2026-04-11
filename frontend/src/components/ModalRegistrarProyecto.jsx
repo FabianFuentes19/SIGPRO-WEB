@@ -60,7 +60,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
   const guardarProyecto = (e) => {
     e.preventDefault();
 
- // se valida los input antes de registrar
+    // se valida los input antes de registrar
     setTouched({
       nombre: true,
       objetivoGeneral: true,
@@ -105,11 +105,10 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
     }
 
     // valida que la fecha de inicio no esté en el pasado
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const fechaInicioElegida = new Date(datosFormulario.fechaInicio + "T00:00:00");
+    const todayStr = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD" local
+    const chosenStr = datosFormulario.fechaInicio;
 
-    if (fechaInicioElegida < hoy) {
+    if (chosenStr < todayStr) {
       setModalMensajes({
         titulo: "Fecha Invalida",
         mensaje: "No puedes registrar un proyecto con una fecha de inicio en el pasado.",
@@ -185,7 +184,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
                 value={datosFormulario.fechaInicio}
                 onChange={cambiarValor}
                 onBlur={() => setTouched({ ...touched, fechaInicio: true })}
-                min={new Date().toISOString().split('T')[0]}
+                min={new Date().toLocaleDateString('en-CA')}
               />
             </div>
             <div className="form-group">

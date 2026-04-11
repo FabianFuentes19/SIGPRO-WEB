@@ -1,7 +1,10 @@
 /* Contenedor principal */
 .overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
@@ -14,10 +17,10 @@
 .modal-exito {
   background: #fff;
   padding: 40px 30px;
-  border-radius: 12px; 
-  width: 400px; 
+  border-radius: 12px;
+  width: 400px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Icono de Checkmark en círculo */
@@ -28,7 +31,7 @@
 }
 
 .icon-bg-exito {
-  background-color: #6ee7b7; 
+  background-color: #6ee7b7;
   width: 65px;
   height: 65px;
   border-radius: 50%;
@@ -38,7 +41,7 @@
 }
 
 .icon-check {
-  color: #166534; 
+  color: #166534;
   font-size: 32px;
   font-weight: bold;
 }
@@ -55,7 +58,7 @@
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 35px;
-  max-width: 80%; 
+  max-width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -67,8 +70,8 @@
 }
 
 .btn-aceptar-exito {
-  flex: 1; 
-  background: #166534; 
+  flex: 1;
+  background: #166534;
   border: none;
   color: white;
   padding: 16px;
@@ -76,26 +79,26 @@
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(22, 101, 52, 0.3); 
+  box-shadow: 0 4px 10px rgba(22, 101, 52, 0.3);
   transition: background 0.2s, transform 0.1s;
 }
 
 .btn-aceptar-exito:hover {
-  background: #15803d; 
+  background: #15803d;
 }
 
 .btn-aceptar-exito:active {
-  transform: translateY(1px); 
+  transform: translateY(1px);
 }
 
 /* La Card del Modal (Específico para Error) */
 .modal-error {
   background: #fff;
   padding: 40px 30px;
-  border-radius: 12px; 
-  width: 400px; 
+  border-radius: 12px;
+  width: 400px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .icon-container-error {
@@ -105,7 +108,7 @@
 }
 
 .icon-bg-error {
-  background-color: #fca5a5; 
+  background-color: #fca5a5;
   width: 65px;
   height: 65px;
   border-radius: 50%;
@@ -115,7 +118,7 @@
 }
 
 .icon-cross {
-  color: #b91c1c; 
+  color: #b91c1c;
   font-size: 32px;
   font-weight: bold;
 }
@@ -132,7 +135,7 @@
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 35px;
-  max-width: 80%; 
+  max-width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -143,8 +146,8 @@
 }
 
 .btn-aceptar-error {
-  flex: 1; 
-  background: #b91c1c; 
+  flex: 1;
+  background: #b91c1c;
   border: none;
   color: white;
   padding: 16px;
@@ -152,26 +155,26 @@
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3); 
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.3);
   transition: background 0.2s, transform 0.1s;
 }
 
 .btn-aceptar-error:hover {
-  background: #991b1b; 
+  background: #991b1b;
 }
 
 .btn-aceptar-error:active {
-  transform: translateY(1px); 
+  transform: translateY(1px);
 }
 
-/* La Card del Modal (Específico para Advertencia) */
+/* alertas */
 .modal-advertencia {
   background: #fff;
   padding: 40px 30px;
-  border-radius: 12px; 
-  width: 400px; 
+  border-radius: 12px;
+  width: 400px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .icon-container-advertencia {
@@ -181,7 +184,7 @@
 }
 
 .icon-bg-advertencia {
-  background-color: #fef3c7; /* Amber light */
+  background-color: #fef3c7;
   width: 65px;
   height: 65px;
   border-radius: 50%;
@@ -191,7 +194,7 @@
 }
 
 .icon-warn {
-  color: #d97706; /* Amber dark */
+  color: #d97706;
   font-size: 32px;
   font-weight: bold;
 }
@@ -208,7 +211,7 @@
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: 35px;
-  max-width: 80%; 
+  max-width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -219,8 +222,8 @@
 }
 
 .btn-aceptar-advertencia {
-  flex: 1; 
-  background: #f59e0b; 
+  flex: 1;
+  background: #f59e0b;
   border: none;
   color: white;
   padding: 16px;
@@ -228,7 +231,7 @@
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); 
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
   transition: background 0.2s, transform 0.1s;
 }
 
@@ -237,6 +240,5 @@
 }
 
 .btn-aceptar-advertencia:active {
-  transform: translateY(1px); 
+  transform: translateY(1px);
 }
-

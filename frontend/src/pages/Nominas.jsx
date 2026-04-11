@@ -60,7 +60,7 @@ const Nominas = ({ onPaymentSuccess }) => {
           puesto: miembro.puesto,
           matricula: miembro.matricula,
           voucher: v.pagoId || `${v.numeroQuincena}`,
-          monto: v.montoEsperado,
+          monto: v.estado === "PAGADO" ? v.montoPagado : v.montoEsperado,
           estado: v.estado,
           fecha: v.estado === "PAGADO" ? v.fechaPagoReal : v.fechaFin,
           numeroQuincena: v.numeroQuincena,

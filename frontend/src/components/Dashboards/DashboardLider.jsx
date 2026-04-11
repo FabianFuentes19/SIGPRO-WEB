@@ -7,6 +7,7 @@ import BorrarUsuario from '../BorrarUsuario.jsx';
 import VerDetallesUsuario from '../VerDetallesUsuario.jsx';
 import VerHistorialPagosUsuario from '../VerHistorialPagosUsuario.jsx';
 import Nominas from '../../pages/Nominas.jsx';
+import { formatCurrency, formatCurrencyWithSign } from '../../utils/formatters';
 
 import {
     LayoutDashboard,
@@ -50,9 +51,9 @@ const DashboardLider = () => {
     const lastBudgetRef = useRef(null);
 
     // Función para calcular el estado presupuesto
-    const calculateBudgetStatus = (actual, inicial) => {
-        if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
-        const perc = (actual / inicial) * 100;
+    const calculateBudgetStatus = (actual, autorizado) => {
+        if (!autorizado || autorizado <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
+        const perc = (actual / autorizado) * 100;
 
         if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'CRITICAL', text: 'Presupuesto Agotado' };
         if (perc <= 10) return { perc, colorClass: 'budget-critical', status: 'CRITICAL', text: 'Te queda menos del 10% de presupuesto' };
@@ -76,7 +77,7 @@ const DashboardLider = () => {
 
             // verifica si al insertar un gasto el presupuesto entra en riesgo
             if (triggerAlert && lastBudgetRef.current !== null && lastBudgetRef.current !== data.presupuesto) {
-                const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoInicial);
+                const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoAutorizado || data.presupuestoInicial);
                 if (statusInfo.status !== 'OK') {
                     setMensajeModal({
                         titulo: "ALERTA",
@@ -339,13 +340,15 @@ const DashboardLider = () => {
                                     </div>
 
                                     <div className="budget-section-left">
-                                        <span className="budget-label">Presupuesto Total</span>
-                                        <h3 className="budget-value">${proyecto.presupuesto.toLocaleString()}</h3>
+                                        <div className="budget-main-display">
+                                            <span className="budget-label">Restante</span>
+                                            <h3 className="budget-value">{formatCurrencyWithSign(proyecto.presupuesto)}</h3>
+                                        </div>
                                     </div>
 
                                     <div className="progress-section-bottom">
                                         {(() => {
-                                            const status = calculateBudgetStatus(proyecto.presupuesto, proyecto.presupuestoInicial);
+                                            const status = calculateBudgetStatus(proyecto.presupuesto, proyecto.presupuestoAutorizado || proyecto.presupuestoInicial);
                                             return (
                                                 <>
                                                     <div className="progress-info-row">
@@ -362,7 +365,7 @@ const DashboardLider = () => {
                                                     </div>
                                                     <div className="budget-summary-row">
                                                         <span className={status.colorClass.replace('budget-', 'text-')}>{status.text}</span>
-                                                        <span>Consumido: ${(proyecto.presupuestoInicial - proyecto.presupuesto).toLocaleString()}</span>
+                                                        <span>Consumido: {formatCurrencyWithSign((proyecto.presupuestoAutorizado || proyecto.presupuestoInicial) - proyecto.presupuesto)}</span>
                                                     </div>
                                                 </>
                                             );

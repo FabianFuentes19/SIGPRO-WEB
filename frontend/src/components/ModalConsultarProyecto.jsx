@@ -1,5 +1,6 @@
 import React from 'react';
 import '../css/ModalConsultarProyecto.css';
+import { formatCurrency } from '../utils/formatters';
 
 const ModalConsultarProyecto = ({ proyecto, onClose }) => {
   // si no hay un proyecto seleccionado el modal no se renderiza y retorna null
@@ -37,10 +38,28 @@ const ModalConsultarProyecto = ({ proyecto, onClose }) => {
             <label>Líder:</label>
             <input type="text" value={proyecto.liderNombre} disabled />
           </div>
+          <div className="form-row-2-col">
+            <div className="form-group input-money-wrapper">
+              <label>Presupuesto Inicial:</label>
+              <div className="money-display-readonly">
+                <span className="currency-symbol">$</span>
+                <input type="text" value={formatCurrency(proyecto.presupuestoInicial)} disabled />
+              </div>
+            </div>
+            <div className="form-group input-money-wrapper">
+              <label>P. Autorizado:</label>
+              <div className="money-display-readonly">
+                <span className="currency-symbol">$</span>
+                <input type="text" value={formatCurrency(proyecto.presupuestoAutorizado || proyecto.presupuestoInicial)} disabled />
+              </div>
+            </div>
+          </div>
           <div className="form-group input-money-wrapper">
-            <label>Presupuesto:</label>
-            <span className="currency-symbol">$</span>
-            <input type="number" value={proyecto.presupuesto} disabled />
+            <label>Presupuesto Restante:</label>
+            <div className="money-display-readonly">
+              <span className="currency-symbol">$</span>
+              <input type="text" value={formatCurrency(proyecto.presupuesto)} disabled />
+            </div>
           </div>
         </form>
         <div className="modal-actions">

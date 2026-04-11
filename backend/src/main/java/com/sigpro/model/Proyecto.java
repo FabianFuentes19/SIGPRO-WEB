@@ -34,6 +34,9 @@ public class Proyecto {
     @Column(name = "PRESUPUESTO_INICIAL", nullable = false, precision = 15, scale = 2)
     private BigDecimal presupuestoInicial;
 
+    @Column(name = "PRESUPUESTO_AUTORIZADO", nullable = false, precision = 15, scale = 2)
+    private BigDecimal presupuestoAutorizado;
+
     @Column(name = "FECHA_INICIO", nullable = false)
     private LocalDate fechaInicio;
 

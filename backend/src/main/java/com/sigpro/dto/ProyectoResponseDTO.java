@@ -17,6 +17,7 @@ public class ProyectoResponseDTO {
     private String liderNombre;
     private BigDecimal presupuesto;
     private BigDecimal presupuestoInicial;
+    private BigDecimal presupuestoAutorizado;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String estado;

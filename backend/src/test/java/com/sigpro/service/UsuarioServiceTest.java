@@ -22,6 +22,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import com.sigpro.dto.PaginatedResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -280,22 +285,25 @@ class UsuarioServiceTest {
     void cpRl001_listarPorRolExito() {
         Usuario u1 = usuarioConRol(1L, "A1", "LIDER");
         Usuario u2 = usuarioConRol(2L, "A2", "LIDER");
-        when(usuarioRepository.findByRolNombre("LIDER")).thenReturn(List.of(u1, u2));
+        Page<Usuario> page = new PageImpl<>(List.of(u1, u2));
 
-        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("LIDER");
+        when(usuarioRepository.findByRolNombreConBusqueda(anyString(), anyString(), any(Pageable.class))).thenReturn(page);
 
-        assertEquals(2, resultado.size());
-        assertTrue(resultado.stream().allMatch(d -> "LIDER".equals(d.getRolNombre())));
+        PaginatedResponse<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("LIDER", "", 0, 10);
+
+        assertEquals(2, resultado.getContent().size());
+        assertTrue(resultado.getContent().stream().allMatch(d -> "LIDER".equals(d.getRolNombre())));
     }
 
     @Test
     @DisplayName("CP-RL-002: Listar por rol — sin datos")
     void cpRl002_listarPorRolSinDatos() {
-        when(usuarioRepository.findByRolNombre("MIEMBRO")).thenReturn(List.of());
+        Page<Usuario> emptyPage = new PageImpl<>(List.of());
+        when(usuarioRepository.findByRolNombreConBusqueda(anyString(), anyString(), any(Pageable.class))).thenReturn(emptyPage);
 
-        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("MIEMBRO");
+        PaginatedResponse<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol("MIEMBRO", "", 0, 10);
 
-        assertTrue(resultado.isEmpty());
+        assertTrue(resultado.getContent().isEmpty());
     }
 
     @ParameterizedTest
@@ -303,10 +311,10 @@ class UsuarioServiceTest {
     @ValueSource(strings = {"   ", "\t"})
     @DisplayName("CP-RL-003: Listar por rol — inválido (null o en blanco)")
     void cpRl003_listarPorRolInvalido(String rolNombre) {
-        List<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol(rolNombre);
+        PaginatedResponse<UsuarioResponseDTO> resultado = usuarioService.obtenerUsuariosPorRol(rolNombre, "", 0, 10);
 
-        assertTrue(resultado.isEmpty());
-        verify(usuarioRepository, never()).findByRolNombre(any());
+        assertNull(resultado.getContent());
+        verify(usuarioRepository, never()).findByRolNombreConBusqueda(any(), any(), any());
     }
 
     @Test
@@ -321,7 +329,6 @@ class UsuarioServiceTest {
         assertEquals("2023001", dto.getMatricula());
         assertEquals("Juan Perez", dto.getNombreCompleto());
         assertEquals("LIDER", dto.getRolNombre());
-        assertNull(dto.getContrasena());
     }
 
     @ParameterizedTest

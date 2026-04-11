@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   LayoutGrid, Users, Wallet, Info, History, LogOut, UserCircle 
 } from "lucide-react";
+import { formatCurrencyWithSign } from "../../utils/formatters.js";
 import "./PerfilLider.css";
 import { useNavigate } from "react-router-dom";
 
@@ -65,12 +66,7 @@ const PerfilLider = () => {
   }, []);
 
   //Este lo puse para que convierta los numeros a un formato en este caso moneda MXN
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(amount);
-  };
+  const formatCurrency = (amount) => formatCurrencyWithSign(amount);
 
   //Este lo puse para que convierta fechas a un formato legible para los usuarios
   const formatDate = (dateStr) => {

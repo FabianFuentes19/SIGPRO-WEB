@@ -19,5 +19,6 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
     // Consultar pagos por proyecto
     List<Pago> findByUsuarioMatriculaAndProyectoId(String matricula, Long proyectoId);
 
-
+    @org.springframework.data.jpa.repository.Query("select coalesce(sum(p.monto), 0) from Pago p where p.proyecto.id = :proyectoId")
+    java.math.BigDecimal sumMontoByProyectoId(@org.springframework.data.repository.query.Param("proyectoId") Long proyectoId);
 }

@@ -4,10 +4,7 @@ import com.sigpro.dto.*;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.model.Usuario;
-import com.sigpro.repository.ProyectoRepository;
-import com.sigpro.repository.ProyectoUsuarioRepository;
-import com.sigpro.repository.RolRepository;
-import com.sigpro.repository.UsuarioRepository;
+import com.sigpro.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +37,12 @@ public class ProyectoService {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    @Autowired
+    private PagoRepository pagoRepository;
+
     public PaginatedResponse<ProyectoResponseDTO> consultarTodos(int page, int size, String buscar, Authentication auth){
         validarRol(auth, "ROLE_ADMINISTRADOR");
         Pageable pageable = PageRequest.of(page, size);
@@ -52,7 +55,7 @@ public class ProyectoService {
         }
 
         List<ProyectoResponseDTO> content = pageResult.getContent().stream()
-                .map(ProyectoMapper::toResponseDto).toList();
+                .map(this::toResponseDtoConCalculos).toList();
 
         return PaginatedResponse.<ProyectoResponseDTO>builder()
                 .content(content)
@@ -75,7 +78,7 @@ public class ProyectoService {
             throw new IllegalArgumentException("No se encontraron resultados");
         }
 
-        return proyectos.stream().map(ProyectoMapper::toResponseDto).toList();
+        return proyectos.stream().map(this::toResponseDtoConCalculos).toList();
     }
 
     @Transactional
@@ -114,7 +117,7 @@ public class ProyectoService {
         pUsuario.setUsuario(lider);
         proyectoUsuarioRepository.save(pUsuario);
  
-        return ProyectoMapper.toResponseDto(proyectoGuardado);
+        return toResponseDtoConCalculos(proyectoGuardado);
     }
 
     @Transactional
@@ -142,20 +145,12 @@ public class ProyectoService {
             proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
         }
         if (dto.getPresupuesto() != null) {
-            // Lógica inteligente de incremento/ajuste
-            java.math.BigDecimal gastadoHastaAhora = proyecto.getPresupuestoInicial().subtract(proyecto.getPresupuesto());
-            
-            // El nuevo presupuesto enviado en el DTO se considera el "Nuevo Total"
-            proyecto.setPresupuestoInicial(dto.getPresupuesto());
-            
-            // El presupuesto actual será el Nuevo Total menos lo que ya se gastó
-            java.math.BigDecimal nuevoRestante = dto.getPresupuesto().subtract(gastadoHastaAhora);
-            
-            // Evitamos que el presupuesto restante sea negativo por error
-            proyecto.setPresupuesto(nuevoRestante.compareTo(java.math.BigDecimal.ZERO) < 0 ? java.math.BigDecimal.ZERO : nuevoRestante);
+            // El nuevo presupuesto enviado en el DTO se considera el "Nuevo Total Autorizado"
+            proyecto.setPresupuestoAutorizado(dto.getPresupuesto());
+            // Nota: presupuestoInicial se mantiene intacto como registro histórico
         }
 
-        return ProyectoMapper.toResponseDto(proyectoRepository.save(proyecto));
+        return toResponseDtoConCalculos(proyectoRepository.save(proyecto));
     }
 
     public ProyectoResponseDTO consultarProyectoLider(Authentication auth) {
@@ -167,7 +162,7 @@ public class ProyectoService {
         Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
         if (proyecto == null) throw new IllegalArgumentException("No tiene proyecto asignado");
 
-        return ProyectoMapper.toResponseDto(proyecto);
+        return toResponseDtoConCalculos(proyecto);
     }
 
     public ProyectoResponseDTO consultarProyectoMiembro(Authentication auth) {
@@ -179,7 +174,7 @@ public class ProyectoService {
         ProyectoUsuario pu = proyectoUsuarioRepository.findByUsuarioId(usuario.getId());
         if (pu == null) throw new IllegalArgumentException("No pertenece a ningún proyecto");
 
-        return ProyectoMapper.toResponseDto(pu.getProyecto());
+        return toResponseDtoConCalculos(pu.getProyecto());
     }
 
     @Transactional
@@ -218,7 +213,21 @@ public class ProyectoService {
                 .map(ProyectoUsuario::getUsuario)
                 .toList();
 
-        return ProyectoMapper.toDetailedDto(proyecto, miembros);
+        ProyectoResponseDTO response = toResponseDtoConCalculos(proyecto);
+        if (miembros != null) {
+            response.setMiembros(
+                    miembros.stream()
+                            .map(u -> {
+                                UsuarioResponseDTO dto = new UsuarioResponseDTO();
+                                dto.setId(u.getId());
+                                dto.setNombreCompleto(u.getNombreCompleto());
+                                dto.setMatricula(u.getMatricula());
+                                return dto;
+                            })
+                            .collect(java.util.stream.Collectors.toList())
+            );
+        }
+        return response;
     }
 
     public List<UsuarioResponseDTO> consultarEquipoCompleto(Authentication auth) {
@@ -249,6 +258,25 @@ public class ProyectoService {
         if (inicio != null && fin != null && fin.isBefore(inicio)) {
             throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
         }
+    }
+
+    private ProyectoResponseDTO toResponseDtoConCalculos(Proyecto proyecto) {
+        ProyectoResponseDTO dto = ProyectoMapper.toResponseDto(proyecto);
+        
+        java.math.BigDecimal gastoMateriales = materialRepository.sumCostoTotalByProyectoId(proyecto.getId());
+        java.math.BigDecimal gastoNominas = pagoRepository.sumMontoByProyectoId(proyecto.getId());
+        java.math.BigDecimal gastoTotal = gastoMateriales.add(gastoNominas);
+        
+        // El restante es: Autorizado - (Materiales + Nóminas)
+        java.math.BigDecimal autorizado = proyecto.getPresupuestoAutorizado() != null ? 
+                proyecto.getPresupuestoAutorizado() : proyecto.getPresupuestoInicial();
+        
+        java.math.BigDecimal restante = autorizado.subtract(gastoTotal);
+        
+        dto.setPresupuesto(restante); // El campo 'presupuesto' en el DTO representa el RESTANTE
+        dto.setPresupuestoAutorizado(autorizado);
+        
+        return dto;
     }
 
 }

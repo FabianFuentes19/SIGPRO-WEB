@@ -9,6 +9,7 @@ import { Eye, LogOut, Pencil } from 'lucide-react';
 import ModalMensajes from '../components/Usuarios/ModalMensajes'
 import Pagination from '../components/Pagination';
 import '../css/Pagination.css';
+import { formatCurrencyWithSign } from '../utils/formatters';
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -136,9 +137,9 @@ const DashProyectos = () => {
   };
 
   // Función para determinar el estado visual del presupuesto
-  const calculateBudgetStatus = (actual, inicial) => {
-    if (!inicial || inicial <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: '' };
-    const perc = (actual / inicial) * 100;
+  const calculateBudgetStatus = (actual, autorizado) => {
+    if (!autorizado || autorizado <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: '' };
+    const perc = (actual / autorizado) * 100;
 
     if (perc <= 0) return { perc: 0, colorClass: 'budget-exhausted', text: 'Agotado' };
     if (perc <= 10) return { perc, colorClass: 'budget-critical', text: 'Crítico' };
@@ -198,6 +199,7 @@ const DashProyectos = () => {
                     <th>NOMBRE</th>
                     <th>LÍDER</th>
                     <th>PRESUPUESTO INICIAL</th>
+                    <th>AUTORIZADO</th>
                     <th>RESTANTE</th>
                     <th>PROGRESO</th>
                     <th>ESTADO</th>
@@ -224,15 +226,18 @@ const DashProyectos = () => {
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
                           <td className="text-right">
-                            {"$" + Number(p.presupuestoInicial).toLocaleString()}
+                            {formatCurrencyWithSign(p.presupuestoInicial)}
                           </td>
                           <td className="text-right">
-                            {"$" + Number(p.presupuesto).toLocaleString()}
+                            {formatCurrencyWithSign(p.presupuestoAutorizado || p.presupuestoInicial)}
+                          </td>
+                          <td className="text-right">
+                            {formatCurrencyWithSign(p.presupuesto)}
                           </td>
                           <td>
                             <div className="budget-cell-container">
                               {(() => {
-                                const status = calculateBudgetStatus(p.presupuesto, p.presupuestoInicial);
+                                const status = calculateBudgetStatus(p.presupuesto, p.presupuestoAutorizado || p.presupuestoInicial);
                                 return (
                                   <>
                                     <div className="budget-progress-outer">

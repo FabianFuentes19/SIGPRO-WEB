@@ -1,6 +1,7 @@
 import React from 'react';
 import './NominaCard.css';
 import { Banknote, CheckCircle2, Calendar } from 'lucide-react';
+import { formatCurrencyWithSign } from '../../utils/formatters';
 
 /**
  * @param {Object} nomina 
@@ -29,7 +30,7 @@ const NominaCard = ({ nomina, onPay }) => {
         <div className="amount-section">
           <span className="amount-label">TOTAL A PAGAR</span>
           <h2 className="amount-value">
-            ${typeof nomina.monto === 'number' ? nomina.monto.toLocaleString() : nomina.monto}
+            {formatCurrencyWithSign(nomina.monto)}
           </h2>
         </div>
 

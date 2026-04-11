@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../css/GestionUsuario.css';
 import { ReceiptText, Loader2 } from 'lucide-react';
+import { formatCurrencyWithSign } from '../utils/formatters';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -49,12 +50,8 @@ const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
         return nombre.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'MXN'
-        }).format(amount);
-    };
+    const formatCurrency = (amount) => formatCurrencyWithSign(amount);
+
 
     const formatDate = (dateStr) => {
         if (!dateStr) return "N/A";
