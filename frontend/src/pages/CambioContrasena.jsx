@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
 import ModalExitoCambio from '../components/Usuarios/ModalExitoCambio';
+import { apiFetch } from "../services/api.js";
 
 
 
@@ -70,12 +71,8 @@ const CambioContrasena = () => {
     try {
       const matricula = localStorage.getItem("matricula"); 
       const token = localStorage.getItem("token");     
-      const res = await fetch(`${BASE_URL}/usuarios/${matricula}/cambiar-contrasena`, {
+      const res = await apiFetch(`/usuarios/${matricula}/cambiar-contrasena`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ actual, nueva })
       });
 

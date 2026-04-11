@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../css/GestionUsuario.css';
 import { ReceiptText, Loader2 } from 'lucide-react';
 import { formatCurrencyWithSign } from '../utils/formatters';
+import { apiFetch } from '../services/api';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -16,11 +17,7 @@ const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
         setCargando(true);
 
         try {
-            const response = await fetch(`${BASE_URL}/pagos/miembro/${encodeURIComponent(usuario.matricula)}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+            const response = await apiFetch(`/pagos/miembro/${encodeURIComponent(usuario.matricula)}`);
 
             if (response.ok) {
                 const data = await response.json();

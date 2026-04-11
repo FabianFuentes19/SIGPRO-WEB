@@ -24,7 +24,7 @@ import {
     History
 } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { registrarMiembro } from '../../services/api.js';
+import { registrarMiembro, apiFetch } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
 import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
 import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
@@ -71,12 +71,7 @@ const DashboardLider = () => {
         }
         try {
             setLoadingProyecto(true);
-            const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+            const response = await apiFetch("/proyectos/mi-proyecto/lider");
             
             if (response.status === 404) {
                 setProyecto(null);
@@ -121,12 +116,7 @@ const DashboardLider = () => {
             return;
         }
         try {
-            const response = await fetch(`${BASE_URL}/usuarios/lider/${encodeURIComponent(matriculaLider)}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+            const response = await apiFetch(`/usuarios/lider/${encodeURIComponent(matriculaLider)}`);
             if (!response.ok) throw new Error("Error al obtener miembros");
             const data = await response.json();
             console.log("Miembros recibidos:", data);
@@ -156,12 +146,8 @@ const DashboardLider = () => {
                 return;
             }
             const token = localStorage.getItem("token");
-            const response = await fetch(`${BASE_URL}/proyectos/${proyectoId}/miembros`, {
+            const response = await apiFetch(`/proyectos/${proyectoId}/miembros`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
                 body: JSON.stringify(datos)
             });
             const data = await response.json();
@@ -186,12 +172,8 @@ const DashboardLider = () => {
     const actualizarMiembro = async (datosActualizados) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${BASE_URL}/usuarios/${usuarioSeleccionado.matricula}`, {
+            const response = await apiFetch(`/usuarios/${usuarioSeleccionado.matricula}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
                 body: JSON.stringify(datosActualizados),
             });
 
@@ -227,12 +209,8 @@ const DashboardLider = () => {
     const eliminarMiembro = async (mat) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${BASE_URL}/usuarios/${encodeURIComponent(mat)}/desactivar`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
+            const response = await apiFetch(`/usuarios/${encodeURIComponent(mat)}/desactivar`, {
+                method: "PATCH"
             });
             if (!response.ok) {
                 const errorData = await response.json();

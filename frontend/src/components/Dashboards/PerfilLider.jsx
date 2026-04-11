@@ -5,6 +5,7 @@ import {
 import { formatCurrencyWithSign } from "../../utils/formatters.js";
 import "./PerfilLider.css";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../../services/api.js";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -36,7 +37,7 @@ const PerfilLider = () => {
         };
 
         // 1. Cargar datos del usuario
-        const resUser = await fetch(`${BASE_URL}/usuarios/${encodeURIComponent(matricula)}`, { headers });
+        const resUser = await apiFetch(`/usuarios/${encodeURIComponent(matricula)}`);
         if (resUser.ok) {
           const userData = await resUser.json();
           setUsuario(userData);
@@ -45,7 +46,7 @@ const PerfilLider = () => {
         }
 
         // 2. Cargar historial de pagos
-        const resPagos = await fetch(`${BASE_URL}/pagos/miembro/${encodeURIComponent(matricula)}`, { headers });
+        const resPagos = await apiFetch(`/pagos/miembro/${encodeURIComponent(matricula)}`);
         if (resPagos.ok) {
           const pagosData = await resPagos.json();
           // Orden descendente por fecha

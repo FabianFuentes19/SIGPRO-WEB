@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../css/ModalRegistrarProyecto.css';
-import { obtenerUsuarios } from '../services/api';
+import { obtenerUsuarios, apiFetch } from '../services/api';
 
 // recibe 2 props al cerrar y al registra , que son funciones
 const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => {
@@ -31,12 +31,7 @@ const ModalRegistrarProyecto = ({ alCerrar, alRegistrar, setModalMensajes }) => 
   useEffect(() => {
     const cargarLideres = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8080/usuarios/lideres/sin-proyecto", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        const response = await apiFetch("/usuarios/lideres/sin-proyecto");
 
         if (response.ok) {
           const data = await response.json();

@@ -4,7 +4,7 @@ import '../css/DashProyecto.css';
 import AgregarUsuario from '../components/AgregarUsuario';
 import EditarUsuario from '../components/EditarUsuario';
 import VerDetallesUsuario from '../components/VerDetallesUsuario';
-import { obtenerUsuarios } from '../services/api';
+import { obtenerUsuarios, apiFetch } from '../services/api';
 import { Eye, LogOut, Pencil, Trash2 } from 'lucide-react';
 import BorrarUsuario from '../components/BorrarUsuario';
 import ModalCerrarSesion from '../components/Usuarios/ModalCerrarSesion';
@@ -59,12 +59,8 @@ const DashLideres = () => {
   const registrarLider = async (nuevoLider) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/usuarios/registrar/lider", {
+      const response = await apiFetch("/usuarios/registrar/lider", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify(nuevoLider),
       });
 
@@ -98,12 +94,8 @@ const DashLideres = () => {
   const actualizarLider = async (datosActualizados) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/usuarios/${liderSeleccionado.matricula}`, {
+      const response = await apiFetch(`/usuarios/${liderSeleccionado.matricula}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify(datosActualizados),
       });
 
@@ -135,11 +127,8 @@ const DashLideres = () => {
   const eliminarLider = async (matricula) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/usuarios/${matricula}/desactivar`, {
+      const response = await apiFetch(`/usuarios/${matricula}/desactivar`, {
         method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
       });
       if (response.ok) {
         setMostrarModalEliminar(false);
@@ -170,11 +159,8 @@ const DashLideres = () => {
   const activarLider = async (matricula) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/usuarios/${matricula}/activar`, {
+      const response = await apiFetch(`/usuarios/${matricula}/activar`, {
         method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
       });
       if (response.ok) {
         setMensajeModal({

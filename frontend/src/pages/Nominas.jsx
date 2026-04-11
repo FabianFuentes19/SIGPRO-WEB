@@ -3,6 +3,7 @@ import '../css/Nominas.css';
 import NominaCard from '../components/Nominas/NominaCard';
 import { Search, ChevronDown, Loader2 } from 'lucide-react';
 import ModalMensajes from '../components/Usuarios/ModalMensajes';
+import { apiFetch } from '../services/api';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -18,9 +19,7 @@ const Nominas = ({ onPaymentSuccess }) => {
 
   const obtenerProyecto = async (token) => {
     try {
-      const resp = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+      const resp = await apiFetch("/proyectos/mi-proyecto/lider");
       if (!resp.ok) return null;
 
       const text = await resp.text();
@@ -36,19 +35,14 @@ const Nominas = ({ onPaymentSuccess }) => {
 
 
   const obtenerMiembrosProyecto = async (token) => {
-    const resp = await fetch(`${BASE_URL}/proyectos/mi-equipo`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
+    const resp = await apiFetch("/proyectos/mi-equipo");
     if (!resp.ok) throw new Error("No se pudieron cargar los miembros del equipo.");
     return await resp.json();
   };
 
   const obtenerVouchersDeMiembro = async (token, miembro, matriculaLider) => {
     try {
-      const resp = await fetch(`${BASE_URL}/pagos/vouchers/${miembro.matricula}?t=${Date.now()}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
+      const resp = await apiFetch(`/pagos/vouchers/${miembro.matricula}?t=${Date.now()}`, {
         cache: 'no-cache'
       });
 
@@ -137,12 +131,8 @@ const Nominas = ({ onPaymentSuccess }) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/pagos/registrar`, {
+      const response = await apiFetch("/pagos/registrar", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify(pagoDTO)
       });
 

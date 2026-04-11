@@ -10,7 +10,7 @@ import ModalMensajes from '../components/Usuarios/ModalMensajes'
 import Pagination from '../components/Pagination';
 import '../css/Pagination.css';
 import { formatCurrencyWithSign } from '../utils/formatters';
-import { obtenerProyectos } from '../services/api'; // Importación añadida
+import { obtenerProyectos, apiFetch } from '../services/api'; // Importación añadida y apiFetch
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -64,12 +64,8 @@ const DashProyectos = () => {
   const registrarProyecto = async (nuevoProyecto) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/proyectos", {
+      const response = await apiFetch("/proyectos", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify(nuevoProyecto),
       });
 
@@ -102,12 +98,8 @@ const DashProyectos = () => {
   const actualizarProyecto = async (proyectoActualizado) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/proyectos/${proyectoActualizado.id}`, {
+      const response = await apiFetch(`/proyectos/${proyectoActualizado.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify(proyectoActualizado),
       });
 

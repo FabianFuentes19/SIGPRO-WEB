@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8080";
  * @param {RequestInit} options - Opciones de fetch (method, body, headers extra, etc.)
  * @returns {Promise<Response>}
  */
-export function apiFetch(endpoint, options = {}) {
+export async function apiFetch(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
   const headers = {
     "Content-Type": "application/json",
@@ -18,7 +18,16 @@ export function apiFetch(endpoint, options = {}) {
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  return fetch(url, { ...options, headers });
+  
+  const response = await fetch(url, { ...options, headers });
+  
+  if (response.status === 401 && !endpoint.includes("/auth/login")) {
+    console.warn("Sesión expirada o no autorizada. Redirigiendo a login...");
+    localStorage.clear();
+    window.location.href = '/login';
+  }
+  
+  return response;
 }
 
 /**
@@ -137,8 +146,8 @@ async function obtenerDatosNominas(token, matriculaLider) {
 
   // Peticiones iniciales
   const [resProj, resMiem] = await Promise.all([
-    fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, { headers }),
-    fetch(`${BASE_URL}/usuarios/lider/${encodeURIComponent(matriculaLider)}`, { headers })
+    apiFetch("/proyectos/mi-proyecto/lider"),
+    apiFetch(`/usuarios/lider/${encodeURIComponent(matriculaLider)}`)
   ]);
 
   if (!resMiem.ok) throw new Error("Error al obtener el equipo");
@@ -149,7 +158,7 @@ async function obtenerDatosNominas(token, matriculaLider) {
   // Obtener vouchers para cada miembro
   const listaNominas = await Promise.all(miembros.map(async (miembro) => {
     try {
-      const resV = await fetch(`${BASE_URL}/pagos/vouchers/${miembro.matricula}`, { headers });
+      const resV = await apiFetch(`/pagos/vouchers/${miembro.matricula}`);
       if (!resV.ok) return null;
 
       const vouchers = await resV.json();
