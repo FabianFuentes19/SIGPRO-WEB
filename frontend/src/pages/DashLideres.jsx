@@ -31,6 +31,11 @@ const DashLideres = () => {
 
   const [mensajeModal, setMensajeModal] = useState(null);
 
+  // Nueva búsqueda: Resetear a página 0
+  useEffect(() => {
+    setPaginaActual(0);
+  }, [busqueda]);
+
   useEffect(() => {
     fetchLideres(paginaActual);
   }, [paginaActual, busqueda]);

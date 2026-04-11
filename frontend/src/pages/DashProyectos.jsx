@@ -10,6 +10,7 @@ import ModalMensajes from '../components/Usuarios/ModalMensajes'
 import Pagination from '../components/Pagination';
 import '../css/Pagination.css';
 import { formatCurrencyWithSign } from '../utils/formatters';
+import { obtenerProyectos } from '../services/api'; // Importación añadida
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -35,27 +36,24 @@ const DashProyectos = () => {
   // Función para traer proyectos desde el backend
   const fetchProjects = async (page = 0) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/proyectos?page=${page}&size=${tamanoPagina}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setProyectos(data.content || []);
-        setTotalPaginas(data.totalPages || 0);
-        setPaginaActual(data.pageNumber || 0);
-      }
+      const data = await obtenerProyectos(page, tamanoPagina, busqueda);
+      setProyectos(data.content || []);
+      setTotalPaginas(data.totalPages || 0);
+      setPaginaActual(data.pageNumber || 0);
     } catch (error) {
       console.error("Error al cargar proyectos:", error);
     }
   };
 
-  // Cargar proyectos al montar el componente o al cambiar de página
+  // Nueva búsqueda: Resetear a página 0
+  useEffect(() => {
+    setPaginaActual(0);
+  }, [busqueda]);
+
+  // Cargar proyectos al montar el componente o al cambiar de página/búsqueda
   useEffect(() => {
     fetchProjects(paginaActual);
-  }, [paginaActual]);
+  }, [paginaActual, busqueda]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
@@ -209,20 +207,14 @@ const DashProyectos = () => {
                 <tbody>
                   {proyectos.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
-                        No hay proyectos registrados aún.
+                      <td colSpan="9" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                        No se encontraron proyectos.
                       </td>
                     </tr>
                   ) : (
-                    proyectos
-                      .filter((p) =>
-                        (p.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-                        (p.liderNombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-                        (p.descripcion || "").toLowerCase().includes(busqueda.toLowerCase())
-                      )
-                      .map((p, index) => (
+                    proyectos.map((p, index) => (
                         <tr key={p.id}>
-                          <td>{index + 1}</td>
+                          <td>{paginaActual * tamanoPagina + index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
                           <td className="text-right">
