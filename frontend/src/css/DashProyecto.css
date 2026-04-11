@@ -259,6 +259,13 @@ body {
 .dropdown-item {
   cursor: pointer;
   padding: 4px;
+  transition: opacity 0.2s;
+}
+
+.dropdown-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .switch {
