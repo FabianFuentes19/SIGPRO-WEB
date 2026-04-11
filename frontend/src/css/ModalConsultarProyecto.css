@@ -7,46 +7,48 @@
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-y: auto;
+  padding: 20px 0;
 }
 
 .modal-container {
   background: white;
-  padding: 20px 30px;
-  border-radius: 8px;
-  width: 450px;
-  max-width: 90%;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px 50px;
+  border-radius: 12px;
+  width: 800px;
+  max-width: 95%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
 }
 
 .modal-title {
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   text-align: center;
   color: #3b4256;
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 700;
 }
 
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
   text-align: left;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
 .form-row-2-col {
   display: flex;
-  gap: 16px;
+  gap: 30px;
 }
 
 .form-row-2-col .form-group {
@@ -54,7 +56,7 @@
 }
 
 .modal-form label {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: #4b5563;
 }
@@ -63,10 +65,10 @@
 .modal-form select,
 .modal-form textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 14px 18px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 16px;
   color: #374151;
   box-sizing: border-box;
   outline: none;
@@ -77,10 +79,24 @@
   cursor: not-allowed;
 }
 
+.modal-form textarea {
+  height: 80px;
+  resize: none;
+  overflow-y: auto;
+}
+
+.textarea-small {
+  height: 60px !important;
+}
+
+.textarea-small-leader {
+  height: 45px !important;
+}
+
 .modal-actions {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 24px;
 }
 
 
@@ -88,8 +104,8 @@
   background-color: #0c9d72;
   color: white;
   border: 1px solid #0c9d72;
-  padding: 10px 20px;
-  font-size: 15px;
+  padding: 12px 30px;
+  font-size: 18px;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
