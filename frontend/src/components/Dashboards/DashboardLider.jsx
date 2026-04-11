@@ -45,6 +45,7 @@ const DashboardLider = () => {
     const [miembros, setMiembros] = useState([]);
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
+    const [loadingProyecto, setLoadingProyecto] = useState(true);
     const [mensajeModal, setMensajeModal] = useState(null);
 
     // rastrea el presupuesto anterior y evitar alertas repetitivas al navegar
@@ -64,14 +65,25 @@ const DashboardLider = () => {
 
     const cargarProyecto = async (triggerAlert = false) => {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token) {
+            setLoadingProyecto(false);
+            return;
+        }
         try {
+            setLoadingProyecto(true);
             const response = await fetch(`${BASE_URL}/proyectos/mi-proyecto/lider`, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
             });
+            
+            if (response.status === 404) {
+                setProyecto(null);
+                setProyectoId(null);
+                return;
+            }
+
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
             const data = await response.json();
 
@@ -93,6 +105,9 @@ const DashboardLider = () => {
             setProyectoId(data.id);
         } catch (error) {
             console.error("Error al cargar proyecto:", error);
+            setProyecto(null);
+        } finally {
+            setLoadingProyecto(false);
         }
     };
 
@@ -315,7 +330,12 @@ const DashboardLider = () => {
                 <main className="main-content">
                     {vistaActual === 'proyecto' && (
                         <>
-                            {proyecto ? (
+                            {loadingProyecto ? (
+                                <div className="loading-container">
+                                    <div className="spinner"></div>
+                                    <p>Cargando información del proyecto...</p>
+                                </div>
+                            ) : proyecto && proyecto.id ? (
                                 <div className="project-card">
                                     <div className="project-header-section">
                                         <h2>{proyecto.nombre}</h2>
@@ -373,7 +393,13 @@ const DashboardLider = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <p>Cargando proyecto...</p>
+                                <div className="no-project-card">
+                                    <Box size={40} strokeWidth={1.5} />
+                                    <div className="no-project-info">
+                                        <h3>Sin proyecto asignado</h3>
+                                        <p>Actualmente no cuentas con un proyecto vinculado. Una vez que se te asigne uno, podrás gestionar a tus miembros y registrar materiales/nóminas.</p>
+                                    </div>
+                                </div>
                             )}
 
                             <div className="members-section">
