@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logoUtez from "../assets/LOGO_UTEZ.png";
 import "../css/Login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 function Login() {
   const [user, setUser] = useState("");
@@ -9,10 +9,20 @@ function Login() {
   const [message, setMessage] = useState("");
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const navigate = useNavigate();
-  // esto es para la validacion de los campos
+  const location = useLocation();
+
+  // esto es para la validación de los campos
   const [touchedUser, setTouchedUser] = useState(false);
   const [touchedPassword, setTouchedPassword] = useState(false);
   const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+  // Detectar si venimos de una sesión expirada
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("sesionExpirada")) {
+      setMessage("Tu sesión ha expirado por seguridad. Por favor, ingresa de nuevo.");
+    }
+  }, [location]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -117,7 +127,11 @@ function Login() {
           <button type="submit" className="btn btn-primary w-100">
             Iniciar Sesión
           </button>
-          <p className="mt-3">{message}</p>
+          {message && (
+            <p className={`mt-3 ${message.includes("expirado") ? "text-warning bg-dark p-2 rounded text-center" : "text-danger"}`}>
+              {message}
+            </p>
+          )}
         </form>
       </div>
     </div>

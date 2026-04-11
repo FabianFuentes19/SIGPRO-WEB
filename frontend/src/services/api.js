@@ -21,10 +21,13 @@ export async function apiFetch(endpoint, options = {}) {
   
   const response = await fetch(url, { ...options, headers });
   
-  if (response.status === 401 && !endpoint.includes("/auth/login")) {
+  // Si es 401 (No autorizado) o 403 (Prohibido/Token expirado), mandamos al login
+  if ((response.status === 401 || response.status === 403) && !endpoint.includes("/auth/login")) {
     console.warn("Sesión expirada o no autorizada. Redirigiendo a login...");
     localStorage.clear();
-    window.location.href = '/login';
+    window.location.replace('/login?sesionExpirada=true'); 
+    // Lanzamos un error para detener cualquier proceso posterior en el componente
+    throw new Error("Sesión expirada");
   }
   
   return response;
@@ -99,11 +102,19 @@ export async function obtenerUsuarios(rol, page = 0, size = 10, buscar = "") {
   }
 
   const response = await apiFetch(endpoint);
-  const data = await response.json();
+  
   if (!response.ok) {
-    throw new Error(data.error || "Error al obtener usuarios");
+    // Si no es ok, intentamos leer el error si existe, si no, lanzamos genérico
+    const errorText = await response.text();
+    let errorMsg = "Error al obtener usuarios";
+    try {
+        const errorJson = JSON.parse(errorText);
+        errorMsg = errorJson.error || errorMsg;
+    } catch (e) {}
+    throw new Error(errorMsg);
   }
-  return data;
+
+  return await response.json();
 }
 
 /**
@@ -214,11 +225,18 @@ export async function obtenerProyectos(page = 0, size = 10, buscar = "") {
     endpoint += `&buscar=${encodeURIComponent(buscar)}`;
   }
   const response = await apiFetch(endpoint);
-  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error(data.error || "Error al obtener proyectos");
+    const errorText = await response.text();
+    let errorMsg = "Error al obtener proyectos";
+    try {
+        const errorJson = JSON.parse(errorText);
+        errorMsg = errorJson.error || errorMsg;
+    } catch (e) {}
+    throw new Error(errorMsg);
   }
-  return data;
+
+  return await response.json();
 }
 
 /**
