@@ -379,7 +379,11 @@ const DashboardLider = () => {
                             <div className="members-section">
                                 <div className="members-top-row">
                                     <h2>Miembros</h2>
-                                    <button className="gold-add-btn" onClick={() => setMostrarModal(true)}>
+                                    <button 
+                                        className="gold-add-btn" 
+                                        onClick={() => setMostrarModal(true)}
+                                        disabled={!proyecto || !proyecto.id}
+                                    >
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
                                     </button>
