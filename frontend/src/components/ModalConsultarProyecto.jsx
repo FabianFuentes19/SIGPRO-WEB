@@ -12,13 +12,15 @@ const ModalConsultarProyecto = ({ proyecto, onClose }) => {
       <div className="modal-container">
         <h3 className="modal-title">Consultar Proyecto</h3>
         <form className="modal-form">
-          <div className="form-group">
-            <label>Nombre proyecto:</label>
-            <input type="text" value={proyecto.nombre} disabled />
-          </div>
-          <div className="form-group">
-            <label>Objetivo:</label>
-            <input type="text" value={proyecto.objetivoGeneral} disabled />
+          <div className="form-row-2-col">
+            <div className="form-group">
+              <label>Nombre proyecto:</label>
+              <textarea value={proyecto.nombre} disabled className="textarea-small" />
+            </div>
+            <div className="form-group">
+              <label>Objetivo:</label>
+              <textarea value={proyecto.objetivoGeneral} disabled className="textarea-small" />
+            </div>
           </div>
           <div className="form-group">
             <label>Descripción:</label>
@@ -34,19 +36,18 @@ const ModalConsultarProyecto = ({ proyecto, onClose }) => {
               <input type="date" value={proyecto.fechaFin} disabled />
             </div>
           </div>
-          <div className="form-group">
-            <label>Líder:</label>
-            <input type="text" value={proyecto.liderNombre} disabled />
-          </div>
           <div className="form-row-2-col">
-            <div className="form-group ">
+            <div className="form-group">
+              <label>Líder:</label>
+              <textarea value={proyecto.liderNombre} disabled className="textarea-small-leader" />
+            </div>
+            <div className="form-group">
               <label>Presupuesto Inicial:</label>
               <div className="money-display-readonly">
                 <span className="currency-symbol">$</span>
                 <input type="text" value={formatCurrency(proyecto.presupuestoInicial)} disabled />
               </div>
             </div>
-            
           </div>
         </form>
         <div className="modal-actions">
