@@ -254,7 +254,16 @@ const DashProyectos = () => {
                           </td>
                           <td>
                             <div className="dropdown-container">
-                              <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
+                              <div 
+                                className={`dropdown-item ${p.estado === 'INACTIVO' ? 'disabled' : ''}`} 
+                                onClick={() => { 
+                                  if (p.estado !== 'INACTIVO') {
+                                    setProyectoSeleccionado(p); 
+                                    setMostrarModalEditar(true); 
+                                  }
+                                }}
+                                title={p.estado === 'INACTIVO' ? "No se puede editar un proyecto inactivo" : "Editar"}
+                              >
                                 <Pencil size={14} />
                               </div>
 
