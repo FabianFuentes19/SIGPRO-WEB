@@ -173,13 +173,13 @@ const Nominas = ({ onPaymentSuccess }) => {
 
 
   /*if (cargando) return (
-    <div className="loading-container">
-      <Loader2 className="animate-spin" size={48} />
-      <p>Cargando información de nóminas...</p>
+    <div className="loading-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px' }}>
+      <Loader2 className="animate-spin" size={48} style={{ color: '#007bff', marginBottom: '10px' }} />
+      <p style={{ color: '#666' }}>Cargando información de nóminas...</p>
     </div>
   );
 
-  if (error) return <div className="error-container">{error}</div>;*/
+  if (error) return <div className="error-container" style={{ textAlign: 'center', padding: '50px', color: '#dc3545' }}>{error}</div>;*/
 
   return (
     <div className="nominas-container">

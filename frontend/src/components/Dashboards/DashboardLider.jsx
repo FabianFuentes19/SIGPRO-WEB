@@ -23,7 +23,7 @@ import {
     Eye,
     History
 } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { registrarMiembro, apiFetch } from '../../services/api.js';
 import PerfilLider from './PerfilLider.jsx';
 import ModalCerrarSesion from '../Usuarios/ModalCerrarSesion.jsx';
@@ -36,7 +36,13 @@ const DashboardLider = () => {
     const location = useLocation();
     const [mostrarModal, setMostrarModal] = useState(false);
     const [mostrarCerrarSesion, setMostrarCerrarSesion] = useState(false);
-    const [vistaActual, setVistaActual] = useState(location.state?.vista || 'proyecto');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [vistaActual, setVistaActual] = useState(searchParams.get('tab') || location.state?.vista || 'proyecto');
+
+    // Sincronizar vistaActual con la URL
+    useEffect(() => {
+        setSearchParams({ tab: vistaActual }, { replace: true });
+    }, [vistaActual, setSearchParams]);
 
     // Estados para CRUD miembros (Tres puntitos)
     const [menuAbiertoId, setMenuAbiertoId] = useState(null);

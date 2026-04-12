@@ -10,7 +10,6 @@ import ModalMensajes from '../components/Usuarios/ModalMensajes'
 import Pagination from '../components/Pagination';
 import '../css/Pagination.css';
 import { formatCurrencyWithSign } from '../utils/formatters';
-import { obtenerProyectos, apiFetch } from '../services/api'; // Importación añadida y apiFetch
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -36,24 +35,27 @@ const DashProyectos = () => {
   // Función para traer proyectos desde el backend
   const fetchProjects = async (page = 0) => {
     try {
-      const data = await obtenerProyectos(page, tamanoPagina, busqueda);
-      setProyectos(data.content || []);
-      setTotalPaginas(data.totalPages || 0);
-      setPaginaActual(data.pageNumber || 0);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/proyectos?page=${page}&size=${tamanoPagina}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProyectos(data.content || []);
+        setTotalPaginas(data.totalPages || 0);
+        setPaginaActual(data.pageNumber || 0);
+      }
     } catch (error) {
       console.error("Error al cargar proyectos:", error);
     }
   };
 
-  // Nueva búsqueda: Resetear a página 0
-  useEffect(() => {
-    setPaginaActual(0);
-  }, [busqueda]);
-
-  // Cargar proyectos al montar el componente o al cambiar de página/búsqueda
+  // Cargar proyectos al montar el componente o al cambiar de página
   useEffect(() => {
     fetchProjects(paginaActual);
-  }, [paginaActual, busqueda]);
+  }, [paginaActual]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
@@ -64,8 +66,12 @@ const DashProyectos = () => {
   const registrarProyecto = async (nuevoProyecto) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await apiFetch("/proyectos", {
+      const response = await fetch("http://localhost:8080/proyectos", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(nuevoProyecto),
       });
 
@@ -98,8 +104,12 @@ const DashProyectos = () => {
   const actualizarProyecto = async (proyectoActualizado) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await apiFetch(`/proyectos/${proyectoActualizado.id}`, {
+      const response = await fetch(`http://localhost:8080/proyectos/${proyectoActualizado.id}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(proyectoActualizado),
       });
 
@@ -136,7 +146,6 @@ const DashProyectos = () => {
     if (perc <= 20) return { perc, colorClass: 'budget-warning', text: 'En riesgo' };
     return { perc, colorClass: 'budget-healthy', text: 'Equilibrado' };
   };
-
 
   return (
     <div className="dashboard-container">
@@ -199,14 +208,20 @@ const DashProyectos = () => {
                 <tbody>
                   {proyectos.length === 0 ? (
                     <tr>
-                      <td colSpan="9" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
-                        No se encontraron proyectos.
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                        No hay proyectos registrados aún.
                       </td>
                     </tr>
                   ) : (
-                    proyectos.map((p, index) => (
+                    proyectos
+                      .filter((p) =>
+                        (p.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+                        (p.liderNombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+                        (p.descripcion || "").toLowerCase().includes(busqueda.toLowerCase())
+                      )
+                      .map((p, index) => (
                         <tr key={p.id}>
-                          <td>{paginaActual * tamanoPagina + index + 1}</td>
+                          <td>{index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
                           <td className="text-right">
@@ -246,16 +261,7 @@ const DashProyectos = () => {
                           </td>
                           <td>
                             <div className="dropdown-container">
-                              <div 
-                                className={`dropdown-item ${p.estado === 'INACTIVO' ? 'disabled' : ''}`} 
-                                onClick={() => { 
-                                  if (p.estado !== 'INACTIVO') {
-                                    setProyectoSeleccionado(p); 
-                                    setMostrarModalEditar(true); 
-                                  }
-                                }}
-                                title={p.estado === 'INACTIVO' ? "No se puede editar un proyecto inactivo" : "Editar"}
-                              >
+                              <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
                                 <Pencil size={14} />
                               </div>
 

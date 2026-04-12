@@ -55,6 +55,19 @@ public class PagoService {
             throw new IllegalArgumentException("El monto debe ser mayor a cero");
         }
 
+        // USAMOS LA FECHA DEL VOUCHER (La que viene del frontend) 
+        // Esto permite identificar exactamente qué quincena se está pagando.
+        LocalDate fechaVoucher = dto.getFecha() != null ? dto.getFecha() : LocalDate.now();
+        
+        // VALIDACIÓN INFALIBLE: ¿Ya existe un pago para ESTA fecha exacta de voucher?
+        List<Pago> pagosPrevios = pagoRepository.findByUsuarioMatriculaAndProyectoId(usuario.getMatricula(), proyecto.getId());
+        boolean yaPagado = pagosPrevios.stream()
+                .anyMatch(p -> p.getFecha().equals(fechaVoucher));
+
+        if (yaPagado) {
+            throw new IllegalArgumentException("Este voucher ya ha sido pagado anteriormente.");
+        }
+
         //valida si hay presupuesto disponible
         if(proyecto.getPresupuesto() == null){
             throw new IllegalArgumentException("El proyecto no tiene presupuesto disponible");
@@ -69,7 +82,7 @@ public class PagoService {
         pago.setUsuario(usuario);
         pago.setProyecto(proyecto);
         pago.setMonto(dto.getMonto());
-        pago.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDate.now());
+        pago.setFecha(fechaVoucher); // <--- REGISTRAMOS LA FECHA DEL PERIODO
 
         Pago guardado = pagoRepository.save(pago);
 
@@ -183,27 +196,22 @@ public class PagoService {
                     .filter(p -> !p.getFecha().isBefore(pInicio) && !p.getFecha().isAfter(pFin))
                     .findFirst();
 
-            if (!hoy.isBefore(fin)) {
-                // valida si la quincena ya finalizo
-                if (pagoMatch.isPresent()) {
-                    Pago p = pagoMatch.get();
-                    v.setEstado("PAGADO");
-                    v.setPagoId(p.getId());
-                    v.setFechaPagoReal(p.getFecha());
-                    v.setMontoPagado(p.getMonto());
-                } else {
-                    v.setEstado("PENDIENTE");
-                }
-            } else {
-                // Qquincena en curso
-                v.setEstado("PROGRAMADO");
-                v.setFechaPagoReal(null);
-            }
-
-            // no se agregan las quincenas en curso
-            if (!"PROGRAMADO".equals(v.getEstado())) {
+            // LÓGICA DE VISIBILIDAD REFINADA:
+            if (pagoMatch.isPresent()) {
+                // Si está pagado, se muestra SIEMPRE (sin importar la fecha)
+                Pago p = pagoMatch.get();
+                v.setEstado("PAGADO");
+                v.setPagoId(p.getId());
+                v.setFechaPagoReal(p.getFecha());
+                v.setMontoPagado(p.getMonto());
+                vouchers.add(v);
+            } else if (!hoy.isBefore(fin)) {
+                // Si ya venció la quincena y no está pagada, se muestra como PENDIENTE
+                v.setEstado("PENDIENTE");
                 vouchers.add(v);
             }
+            // Si la quincena no ha terminado y no se ha pagado, simplemente NO se agrega a la lista (Adiós "Programado")
+
             inicio = fin.plusDays(1);
         }
 

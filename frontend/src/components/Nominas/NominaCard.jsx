@@ -8,7 +8,19 @@ import { formatCurrencyWithSign } from '../../utils/formatters';
  * @param {Function} onPay 
  */
 const NominaCard = ({ nomina, onPay }) => {
+  const [cargando, setCargando] = React.useState(false);
   const isPaid = nomina.estado === 'PAGADO';
+
+  const manejarPago = async () => {
+    if (cargando) return;
+    
+    setCargando(true);
+    try {
+      await onPay();
+    } catch (error) {
+      console.error("Error al procesar el pago:", error);
+    }
+  };
 
   return (
     <div className="nomina-card">
@@ -53,9 +65,19 @@ const NominaCard = ({ nomina, onPay }) => {
             <span>Pagado con éxito</span>
           </button>
         ) : (
-          <button className="btn-pay-nomina" onClick={onPay} disabled={nomina.estado !== "PENDIENTE"}>
-            <Banknote size={18} />
-            <span>Pagar Nómina</span>
+          <button 
+             className="btn-pay-nomina" 
+             onClick={manejarPago} 
+             disabled={nomina.estado !== "PENDIENTE" || cargando}
+          >
+            {cargando ? (
+              <span>Procesando...</span>
+            ) : (
+              <>
+                <Banknote size={18} />
+                <span>Pagar Nómina</span>
+              </>
+            )}
           </button>
         )}
       </div>
