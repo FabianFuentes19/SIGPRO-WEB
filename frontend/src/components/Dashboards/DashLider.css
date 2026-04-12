@@ -210,11 +210,83 @@
 }
 
 /* MIEMBROS */
+.members-section {
+    background: transparent;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.members-section h2 {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    margin: 0;
+}
+
 .members-top-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
+}
+
+.members-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+}
+
+button.members-tab,
+button.members-tab:hover,
+button.members-tab:focus,
+button.members-tab:focus-visible,
+button.members-tab:active,
+button.members-tab:visited {
+    padding: 10px 28px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #999 !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    text-decoration: none !important;
+}
+
+button.members-tab.active,
+button.members-tab.active:hover,
+button.members-tab.active:focus,
+button.members-tab.active:active {
+    color: #1a1a1a !important;
+    border-bottom: 3px solid var(--gold-color) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.tab-info-icon {
+    font-size: 0.95rem;
+    color: #999;
+    cursor: help;
+}
+
+.no-members-msg {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-size: 0.95rem;
+    background: #fafafa;
+    border-radius: 12px;
 }
 
 .count-badge {
@@ -254,8 +326,13 @@
     background: white;
     padding: 15px 20px;
     border-radius: 12px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease;
+}
+
+.member-card-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .circle-avatar {
@@ -287,10 +364,15 @@
 
 .more-dots {
     margin-left: auto;
-    color: #ccc;
+    color: #aaa;
     cursor: pointer;
     display: flex;
     align-items: center;
+    transition: color 0.2s ease;
+}
+
+.more-dots:hover {
+    color: var(--gold-color);
 }
 
 /* PUNTITOS (CRUD MIEMBROS) */
