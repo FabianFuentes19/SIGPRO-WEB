@@ -43,6 +43,8 @@ const DashboardLider = () => {
     const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
     const [modalActivo, setModalActivo] = useState(null);
     const [miembros, setMiembros] = useState([]);
+    const [miembrosAnteriores, setMiembrosAnteriores] = useState([]);
+    const [tabMiembros, setTabMiembros] = useState('activos');
     const [proyecto, setProyecto] = useState(null);
     const [proyectoId, setProyectoId] = useState(null);
     const [loadingProyecto, setLoadingProyecto] = useState(true);
@@ -121,14 +123,14 @@ const DashboardLider = () => {
             const data = await response.json();
             console.log("Miembros recibidos:", data);
             const lista = Array.isArray(data) ? data : [];
-            setMiembros(lista
-                .filter((m) => m.estado !== 'INACTIVO')
-                .map((m, index) => ({
-                    ...m,
-                    id: m.matricula || `temp-${index}`,
-                    iniciales: (m.nombreCompleto || '').trim().split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() || '??',
-                    rol: m.rolNombre || m.puesto || ''
-                })));
+            const mapped = lista.map((m, index) => ({
+                ...m,
+                id: m.matricula || `temp-${index}`,
+                iniciales: (m.nombreCompleto || '').trim().split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() || '??',
+                rol: m.rolNombre || m.puesto || ''
+            }));
+            setMiembros(mapped.filter((m) => m.estado !== 'INACTIVO'));
+            setMiembrosAnteriores(mapped.filter((m) => m.estado === 'INACTIVO'));
         } catch (error) {
             console.error("Error al cargar miembros:", error);
             setMiembros([]);
@@ -383,49 +385,78 @@ const DashboardLider = () => {
                             <div className="members-section">
                                 <div className="members-top-row">
                                     <h2>Miembros</h2>
-                                    <button 
-                                        className="gold-add-btn" 
+                                    <button
+                                        className="gold-add-btn"
                                         onClick={() => setMostrarModal(true)}
                                         disabled={!proyecto || !proyecto.id}
+                                        style={{ visibility: tabMiembros === 'activos' ? 'visible' : 'hidden' }}
                                     >
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
                                     </button>
                                 </div>
 
-                                <div className="members-stack-list">
-                                    {miembros.map((m) => (
-                                        <div key={m.id} className="member-card-item">
-                                            <div className="circle-avatar">{m.iniciales}</div>
-                                            <div className="member-data">
-                                                <strong>{m.nombreCompleto}</strong>
-                                                <span>{m.rol}</span>
-                                            </div>
+                                <div className="members-tabs">
+                                    <button
+                                        className={`members-tab ${tabMiembros === 'activos' ? 'active' : ''}`}
+                                        onClick={() => setTabMiembros('activos')}
+                                    >
+                                        Activos
+                                    </button>
+                                    <button
+                                        className={`members-tab ${tabMiembros === 'anteriores' ? 'active' : ''}`}
+                                        onClick={() => setTabMiembros('anteriores')}
+                                    >
+                                        Anteriores
+                                        <span className="tab-info-icon" title="Miembros que ya no forman parte del proyecto. Solo consulta e historial de pagos.">&#9432;</span>
+                                    </button>
+                                </div>
 
-                                            <div className="more-dots-container" style={{ position: 'relative' }}>
-                                                <div className="more-dots" onClick={(e) => toggleMenu(e, m.id)}>
-                                                    <MoreVertical size={20} />
+                                <div className="members-stack-list">
+                                    {(tabMiembros === 'activos' ? miembros : miembrosAnteriores).length === 0 ? (
+                                        <div className="no-members-msg">
+                                            {tabMiembros === 'anteriores'
+                                                ? 'No hay miembros anteriores registrados.'
+                                                : 'No hay miembros registrados.'}
+                                        </div>
+                                    ) : (
+                                        (tabMiembros === 'activos' ? miembros : miembrosAnteriores).map((m) => (
+                                            <div key={m.id} className="member-card-item">
+                                                <div className="circle-avatar">{m.iniciales}</div>
+                                                <div className="member-data">
+                                                    <strong>{m.nombreCompleto}</strong>
+                                                    <span>{m.rol}</span>
                                                 </div>
 
-                                                {menuAbiertoId === m.id && (
-                                                    <div className="dropdown-menu-opciones">
-                                                        <div className="dropdown-item" onClick={() => abrirAccion('editar', m)}>
-                                                            <Pencil size={14} /> <span>Editar</span>
-                                                        </div>
-                                                        <div className="dropdown-item" onClick={() => abrirAccion('detalles', m)}>
-                                                            <Eye size={14} /> <span>Ver detalles</span>
-                                                        </div>
-                                                        <div className="dropdown-item" onClick={() => abrirAccion('historial', m)}>
-                                                            <History size={14} /> <span>Ver historial</span>
-                                                        </div>
-                                                        <div className="dropdown-item" onClick={() => abrirAccion('borrar', m)}>
-                                                            <Trash2 size={14} /> <span>Borrar</span>
-                                                        </div>
+                                                <div className="more-dots-container" style={{ position: 'relative' }}>
+                                                    <div className="more-dots" onClick={(e) => toggleMenu(e, m.id)}>
+                                                        <MoreVertical size={20} />
                                                     </div>
-                                                )}
+
+                                                    {menuAbiertoId === m.id && (
+                                                        <div className="dropdown-menu-opciones">
+                                                            {tabMiembros === 'activos' && (
+                                                                <div className="dropdown-item" onClick={() => abrirAccion('editar', m)}>
+                                                                    <Pencil size={14} /> <span>Editar</span>
+                                                                </div>
+                                                            )}
+                                                            <div className="dropdown-item" onClick={() => abrirAccion('detalles', m)}>
+                                                                <Eye size={14} /> <span>Ver detalles</span>
+                                                            </div>
+                                                            <div className="dropdown-item" onClick={() => abrirAccion('historial', m)}>
+                                                                <History size={14} /> <span>Ver historial</span>
+                                                            </div>
+                                                            {tabMiembros === 'activos' && (
+                                                                <div className="dropdown-item" onClick={() => abrirAccion('borrar', m)}>
+                                                                    <Trash2 size={14} /> <span>Borrar</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))
+                                    )}
                                 </div>
                             </div>
                         </>
