@@ -200,7 +200,6 @@ const DashProyectos = () => {
                     <th>PRESUPUESTO INICIAL</th>
                     <th>AUTORIZADO</th>
                     <th>RESTANTE</th>
-                    <th>PROGRESO</th>
                     <th>ESTADO</th>
                     <th>ACCIONES</th>
                   </tr>
@@ -234,26 +233,6 @@ const DashProyectos = () => {
                             {formatCurrencyWithSign(p.presupuesto)}
                           </td>
                           <td>
-                            <div className="budget-cell-container">
-                              {(() => {
-                                const status = calculateBudgetStatus(p.presupuesto, p.presupuestoAutorizado || p.presupuestoInicial);
-                                return (
-                                  <>
-                                    <div className="budget-progress-outer">
-                                      <div
-                                        className={`budget-progress-inner ${status.colorClass}`}
-                                        style={{ width: `${Math.min(status.perc, 100)}%` }}
-                                      ></div>
-                                    </div>
-                                    <span className={`budget-status-text ${status.colorClass.replace('budget-', 'text-')}`}>
-                                      {Math.round(status.perc)}%
-                                    </span>
-                                  </>
-                                );
-                              })()}
-                            </div>
-                          </td>
-                          <td>
                             {/*Agrego esto para poner el estado del Proyecto*/}
                             <span className={`badge ${p.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}`}>
                               {p.estado === 'ACTIVO' ? 'ACTIVO' : 'INACTIVO'}
@@ -261,7 +240,16 @@ const DashProyectos = () => {
                           </td>
                           <td>
                             <div className="dropdown-container">
-                              <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalEditar(true); }}>
+                              <div 
+                                className={`dropdown-item ${p.estado === 'INACTIVO' ? 'disabled' : ''}`} 
+                                onClick={() => { 
+                                  if (p.estado !== 'INACTIVO') {
+                                    setProyectoSeleccionado(p); 
+                                    setMostrarModalEditar(true); 
+                                  }
+                                }}
+                                title={p.estado === 'INACTIVO' ? "No se puede editar un proyecto inactivo" : "Editar"}
+                              >
                                 <Pencil size={14} />
                               </div>
 

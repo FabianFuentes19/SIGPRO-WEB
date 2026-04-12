@@ -11,5 +11,6 @@ public class PagoResponseDTO {
     private Long proyectoId;
     private String matriculaUsuario;
     private BigDecimal monto; // Use este para manejar la cantidad real
-    private LocalDate fecha;
+    private LocalDate fechaCorte;
+    private LocalDate fechaPagoReal;
 }

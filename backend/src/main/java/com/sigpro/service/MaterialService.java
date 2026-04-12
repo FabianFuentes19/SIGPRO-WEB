@@ -1,5 +1,7 @@
 package com.sigpro.service;
 
+import com.sigpro.dto.AlertaDTO;
+import com.sigpro.dto.MaterialConAlertaResponseDTO;
 import com.sigpro.dto.MaterialMapper;
 import com.sigpro.dto.MaterialRequestDTO;
 import com.sigpro.dto.MaterialResponseDTO;
@@ -8,6 +10,7 @@ import com.sigpro.model.Material;
 import com.sigpro.model.Proyecto;
 import com.sigpro.repository.MaterialRepository;
 import com.sigpro.repository.ProyectoRepository;
+import com.sigpro.util.AlertaCalculator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +39,7 @@ public class MaterialService {
      * No incluye actualización ni eliminación (DFR).
      */
     @Transactional
-    public MaterialResponseDTO registrarMaterial(@Valid MaterialRequestDTO dto) {
+    public MaterialConAlertaResponseDTO registrarMaterial(@Valid MaterialRequestDTO dto) {
         Proyecto proyecto = proyectoRepository.findById(dto.getProyectoId())
                 .orElseThrow(() -> new IllegalArgumentException("El proyecto no existe"));
 
@@ -66,7 +69,9 @@ public class MaterialService {
 
         proyecto.setPresupuesto(proyecto.getPresupuesto().subtract(costoTotal));
         proyectoRepository.save(proyecto);
-        return MaterialMapper.toResponseDto(guardado);
+
+        AlertaDTO alerta = AlertaCalculator.calcularAlerta(proyecto);
+        return new MaterialConAlertaResponseDTO(MaterialMapper.toResponseDto(guardado), alerta);
     }
 
     /**
@@ -76,7 +81,7 @@ public class MaterialService {
     public List<MaterialResponseDTO> listarMaterialesPorProyecto(Long proyectoId, String nombre) {
         List<Material> lista;
         if (nombre != null && !nombre.isBlank()) {
-            lista = materialRepository.findByProyectoIdAndNombreContainingIgnoreCase(proyectoId, nombre.trim());
+            lista = materialRepository.findByProyectoIdAndNombreSinAcentos(proyectoId, nombre.trim());
         } else {
             lista = materialRepository.findByProyectoId(proyectoId);
         }

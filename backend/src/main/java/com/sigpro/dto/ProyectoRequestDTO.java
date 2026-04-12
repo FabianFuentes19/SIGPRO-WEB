@@ -27,10 +27,19 @@ public class ProyectoRequestDTO {
     @NotNull(message = "La fecha de inicio es obligatoria")
     private LocalDate fechaInicio;
 
+    @Future(message = "La fecha de fin debe ser futura")
     @NotNull(message = "La fecha de fin es obligatoria")
     private LocalDate fechaFin;
 
     private String liderMatricula;
-
     private Long liderId;
+
+    //validación de fechas
+    @AssertTrue(message = "La fecha de fin debe ser posterior a la fecha de inicio")
+    public boolean isFechaFinPosterior() {
+        if (fechaInicio == null || fechaFin == null) {
+            return true;
+        }
+        return fechaFin.isAfter(fechaInicio);
+    }
 }

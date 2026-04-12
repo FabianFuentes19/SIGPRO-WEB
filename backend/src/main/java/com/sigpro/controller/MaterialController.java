@@ -1,6 +1,7 @@
 
 package com.sigpro.controller;
 
+import com.sigpro.dto.MaterialConAlertaResponseDTO;
 import com.sigpro.dto.MaterialRequestDTO;
 import com.sigpro.dto.MaterialResponseDTO;
 import com.sigpro.service.MaterialService;
@@ -25,8 +26,8 @@ public class MaterialController {
     private MaterialService materialService;
 
     @PostMapping
-    public ResponseEntity<MaterialResponseDTO> registrar(@Valid @RequestBody MaterialRequestDTO dto) {
-        MaterialResponseDTO creado = materialService.registrarMaterial(dto);
+    public ResponseEntity<MaterialConAlertaResponseDTO> registrar(@Valid @RequestBody MaterialRequestDTO dto) {
+        MaterialConAlertaResponseDTO creado = materialService.registrarMaterial(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 

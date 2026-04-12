@@ -20,6 +20,10 @@ public class PagoRequestDTO {
     @Positive(message = "El monto debe ser mayor a cero")
     private BigDecimal monto;
 
-    private LocalDate fecha;
+    @NotNull(message = "La fecha de corte es obligatoria")
+    private LocalDate fechaCorte;
+
+    @NotNull(message = "La fecha de pago real es obligatoria")
+    private LocalDate fechaPagoReal;
 
 }

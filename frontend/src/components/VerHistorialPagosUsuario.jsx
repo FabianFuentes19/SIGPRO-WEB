@@ -86,7 +86,7 @@ const VerHistorialPagosUsuario = ({ usuario, alCerrar, tipo = "Usuario" }) => {
                                             </div>
                                             <div className="ux-payment-text">
                                                 <label>FECHA DE PAGO</label>
-                                                <strong>{formatDate(pago.fecha)}</strong>
+                                                <strong>{formatDate(pago.fechaPagoReal)}</strong>
                                             </div>
                                         </div>
                                         <div className="ux-payment-monto">

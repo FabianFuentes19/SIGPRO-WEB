@@ -29,7 +29,10 @@ public class Pago {
     private BigDecimal monto;
 
     @Column(name = "FECHA", nullable = false)
-    private LocalDate fecha;
+    private LocalDate fechaCorte;
+
+    @Column(name = "FECHA_REGISTRO", nullable = false)
+    private LocalDate fechaPagoReal;
 
 
 }

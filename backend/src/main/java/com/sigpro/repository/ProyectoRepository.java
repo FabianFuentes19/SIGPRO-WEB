@@ -22,7 +22,7 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
     org.springframework.data.domain.Page<Proyecto> findAllByLiderEstado(String estado, org.springframework.data.domain.Pageable pageable);
 
     @Query("SELECT p FROM Proyecto p " +
-            "WHERE (UPPER(p.nombre) LIKE UPPER(CONCAT('%', :buscar, '%')) " +
-            "OR UPPER(p.lider.nombreCompleto) LIKE UPPER(CONCAT('%', :buscar, '%')))")
+            "WHERE (TRANSLATE(LOWER(p.nombre), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') LIKE TRANSLATE(LOWER(CONCAT('%', :buscar, '%')), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') " +
+            "OR TRANSLATE(LOWER(p.lider.nombreCompleto), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') LIKE TRANSLATE(LOWER(CONCAT('%', :buscar, '%')), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC'))")
     Page<Proyecto> findByNombreConBusqueda(@Param("buscar") String buscar, Pageable pageable);
 }

@@ -157,9 +157,7 @@ const PerfilLider = () => {
                           <td className="color-gris">{formatDate(pago.fecha)}</td>
                           <td className="texto-negrita">{formatCurrency(pago.monto)}</td>
                           <td>
-                            <span className={pago.estado === "PAGADO" ? "estado-pagado" : "estado-pendiente"}>
-                                {pago.estado}
-                            </span>
+                            <span className="estado-pagado">COMPLETADO</span>
                           </td>
                         </tr>
                       ))}

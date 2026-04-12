@@ -260,7 +260,7 @@ const DashLideres = () => {
                           </td>
                           <td>
                             <div className="dropdown-container">
-                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEditar(true); }}>
+                              <div className={`dropdown-item ${l.estado !== 'ACTIVO' ? 'disabled' : ''}`} onClick={() => { if (l.estado === 'ACTIVO') { setLiderSeleccionado(l); setMostrarModalEditar(true); } }}>
                                 <Pencil size={14} />
                               </div>
 
@@ -268,11 +268,7 @@ const DashLideres = () => {
                                 <Eye size={14} />
                               </div>
 
-                              {<div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEliminar(true); }}>
-                                <Trash2 size={14} />
-                              </div>}
-
-                              {/*<label className="switch">
+                              <label className="switch">
                                 <input
                                   type="checkbox"
                                   checked={l.estado === "ACTIVO"}
@@ -285,7 +281,13 @@ const DashLideres = () => {
                                   }}
                                 />
                                 <span className="slider round"></span>
-                              </label> */}
+                              </label>
+
+                              {/*
+                              <div className="dropdown-item" onClick={() => { setLiderSeleccionado(l); setMostrarModalEliminar(true); }}>
+                                <Trash2 size={14} />
+                              </div>
+                              */}
 
                             </div>
                           </td>

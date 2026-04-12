@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './DashLider.css';
 import AgregarUsuario from '../AgregarUsuario.jsx';
 import Materiales from '../Materiales/Materiales.jsx';
@@ -56,9 +56,6 @@ const DashboardLider = () => {
     const [loadingProyecto, setLoadingProyecto] = useState(true);
     const [mensajeModal, setMensajeModal] = useState(null);
 
-    // rastrea el presupuesto anterior y evitar alertas repetitivas al navegar
-    const lastBudgetRef = useRef(null);
-
     // Función para calcular el estado presupuesto
     const calculateBudgetStatus = (actual, autorizado) => {
         if (!autorizado || autorizado <= 0) return { perc: 0, colorClass: 'budget-exhausted', status: 'UNKNOWN', text: '' };
@@ -71,7 +68,7 @@ const DashboardLider = () => {
     };
 
 
-    const cargarProyecto = async (triggerAlert = false) => {
+    const cargarProyecto = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
             setLoadingProyecto(false);
@@ -90,20 +87,6 @@ const DashboardLider = () => {
             if (!response.ok) throw new Error("No se pudo obtener el proyecto");
             const data = await response.json();
 
-            // verifica si al insertar un gasto el presupuesto entra en riesgo
-            if (triggerAlert && lastBudgetRef.current !== null && lastBudgetRef.current !== data.presupuesto) {
-                const statusInfo = calculateBudgetStatus(data.presupuesto, data.presupuestoAutorizado || data.presupuestoInicial);
-                if (statusInfo.status !== 'OK') {
-                    setMensajeModal({
-                        titulo: "ALERTA",
-                        mensaje: statusInfo.text,
-                        tipo: statusInfo.status === 'CRITICAL' ? "error" : "advertencia"
-                    });
-                }
-
-            }
-
-            lastBudgetRef.current = data.presupuesto;
             setProyecto(data);
             setProyectoId(data.id);
         } catch (error) {
@@ -468,8 +451,8 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={() => cargarProyecto(true)} />}
-                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={() => cargarProyecto(true)} />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={() => cargarProyecto()} />}
+                    {vistaActual === 'nominas' && <Nominas onPaymentSuccess={() => cargarProyecto()} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 
                 </main>

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.regex.Pattern;
@@ -174,7 +175,15 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByMatricula(m)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Campos permitidos por DFR: nombre completo, grupo, carrera, cuatrimestre
+        // Validar campos si se proporcionan
+        if (dto.getPuesto() != null && dto.getPuesto().trim().isEmpty()) {
+            throw new IllegalArgumentException("El puesto no puede estar vacío");
+        }
+        if (dto.getSalarioQuincenal() != null && dto.getSalarioQuincenal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El salario quincenal debe ser mayor a cero");
+        }
+
+        // Campos permitidos por DFR: nombre completo, grupo, carrera, cuatrimestre, puesto, salarioQuincenal
         if (dto.getNombreCompleto() != null) {
             usuario.setNombreCompleto(dto.getNombreCompleto().trim());
         }
@@ -187,8 +196,14 @@ public class UsuarioService {
         if (dto.getCuatrimestre() != null) {
             usuario.setCuatrimestre(dto.getCuatrimestre());
         }
+        if (dto.getPuesto() != null) {
+            usuario.setPuesto(dto.getPuesto().trim());
+        }
+        if (dto.getSalarioQuincenal() != null) {
+            usuario.setSalarioQuincenal(dto.getSalarioQuincenal());
+        }
 
-        // No se permite modificar: matricula, puesto, salarioQuincenal, fechaIngreso, contrasena, rol
+        // No se permite modificar: matricula, fechaIngreso, contrasena, rol
         Usuario actualizado = usuarioRepository.save(usuario);
         return UsuarioMapper.toResponseDto(actualizado);
     }

@@ -15,8 +15,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT u FROM Usuario u " +
             "WHERE UPPER(u.rol.nombre) = UPPER(:rolNombre) " +
-            "AND (UPPER(u.nombreCompleto) LIKE UPPER(CONCAT('%', :buscar, '%')) " +
-            "OR UPPER(u.matricula) LIKE UPPER(CONCAT('%', :buscar, '%')))")
+            "AND (TRANSLATE(LOWER(u.nombreCompleto), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') LIKE TRANSLATE(LOWER(CONCAT('%', :buscar, '%')), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') " +
+            "OR TRANSLATE(LOWER(u.matricula), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') LIKE TRANSLATE(LOWER(CONCAT('%', :buscar, '%')), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC'))")
     Page<Usuario> findByRolNombreConBusqueda(@Param("rolNombre") String rolNombre, @Param("buscar") String buscar, Pageable pageable);
 
     @Query("SELECT u FROM Usuario u " +

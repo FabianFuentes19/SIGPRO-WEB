@@ -2,6 +2,7 @@ package com.sigpro.controller;
 
 import com.sigpro.dto.PagoRequestDTO;
 import com.sigpro.dto.PagoResponseDTO;
+import com.sigpro.dto.PagoConAlertaResponseDTO;
 import com.sigpro.dto.VoucherDTO;
 import com.sigpro.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class PagoController {
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarPago(@RequestBody PagoRequestDTO dto, Authentication auth) {
         try {
-            PagoResponseDTO pago = pagoService.registrarPago(dto, auth);
-            return ResponseEntity.ok(pago);
+            PagoConAlertaResponseDTO resultado = pagoService.registrarPago(dto, auth);
+            return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {

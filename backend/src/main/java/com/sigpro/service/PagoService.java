@@ -4,6 +4,8 @@ import com.sigpro.dto.PagoRequestDTO;
 import com.sigpro.dto.PagoResponseDTO;
 import com.sigpro.dto.PagoMapper;
 import com.sigpro.dto.VoucherDTO;
+import com.sigpro.dto.AlertaDTO;
+import com.sigpro.dto.PagoConAlertaResponseDTO;
 import com.sigpro.model.Pago;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.Usuario;
@@ -11,6 +13,7 @@ import com.sigpro.repository.PagoRepository;
 import com.sigpro.repository.ProyectoRepository;
 import com.sigpro.repository.ProyectoUsuarioRepository;
 import com.sigpro.repository.UsuarioRepository;
+import com.sigpro.util.AlertaCalculator;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,7 @@ public class PagoService {
     private ProyectoUsuarioRepository proyectoUsuarioRepository;
 
     @Transactional
-    public PagoResponseDTO registrarPago(@Valid PagoRequestDTO dto, Authentication auth) {
+    public PagoConAlertaResponseDTO registrarPago(@Valid PagoRequestDTO dto, Authentication auth) {
         validarRol(auth,"ROLE_LIDER");
 
         Usuario usuario = usuarioRepository.findByMatricula(dto.getMatriculaUsuario())
@@ -55,14 +58,14 @@ public class PagoService {
             throw new IllegalArgumentException("El monto debe ser mayor a cero");
         }
 
-        // USAMOS LA FECHA DEL VOUCHER (La que viene del frontend) 
+        // USAMOS LA FECHA DE CORTE DEL VOUCHER (La que viene del frontend) 
         // Esto permite identificar exactamente qué quincena se está pagando.
-        LocalDate fechaVoucher = dto.getFecha() != null ? dto.getFecha() : LocalDate.now();
+        LocalDate fechaCorte = dto.getFechaCorte();
         
-        // VALIDACIÓN INFALIBLE: ¿Ya existe un pago para ESTA fecha exacta de voucher?
+        // VALIDACIÓN INFALIBLE: ¿Ya existe un pago para ESTA fecha exacta de corte?
         List<Pago> pagosPrevios = pagoRepository.findByUsuarioMatriculaAndProyectoId(usuario.getMatricula(), proyecto.getId());
         boolean yaPagado = pagosPrevios.stream()
-                .anyMatch(p -> p.getFecha().equals(fechaVoucher));
+                .anyMatch(p -> p.getFechaCorte().equals(fechaCorte));
 
         if (yaPagado) {
             throw new IllegalArgumentException("Este voucher ya ha sido pagado anteriormente.");
@@ -82,7 +85,8 @@ public class PagoService {
         pago.setUsuario(usuario);
         pago.setProyecto(proyecto);
         pago.setMonto(dto.getMonto());
-        pago.setFecha(fechaVoucher); // <--- REGISTRAMOS LA FECHA DEL PERIODO
+        pago.setFechaCorte(fechaCorte);
+        pago.setFechaPagoReal(dto.getFechaPagoReal());
 
         Pago guardado = pagoRepository.save(pago);
 
@@ -90,7 +94,11 @@ public class PagoService {
         proyecto.setPresupuesto(proyecto.getPresupuesto().subtract(dto.getMonto()));
         proyectoRepository.save(proyecto);
 
-        return PagoMapper.toResponseDto(guardado);
+        // Calcular alerta después de actualizar presupuesto
+        AlertaDTO alerta = AlertaCalculator.calcularAlerta(proyecto);
+
+        PagoResponseDTO pagoResponse = PagoMapper.toResponseDto(guardado);
+        return new PagoConAlertaResponseDTO(pagoResponse, alerta);
     }
 
     public List<PagoResponseDTO> consultarMisPagos(Authentication auth) {
@@ -193,7 +201,7 @@ public class PagoService {
             final LocalDate pFin = fin;
 
             Optional<Pago> pagoMatch = pagos.stream()
-                    .filter(p -> !p.getFecha().isBefore(pInicio) && !p.getFecha().isAfter(pFin))
+                    .filter(p -> !p.getFechaCorte().isBefore(pInicio) && !p.getFechaCorte().isAfter(pFin))
                     .findFirst();
 
             // LÓGICA DE VISIBILIDAD REFINADA:
@@ -202,7 +210,7 @@ public class PagoService {
                 Pago p = pagoMatch.get();
                 v.setEstado("PAGADO");
                 v.setPagoId(p.getId());
-                v.setFechaPagoReal(p.getFecha());
+                v.setFechaPagoReal(p.getFechaPagoReal());
                 v.setMontoPagado(p.getMonto());
                 vouchers.add(v);
             } else if (!hoy.isBefore(fin)) {

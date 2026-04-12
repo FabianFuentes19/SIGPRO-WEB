@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -146,7 +146,16 @@ public class ProyectoService {
         }
         if (dto.getPresupuesto() != null) {
             // El nuevo presupuesto enviado en el DTO se considera el "Nuevo Total Autorizado"
-            proyecto.setPresupuestoAutorizado(dto.getPresupuesto());
+            BigDecimal nuevoAutorizado = dto.getPresupuesto();
+            proyecto.setPresupuestoAutorizado(nuevoAutorizado);
+
+            // Recalcular el presupuesto disponible real a partir de los gastos actuales
+            BigDecimal gastoMateriales = materialRepository.sumCostoTotalByProyectoId(proyecto.getId());
+            BigDecimal gastoNominas = pagoRepository.sumMontoByProyectoId(proyecto.getId());
+            BigDecimal gastoTotal = gastoMateriales.add(gastoNominas);
+            BigDecimal presupuestoDisponible = nuevoAutorizado.subtract(gastoTotal);
+
+            proyecto.setPresupuesto(presupuestoDisponible.max(BigDecimal.ZERO));
             // Nota: presupuestoInicial se mantiene intacto como registro histórico
         }
 
@@ -240,10 +249,9 @@ public class ProyectoService {
         Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
         if (proyecto == null) throw new IllegalArgumentException("No tiene proyecto asignado");
 
-        // se consulta solo los activos
+        // se consulta todo el equipo del proyecto; el filtrado de vouchers se hará según cada usuario
         return proyectoUsuarioRepository.findByProyectoId(proyecto.getId()).stream()
                 .map(ProyectoUsuario::getUsuario)
-                .filter(u -> "ACTIVO".equalsIgnoreCase(u.getEstado()) || u.getMatricula().equals(matriculaAutenticada))
                 .map(UsuarioMapper::toResponseDto)
                 .toList();
     }

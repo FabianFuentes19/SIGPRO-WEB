@@ -43,6 +43,8 @@ const AgregarUsuario = ({ alCerrar, alRegistrar, tipo = "Usuario", onError }) =>
         if (!datosFormulario.carrera) camposVacios.push("Carrera");
         if (!datosFormulario.cuatrimestre) camposVacios.push("Cuatrimestre");
         if (!datosFormulario.grupo) camposVacios.push("Grupo");
+        if(!datosFormulario.puesto.trim()) camposVacios.push("Puesto");
+        if(!datosFormulario.salarioQuincenal.trim()) camposVacios.push("Salario quincenal");
 
         if (camposVacios.length > 0) {
             if (onError) {

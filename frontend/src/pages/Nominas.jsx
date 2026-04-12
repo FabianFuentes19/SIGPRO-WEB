@@ -4,6 +4,7 @@ import NominaCard from '../components/Nominas/NominaCard';
 import { Search, ChevronDown, Loader2 } from 'lucide-react';
 import ModalMensajes from '../components/Usuarios/ModalMensajes';
 import { apiFetch } from '../services/api';
+import { removeAccents } from '../utils/formatters.js';
 
 const BASE_URL = "http://localhost:8080";
 
@@ -126,7 +127,8 @@ const Nominas = ({ onPaymentSuccess }) => {
       proyectoId: proyectoId,
       matriculaUsuario: matricula,
       monto: monto,
-      fecha: fechaVoucher
+      fechaCorte: fechaVoucher,
+      fechaPagoReal: new Date().toISOString().slice(0, 10)
 
     };
 
@@ -137,16 +139,31 @@ const Nominas = ({ onPaymentSuccess }) => {
       });
 
       if (response.ok) {
+          const resultData = await response.json();
+          
+          // Mostrar resultado exitoso
           setMensajeModal({
             titulo: "Registro Exitoso",
             mensaje: "Pago registrado correctamente",
             tipo: "exito"
           });
-        await cargarTodo();
-        // Avisar al dashboard para que actualice el presupuesto del proyecto
-        if (typeof onPaymentSuccess === 'function') {
-          onPaymentSuccess();
-        }
+
+          // Si hay alerta en la respuesta, mostrarla después del éxito
+          if (resultData.alerta) {
+            setTimeout(() => {
+              setMensajeModal({
+                titulo: "ALERTA",
+                mensaje: resultData.alerta.mensaje,
+                tipo: resultData.alerta.tipo === "advertencia" ? "advertencia" : "error"
+              });
+            }, 2000); // Esperar 2 segundos después del primer modal
+          }
+
+          await cargarTodo();
+          // Avisar al dashboard para que actualice el presupuesto del proyecto
+          if (typeof onPaymentSuccess === 'function') {
+            onPaymentSuccess();
+          }
       } else {
         const errorData = await response.json();
         setMensajeModal({
@@ -162,8 +179,12 @@ const Nominas = ({ onPaymentSuccess }) => {
   };
 
   const nominasFiltradas = nominas.filter(n => {
-    const coincideBusqueda = n.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      n.puesto.toLowerCase().includes(busqueda.toLowerCase());
+    const busquedaNormalizada = removeAccents(busqueda.toLowerCase());
+    const nombreNormalizado = removeAccents(n.nombre.toLowerCase());
+    const puestoNormalizado = removeAccents(n.puesto.toLowerCase());
+
+    const coincideBusqueda = nombreNormalizado.includes(busquedaNormalizada) ||
+      puestoNormalizado.includes(busquedaNormalizada);
 
     if (filtro === "Todos") return coincideBusqueda;
     if (filtro === "Pagados") return coincideBusqueda && n.estado === "PAGADO";

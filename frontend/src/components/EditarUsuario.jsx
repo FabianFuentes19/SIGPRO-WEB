@@ -61,12 +61,26 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario", onError
     if (!datosFormulario.carrera) camposVacios.push("Carrera");
     if (!datosFormulario.cuatrimestre) camposVacios.push("Cuatrimestre");
     if (!datosFormulario.grupo) camposVacios.push("Grupo");
+    if (!datosFormulario.puesto.trim()) camposVacios.push("Puesto");
+    if (!String(datosFormulario.salarioQuincenal).trim()) camposVacios.push("Salario quincenal");
 
     if (camposVacios.length > 0) {
         if (onError) {
             onError({
                 titulo: "Datos incompletos",
                 mensaje: `Faltan campos obligatorios: ${camposVacios.join(", ")}`,
+                tipo: "error"
+            });
+        }
+        return;
+    }
+
+    const salarioNum = Number(datosFormulario.salarioQuincenal);
+    if (Number.isNaN(salarioNum) || salarioNum <= 0) {
+        if (onError) {
+            onError({
+                titulo: "Salario inválido",
+                mensaje: "El salario quincenal debe ser un número mayor a 0",
                 tipo: "error"
             });
         }
@@ -81,9 +95,7 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario", onError
       carrera: datosFormulario.carrera,
       cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),
       puesto: datosFormulario.puesto,
-      salarioQuincenal: datosFormulario.salarioQuincenal
-        ? parseFloat(datosFormulario.salarioQuincenal)
-        : 0,
+      salarioQuincenal: salarioNum,
       estado: "ACTIVO",
       rol: { id: 2, nombre: "LIDER" } 
     };

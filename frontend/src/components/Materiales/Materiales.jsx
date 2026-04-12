@@ -20,7 +20,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
         }
         setCargando(true);
         try {
-            const data = await obtenerMaterialesPorProyecto(proyectoId, busqueda);
+            const data = await obtenerMaterialesPorProyecto(proyectoId);
             setMateriales(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error(e);
@@ -33,7 +33,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
     useEffect(() => {
         cargarMateriales();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [proyectoId, busqueda]);
+    }, [proyectoId]);
 
     const materialesFiltrados = useMemo(() => {
         const q = busqueda.trim().toLowerCase();
@@ -45,6 +45,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
         return materiales.reduce((acc, item) => acc + (Number(item?.costoTotal) || 0), 0);
     }, [materiales]);
 
+
     const formatearMoneda = (v) => formatCurrencyWithSign(v);
 
     const onRegistrar = async (datos) => {
@@ -54,7 +55,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
         }
         try {
             // Limpieza: solo nombre, monto, cantidad, proyectoId (NO costoTotal)
-            await registrarMaterial({
+            const result = await registrarMaterial({
                 nombre: datos?.nombre,
                 monto: datos?.monto,
                 cantidad: datos?.cantidad,
@@ -66,6 +67,17 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
                 mensaje: "Material registrado correctamente",
                 tipo: "exito"
             });
+
+            if (result?.alerta) {
+                setTimeout(() => {
+                    setMensajeModal({
+                        titulo: "ALERTA",
+                        mensaje: result.alerta.mensaje,
+                        tipo: result.alerta.tipo === "advertencia" ? "advertencia" : "error"
+                    });
+                }, 2000);
+            }
+
             await cargarMateriales(); // refresca lista y total automáticamente
             if (typeof onMaterialSuccess === 'function') {
                 onMaterialSuccess();
@@ -120,7 +132,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
                             <span>Consultando materiales</span>
                         </div>
                     </div>
-                ) : materiales.map((m) => (
+                ) : materialesFiltrados.map((m) => (
                     <div key={m.id} className="member-card-item">
                         <div className="member-data">
                             <strong>{m.nombre}</strong>
@@ -137,6 +149,7 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
                 <AgregarMaterial
                     alCerrar={() => setMostrarModal(false)}
                     alRegistrar={onRegistrar}
+                    onError={setMensajeModal}
                 />
             )}
 

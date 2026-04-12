@@ -14,7 +14,8 @@ public class PagoMapper {
         dto.setProyectoId(pago.getProyecto().getId());
         dto.setMatriculaUsuario(pago.getUsuario().getMatricula());
         dto.setMonto(pago.getMonto());
-        dto.setFecha(pago.getFecha());
+        dto.setFechaCorte(pago.getFechaCorte());
+        dto.setFechaPagoReal(pago.getFechaPagoReal());
         return dto;
     }
 
@@ -23,7 +24,8 @@ public class PagoMapper {
         pago.setUsuario(usuario);
         pago.setProyecto(proyecto);
         pago.setMonto(dto.getMonto());
-        pago.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDate.now());
+        pago.setFechaCorte(dto.getFechaCorte());
+        pago.setFechaPagoReal(dto.getFechaPagoReal());
         return pago;
     }
 
