@@ -49,8 +49,10 @@ const PerfilLider = () => {
         const resPagos = await apiFetch(`/pagos/miembro/${encodeURIComponent(matricula)}`);
         if (resPagos.ok) {
           const pagosData = await resPagos.json();
+          console.log("Pagos recibidos:", pagosData);
+
           // Orden descendente por fecha
-          const sorted = pagosData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+          const sorted = pagosData.sort((a, b) => new Date(b.fechaPagoReal) - new Date(a.fechaPagoReal));
           setListaPagos(sorted);
         } else {
             console.error("No se pudo obtener el historial de pagos");
@@ -154,7 +156,7 @@ const PerfilLider = () => {
                             <Wallet size={16} /> {pago.concepto || "Nómina Quincenal"}
                           </td>
                           <td>{usuario.matricula}</td>
-                          <td className="color-gris">{formatDate(pago.fecha)}</td>
+                          <td className="color-gris">{formatDate(pago.fechaPagoReal)}</td>
                           <td className="texto-negrita">{formatCurrency(pago.monto)}</td>
                           <td>
                             <span className="estado-pagado">COMPLETADO</span>
