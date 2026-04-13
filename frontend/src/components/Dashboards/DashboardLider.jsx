@@ -377,8 +377,12 @@ const DashboardLider = () => {
                                     <button
                                         className="gold-add-btn"
                                         onClick={() => setMostrarModal(true)}
-                                        disabled={!proyecto || !proyecto.id}
-                                        style={{ visibility: tabMiembros === 'activos' ? 'visible' : 'hidden' }}
+                                        disabled={!proyecto || !proyecto.id || proyecto.estado !== 'ACTIVO'}
+                                        style={{ 
+                                            visibility: tabMiembros === 'activos' ? 'visible' : 'hidden',
+                                            cursor: proyecto?.estado !== 'ACTIVO' ? 'not-allowed' : 'pointer',
+                                            opacity: proyecto?.estado !== 'ACTIVO' ? 0.6 : 1
+                                        }}
                                     >
                                         <UserPlus size={18} />
                                         <span>Agregar miembro</span>
@@ -451,7 +455,7 @@ const DashboardLider = () => {
                         </>
                     )}
 
-                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} onMaterialSuccess={() => cargarProyecto()} />}
+                    {vistaActual === 'materiales' && <Materiales proyectoId={proyectoId} proyecto={proyecto} onMaterialSuccess={() => cargarProyecto()} />}
                     {vistaActual === 'nominas' && <Nominas onPaymentSuccess={() => cargarProyecto()} />}
                     {vistaActual === 'perfil' && <PerfilLider />}
 

@@ -6,7 +6,7 @@ import { obtenerMaterialesPorProyecto, registrarMaterial } from '../../services/
 import ModalMensajes from '../Usuarios/ModalMensajes.jsx';
 import { formatCurrencyWithSign } from '../../utils/formatters';
 
-const Materiales = ({ proyectoId, onMaterialSuccess }) => {
+const Materiales = ({ proyectoId, proyecto, onMaterialSuccess }) => {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [materiales, setMateriales] = useState([]);
     const [busqueda, setBusqueda] = useState('');
@@ -54,7 +54,6 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
             return;
         }
         try {
-            // Limpieza: solo nombre, monto, cantidad, proyectoId (NO costoTotal)
             const result = await registrarMaterial({
                 nombre: datos?.nombre,
                 monto: datos?.monto,
@@ -114,10 +113,16 @@ const Materiales = ({ proyectoId, onMaterialSuccess }) => {
 
             <div className="material-actions-row">
                 <button
-                    className={`gold-add-btn ${!proyectoId ? 'disabled' : ''}`}
-                    onClick={() => proyectoId ? setMostrarModal(true) : alert("Debes tener un proyecto asignado para agregar miembros")}
-                    disabled={!proyectoId}
-                    style={!proyectoId ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                    className="gold-add-btn"
+                    onClick={() => setMostrarModal(true)}
+                    disabled={proyecto?.estado?.toUpperCase() !== 'ACTIVO'}
+                    style={{ 
+                        cursor: proyecto?.estado?.toUpperCase() !== 'ACTIVO' ? 'not-allowed' : 'pointer',
+                        opacity: proyecto?.estado?.toUpperCase() !== 'ACTIVO' ? 0.6 : 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}
                 >
                     <Plus size={18} />
                     <span>Agregar material</span>

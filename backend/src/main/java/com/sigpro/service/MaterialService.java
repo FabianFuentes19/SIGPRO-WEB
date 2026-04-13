@@ -43,6 +43,10 @@ public class MaterialService {
         Proyecto proyecto = proyectoRepository.findById(dto.getProyectoId())
                 .orElseThrow(() -> new IllegalArgumentException("El proyecto no existe"));
 
+        if (!"ACTIVO".equalsIgnoreCase(proyecto.getEstado())) {
+            throw new IllegalStateException("No se puede agregar materila ya que el proyecto está " + proyecto.getEstado());
+        }
+
         BigDecimal costoTotal = dto.getMonto()
                 .multiply(BigDecimal.valueOf(dto.getCantidad()))
                 .setScale(MONEDA_SCALE, RoundingMode.HALF_UP);

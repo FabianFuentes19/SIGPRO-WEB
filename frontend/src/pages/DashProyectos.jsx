@@ -33,29 +33,29 @@ const DashProyectos = () => {
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
   // Función para traer proyectos desde el backend
-  const fetchProjects = async (page = 0) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/proyectos?page=${page}&size=${tamanoPagina}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setProyectos(data.content || []);
-        setTotalPaginas(data.totalPages || 0);
-        setPaginaActual(data.pageNumber || 0);
-      }
-    } catch (error) {
-      console.error("Error al cargar proyectos:", error);
+const fetchProjects = async (page = 0, query = "") => {
+  try {
+    const token = localStorage.getItem("token");
+    const url = `http://localhost:8080/proyectos?page=${page}&size=${tamanoPagina}&buscar=${encodeURIComponent(query)}`;
+    
+    const response = await fetch(url, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setProyectos(data.content || []);
+      setTotalPaginas(data.totalPages || 0);
     }
-  };
+  } catch (error) {
+    console.error("Error al cargar proyectos:", error);
+  }
+};
 
   // Cargar proyectos al montar el componente o al cambiar de página
   useEffect(() => {
-    fetchProjects(paginaActual);
-  }, [paginaActual]);
+    fetchProjects(paginaActual, busqueda);
+  }, [paginaActual, busqueda]);
 
   const handleCerrarSesion = () => {
     localStorage.clear();
@@ -84,7 +84,7 @@ const DashProyectos = () => {
           mensaje: "Proyecto agregado correctamente",
           tipo: "exito"
         });
-        fetchProjects();
+        fetchProjects(paginaActual, busqueda); // Actualizado para recargar la lista actual
       } else {
         const errorData = await response.json();
         setModalMensajes({
@@ -120,7 +120,7 @@ const DashProyectos = () => {
           mensaje: "Proyecto actualizado correctamente",
           tipo: "exito"
         });
-        fetchProjects();
+        fetchProjects(paginaActual, busqueda); // Actualizado para recargar la lista actual
       } else {
         const errorData = await response.json();
         setModalMensajes({
@@ -183,7 +183,10 @@ const DashProyectos = () => {
               className="form-control search-input"
               placeholder="Buscar"
               value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
+              onChange={(e) => {
+                setBusqueda(e.target.value);
+                setPaginaActual(0); // Reinicia a la primera página cuando se busca para evitar inconsistencias
+              }}
             />
             {/* Botón para abrir modal de registro */}
             <button className="btn add-btn" onClick={() => setMostrarModal(true)}>Agregar</button>
@@ -207,20 +210,16 @@ const DashProyectos = () => {
                 <tbody>
                   {proyectos.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
                         No hay proyectos registrados aún.
                       </td>
                     </tr>
                   ) : (
-                    proyectos
-                      .filter((p) =>
-                        (p.nombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-                        (p.liderNombre || "").toLowerCase().includes(busqueda.toLowerCase()) ||
-                        (p.descripcion || "").toLowerCase().includes(busqueda.toLowerCase())
-                      )
-                      .map((p, index) => (
+                    /* Eliminado .filter() manual ya que el backend maneja la búsqueda y paginación */
+                    proyectos.map((p, index) => (
                         <tr key={p.id}>
-                          <td>{index + 1}</td>
+                          {/* Cálculo del número correlativo basado en la página actual */}
+                          <td>{(paginaActual * tamanoPagina) + index + 1}</td>
                           <td>{p.nombre}</td>
                           <td>{p.liderNombre}</td>
                           <td className="text-right">

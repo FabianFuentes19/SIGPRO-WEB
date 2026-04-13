@@ -54,15 +54,19 @@ public class PagoService {
         Proyecto proyecto = proyectoRepository.findById(dto.getProyectoId())
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
 
+        if (!"ACTIVO".equalsIgnoreCase(proyecto.getEstado())) {
+            if (dto.getFechaCorte().isAfter(proyecto.getFechaFin())) {
+                throw new IllegalStateException("Proyecto finalizado. No se pueden registrar pagos posteriores al " + proyecto.getFechaFin());
+            }
+        }
+
         if (dto.getMonto() == null || dto.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a cero");
         }
 
-        // USAMOS LA FECHA DE CORTE DEL VOUCHER (La que viene del frontend) 
-        // Esto permite identificar exactamente qué quincena se está pagando.
         LocalDate fechaCorte = dto.getFechaCorte();
         
-        // VALIDACIÓN INFALIBLE: ¿Ya existe un pago para ESTA fecha exacta de corte?
+        // verifica si ya existe un pago en esa quincena
         List<Pago> pagosPrevios = pagoRepository.findByUsuarioMatriculaAndProyectoId(usuario.getMatricula(), proyecto.getId());
         boolean yaPagado = pagosPrevios.stream()
                 .anyMatch(p -> p.getFechaCorte().equals(fechaCorte));
@@ -154,6 +158,11 @@ public class PagoService {
         Usuario usuario = usuarioRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
+        String matriculaLider = (String) auth.getPrincipal();
+        Usuario lider = usuarioRepository.findByMatricula(matriculaLider)
+                .orElseThrow(() -> new IllegalArgumentException("Líder no encontrado"));
+        Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
+
         String estado = usuario.getEstado() != null ? usuario.getEstado().trim() : "";
         if (!"ACTIVO".equalsIgnoreCase(estado)) {
             throw new IllegalArgumentException("Cuenta inactiva (" + estado + ")");
@@ -169,25 +178,32 @@ public class PagoService {
 
         LocalDate inicio = fechaIngreso;
         LocalDate hoy = LocalDate.now();
+        LocalDate limiteGeneracion = (proyecto != null && proyecto.getFechaFin().isBefore(hoy))
+                ? proyecto.getFechaFin()
+                : hoy;
+
         int contador = 1;
 
-        while (!inicio.isAfter(hoy)) {
+        while (!inicio.isAfter(limiteGeneracion)) {
             //calcula fin de quincena
-            LocalDate fin = (inicio.getDayOfMonth() <= 15)
+            LocalDate finNormal = (inicio.getDayOfMonth() <= 15)
                     ? inicio.withDayOfMonth(15)
                     : inicio.withDayOfMonth(inicio.lengthOfMonth());
+
+            //si el proyecto termina antes de la quincena
+            LocalDate fin = (proyecto != null && proyecto.getFechaFin().isBefore(finNormal))
+                    ? proyecto.getFechaFin()
+                    : finNormal;
 
             BigDecimal montoQuincenal = usuario.getSalarioQuincenal() != null 
                     ? usuario.getSalarioQuincenal() 
                     : BigDecimal.ZERO;
 
-            if (vouchers.isEmpty() && montoQuincenal.compareTo(BigDecimal.ZERO) > 0) {
-                long diasTrabajados = ChronoUnit.DAYS.between(inicio, fin) + 1;
-                // calculo de pago proporcional
-                if (diasTrabajados < 15) {
-                    montoQuincenal = montoQuincenal.multiply(BigDecimal.valueOf(diasTrabajados))
-                            .divide(BigDecimal.valueOf(15), 2, RoundingMode.HALF_UP);
-                }
+            long diasTrabajados = ChronoUnit.DAYS.between(inicio, fin) + 1;
+            //calculo proporcional
+            if (diasTrabajados < 15 && montoQuincenal.compareTo(BigDecimal.ZERO) > 0) {
+                montoQuincenal = montoQuincenal.multiply(BigDecimal.valueOf(diasTrabajados))
+                        .divide(BigDecimal.valueOf(15), 2, RoundingMode.HALF_UP);
             }
 
             VoucherDTO v = new VoucherDTO();
@@ -204,9 +220,8 @@ public class PagoService {
                     .filter(p -> !p.getFechaCorte().isBefore(pInicio) && !p.getFechaCorte().isAfter(pFin))
                     .findFirst();
 
-            // LÓGICA DE VISIBILIDAD REFINADA:
             if (pagoMatch.isPresent()) {
-                // Si está pagado, se muestra SIEMPRE (sin importar la fecha)
+                // Si está pagado, se muestra siempre
                 Pago p = pagoMatch.get();
                 v.setEstado("PAGADO");
                 v.setPagoId(p.getId());
@@ -214,13 +229,18 @@ public class PagoService {
                 v.setMontoPagado(p.getMonto());
                 vouchers.add(v);
             } else if (!hoy.isBefore(fin)) {
-                // Si ya venció la quincena y no está pagada, se muestra como PENDIENTE
+                // si ya venció la quincena y no está pagada, se muestra como PENDIENTE
                 v.setEstado("PENDIENTE");
                 vouchers.add(v);
             }
-            // Si la quincena no ha terminado y no se ha pagado, simplemente NO se agrega a la lista (Adiós "Programado")
 
             inicio = fin.plusDays(1);
+
+            if (inicio.isAfter(finNormal) && inicio.isBefore(limiteGeneracion.plusDays(1))) {
+                // continúa normal
+            } else if (inicio.isAfter(proyecto.getFechaFin())) {
+                break;
+            }
         }
 
         return vouchers;

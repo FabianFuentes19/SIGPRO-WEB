@@ -42,25 +42,25 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         const role = (data.rol || "").toUpperCase();
-        console.log("Login exitoso. Rol recibido:", role);
+        //console.log("Login exitoso. Rol recibido:", role);
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("rol", role);
         localStorage.setItem("matricula", user);
 
         if (role === "ADMINISTRADOR" || role === "ADMIN") {
-          console.log("Redirigiendo a proyectos (Admin)");
+          //console.log("Redirigiendo a proyectos (Admin)");
           navigate("/lideres");
         } else {
-          console.log("Redirigiendo a dashboard (Lider/Miembro)");
+          //console.log("Redirigiendo a dashboard (Lider/Miembro)");
           navigate("/dashboard");
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        setMessage(errorData.error || "Credenciales inválidas");
+        setMessage("Credenciales inválidas");
       }
     } catch (error) {
-      console.error("Error:", error);
+      //console.error("Error:", error);
       setMessage("Error de conexión con el servidor");
     }
   };

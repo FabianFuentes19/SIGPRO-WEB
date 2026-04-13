@@ -32,9 +32,6 @@ public class ProyectoService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private RolRepository rolRepository;
-
-    @Autowired
     private UsuarioService usuarioService;
 
     @Autowired
@@ -55,7 +52,8 @@ public class ProyectoService {
         }
 
         List<ProyectoResponseDTO> content = pageResult.getContent().stream()
-                .map(this::toResponseDtoConCalculos).toList();
+                .map(ProyectoMapper::toResponseDto) // Usa el mapeador simple
+                .toList();
 
         return PaginatedResponse.<ProyectoResponseDTO>builder()
                 .content(content)
@@ -145,18 +143,16 @@ public class ProyectoService {
             proyecto.setObjetivoGeneral(dto.getObjetivoGeneral());
         }
         if (dto.getPresupuesto() != null) {
-            // El nuevo presupuesto enviado en el DTO se considera el "Nuevo Total Autorizado"
             BigDecimal nuevoAutorizado = dto.getPresupuesto();
             proyecto.setPresupuestoAutorizado(nuevoAutorizado);
 
-            // Recalcular el presupuesto disponible real a partir de los gastos actuales
+            // recalculo el presupuesto disponible a partir de los gastos
             BigDecimal gastoMateriales = materialRepository.sumCostoTotalByProyectoId(proyecto.getId());
             BigDecimal gastoNominas = pagoRepository.sumMontoByProyectoId(proyecto.getId());
             BigDecimal gastoTotal = gastoMateriales.add(gastoNominas);
             BigDecimal presupuestoDisponible = nuevoAutorizado.subtract(gastoTotal);
 
             proyecto.setPresupuesto(presupuestoDisponible.max(BigDecimal.ZERO));
-            // Nota: presupuestoInicial se mantiene intacto como registro histórico
         }
 
         return toResponseDtoConCalculos(proyectoRepository.save(proyecto));
@@ -196,6 +192,10 @@ public class ProyectoService {
 
         Proyecto proyecto = proyectoRepository.findById(proyectoId)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        if (!ESTADO_ACTIVO.equalsIgnoreCase(proyecto.getEstado())) {
+            throw new IllegalArgumentException("No se pueden agregar miembros a un proyecto que está " + proyecto.getEstado());
+        }
 
         if (!proyecto.getLider().getId().equals(lider.getId())) {
             throw new SecurityException("No autorizado: solo el líder del proyecto puede agregar miembros");
@@ -247,11 +247,14 @@ public class ProyectoService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         Proyecto proyecto = proyectoRepository.findByLiderId(lider.getId());
-        if (proyecto == null) throw new IllegalArgumentException("No tiene proyecto asignado");
+        if (proyecto == null) {
+            return java.util.Collections.emptyList();
+        }
 
-        // se consulta todo el equipo del proyecto; el filtrado de vouchers se hará según cada usuario
+        // se consulta solo los activos
         return proyectoUsuarioRepository.findByProyectoId(proyecto.getId()).stream()
                 .map(ProyectoUsuario::getUsuario)
+                .filter(u -> "ACTIVO".equalsIgnoreCase(u.getEstado()) || u.getMatricula().equals(matriculaAutenticada))
                 .map(UsuarioMapper::toResponseDto)
                 .toList();
     }
@@ -271,17 +274,17 @@ public class ProyectoService {
     private ProyectoResponseDTO toResponseDtoConCalculos(Proyecto proyecto) {
         ProyectoResponseDTO dto = ProyectoMapper.toResponseDto(proyecto);
         
-        java.math.BigDecimal gastoMateriales = materialRepository.sumCostoTotalByProyectoId(proyecto.getId());
-        java.math.BigDecimal gastoNominas = pagoRepository.sumMontoByProyectoId(proyecto.getId());
-        java.math.BigDecimal gastoTotal = gastoMateriales.add(gastoNominas);
+        BigDecimal gastoMateriales = materialRepository.sumCostoTotalByProyectoId(proyecto.getId());
+        BigDecimal gastoNominas = pagoRepository.sumMontoByProyectoId(proyecto.getId());
+        BigDecimal gastoTotal = gastoMateriales.add(gastoNominas);
         
-        // El restante es: Autorizado - (Materiales + Nóminas)
-        java.math.BigDecimal autorizado = proyecto.getPresupuestoAutorizado() != null ? 
+
+        BigDecimal autorizado = proyecto.getPresupuestoAutorizado() != null ?
                 proyecto.getPresupuestoAutorizado() : proyecto.getPresupuestoInicial();
         
-        java.math.BigDecimal restante = autorizado.subtract(gastoTotal);
+        BigDecimal restante = autorizado.subtract(gastoTotal);
         
-        dto.setPresupuesto(restante); // El campo 'presupuesto' en el DTO representa el RESTANTE
+        dto.setPresupuesto(restante);
         dto.setPresupuestoAutorizado(autorizado);
         
         return dto;
