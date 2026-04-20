@@ -91,6 +91,8 @@ class MaterialIntegrationTest {
         p.setObjetivoGeneral("Obj");
         p.setLider(lider);
         p.setPresupuesto(presupuesto);
+        p.setPresupuestoInicial(presupuesto);
+        p.setPresupuestoAutorizado(presupuesto);
         p.setFechaInicio(LocalDate.now());
         p.setFechaFin(LocalDate.now().plusMonths(6));
         p.setEstado("ACTIVO");
