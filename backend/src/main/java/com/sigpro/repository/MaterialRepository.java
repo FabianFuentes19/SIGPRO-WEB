@@ -18,6 +18,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
 
     List<Material> findByProyectoIdAndNombreContainingIgnoreCase(Long proyectoId, String nombre);
 
+    List<Material> findByNombreContainingIgnoreCase(String nombre);
+
     @Query("SELECT m FROM Material m WHERE m.proyecto.id = :proyectoId " +
             "AND TRANSLATE(LOWER(m.nombre), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC') LIKE TRANSLATE(LOWER(CONCAT('%', :buscar, '%')), 'áéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛäëïöüÄËÏÖÜãõñÃÕÑçÇ', 'aeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUaeiouAEIOUcC')")
     List<Material> findByProyectoIdAndNombreSinAcentos(@Param("proyectoId") Long proyectoId, @Param("buscar") String buscar);

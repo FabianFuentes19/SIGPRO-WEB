@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.constraints.Positive;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/materiales")
 @Validated
 @PreAuthorize("hasRole('LIDER')")
+@CrossOrigin(origins = "*")
 public class MaterialController {
 
     @Autowired
@@ -29,6 +31,16 @@ public class MaterialController {
     public ResponseEntity<MaterialConAlertaResponseDTO> registrar(@Valid @RequestBody MaterialRequestDTO dto) {
         MaterialConAlertaResponseDTO creado = materialService.registrarMaterial(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MaterialResponseDTO>> listarMateriales(
+            @RequestParam(required = false) String nombre
+    ) {
+        List<MaterialResponseDTO> lista = (nombre != null && !nombre.trim().isEmpty())
+                ? materialService.buscarPorNombre(nombre)
+                : materialService.listarTodos();
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/proyecto/{proyectoId}")

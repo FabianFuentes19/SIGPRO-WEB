@@ -40,6 +40,13 @@ public class MaterialService {
      */
     @Transactional
     public MaterialConAlertaResponseDTO registrarMaterial(@Valid MaterialRequestDTO dto) {
+        if (dto.getMonto() == null || dto.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("El monto debe ser mayor a cero");
+        }
+        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
+            throw new RuntimeException("La cantidad debe ser mayor a cero");
+        }
+
         Proyecto proyecto = proyectoRepository.findById(dto.getProyectoId())
                 .orElseThrow(() -> new IllegalArgumentException("El proyecto no existe"));
 
@@ -78,6 +85,23 @@ public class MaterialService {
         return new MaterialConAlertaResponseDTO(MaterialMapper.toResponseDto(guardado), alerta);
     }
 
+    @Transactional(readOnly = true)
+    public List<MaterialResponseDTO> listarTodos() {
+        return materialRepository.findAll().stream()
+                .map(MaterialMapper::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<MaterialResponseDTO> buscarPorNombre(String nombre) {
+        String normalizado = nombre == null ? "" : nombre.trim();
+        if (normalizado.isEmpty()) {
+            return listarTodos();
+        }
+        return materialRepository.findByNombreContainingIgnoreCase(normalizado).stream()
+                .map(MaterialMapper::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
     /**
      * Lista los materiales de un proyecto (solo lectura).
      */
@@ -94,3 +118,13 @@ public class MaterialService {
                 .collect(Collectors.toList());
     }
 }
+
+/*
+Dejar de filtrar todos los materiales en memoria y usar la búsqueda ya soportada por la API.
+ */
+
+/*
+- **Cambio mínimo requerido en backend**:
+- Asegurar que el endpoint de materiales acepte y procese correctamente el parámetro `nombre` materiales controller.
+- Si hace falta, normalizar trim o comportamiento cuando la búsqueda va vacía.
+*/ 
