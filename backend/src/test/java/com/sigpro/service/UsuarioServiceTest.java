@@ -2,6 +2,7 @@ package com.sigpro.service;
 
 import com.sigpro.dto.UsuarioRequestDTO;
 import com.sigpro.dto.UsuarioResponseDTO;
+import com.sigpro.dto.UsuarioUpdateDTO;
 import com.sigpro.model.Proyecto;
 import com.sigpro.model.ProyectoUsuario;
 import com.sigpro.model.Rol;
@@ -374,7 +375,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioRequestDTO cambios = new UsuarioRequestDTO();
+        UsuarioUpdateDTO cambios = new UsuarioUpdateDTO();
         cambios.setNombreCompleto("Juan Perez Modificado");
         cambios.setGrupo("B");
 
@@ -405,7 +406,7 @@ class UsuarioServiceTest {
     void cpMd003_modificarNoExiste() {
         when(usuarioRepository.findByMatricula("999")).thenReturn(Optional.empty());
 
-        UsuarioRequestDTO dto = new UsuarioRequestDTO();
+        UsuarioUpdateDTO dto = new UsuarioUpdateDTO();
         dto.setNombreCompleto("X");
 
         IllegalArgumentException ex = assertThrows(
@@ -435,7 +436,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByMatricula("2023001")).thenReturn(Optional.of(existente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsuarioRequestDTO cambios = new UsuarioRequestDTO();
+        UsuarioUpdateDTO cambios = new UsuarioUpdateDTO();
         cambios.setNombreCompleto("Juan Perez Nuevo");
         cambios.setCarrera("ITI");
 

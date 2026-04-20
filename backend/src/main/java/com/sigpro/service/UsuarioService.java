@@ -1,9 +1,6 @@
 package com.sigpro.service;
 
-import com.sigpro.dto.PaginatedResponse;
-import com.sigpro.dto.UsuarioRequestDTO;
-import com.sigpro.dto.UsuarioResponseDTO;
-import com.sigpro.dto.UsuarioMapper;
+import com.sigpro.dto.*;
 import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
 import com.sigpro.model.ProyectoUsuario;
@@ -163,7 +160,7 @@ public class UsuarioService {
         return UsuarioMapper.toResponseDto(usuario);
     }
 
-    public UsuarioResponseDTO modificarUsuario(String matricula, UsuarioRequestDTO dto) {
+    public UsuarioResponseDTO modificarUsuario(String matricula, UsuarioUpdateDTO dto) {
         String m = safeTrim(matricula);
         if (m == null || m.isEmpty()) {
             throw new IllegalArgumentException("Matrícula obligatoria");

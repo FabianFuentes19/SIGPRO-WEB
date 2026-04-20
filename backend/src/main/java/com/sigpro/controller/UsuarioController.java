@@ -3,6 +3,7 @@ package com.sigpro.controller;
 import com.sigpro.dto.PaginatedResponse;
 import com.sigpro.dto.UsuarioRequestDTO;
 import com.sigpro.dto.UsuarioResponseDTO;
+import com.sigpro.dto.UsuarioUpdateDTO;
 import com.sigpro.model.Usuario;
 import com.sigpro.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -101,7 +102,7 @@ public class UsuarioController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'LIDER')")
     public ResponseEntity<?> actualizar(
             @PathVariable String matricula,
-            @Valid @RequestBody UsuarioRequestDTO dto,
+            @Valid @RequestBody UsuarioUpdateDTO dto,
             Authentication auth) {
         try {
             boolean isAdmin = auth.getAuthorities().stream()

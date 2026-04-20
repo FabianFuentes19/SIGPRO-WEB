@@ -89,8 +89,7 @@ const EditarUsuario = ({ usuario, alCerrar, alGuardar, tipo = "Usuario", onError
 
     const payload = {
       nombreCompleto: datosFormulario.nombreCompleto,
-      matricula: datosFormulario.matricula,
-      contrasena: usuario?.contrasena || "1234", 
+      matricula: datosFormulario.matricula, 
       grupo: datosFormulario.grupo,
       carrera: datosFormulario.carrera,
       cuatrimestre: parseInt(datosFormulario.cuatrimestre, 10),

@@ -1,6 +1,7 @@
 package com.sigpro.service;
 
 import com.sigpro.dto.UsuarioRequestDTO;
+import com.sigpro.dto.UsuarioUpdateDTO;
 import com.sigpro.model.Rol;
 import com.sigpro.model.Usuario;
 import com.sigpro.repository.UsuarioRepository;
@@ -39,7 +40,7 @@ class UsuarioServiceExamTest {
         // Arrange
         UsuarioRequestDTO dto = new UsuarioRequestDTO();
         dto.setMatricula("2023001");
-        dto.setContrasena("12345"); // Muy corta, no cumple Regex
+        dto.setContrasena("12345");
         dto.setNombreCompleto("Prueba");
         dto.setGrupo("A");
         dto.setCarrera("ITI");
@@ -88,7 +89,7 @@ class UsuarioServiceExamTest {
         usuario.setMatricula(matricula);
         usuario.setNombreCompleto("Nombre Original");
 
-        UsuarioRequestDTO dto = new UsuarioRequestDTO();
+        UsuarioUpdateDTO dto = new UsuarioUpdateDTO();
         dto.setNombreCompleto("Nombre Editado");
         dto.setPuesto("Desarrollador");
         dto.setSalarioQuincenal(new BigDecimal("5000.00"));
@@ -110,7 +111,7 @@ class UsuarioServiceExamTest {
     void modificarUsuarioErrorSalario() {
         // Arrange
         String matricula = "2023001";
-        UsuarioRequestDTO dto = new UsuarioRequestDTO();
+        UsuarioUpdateDTO dto = new UsuarioUpdateDTO();
         dto.setSalarioQuincenal(new BigDecimal("-100.00"));
 
         when(usuarioRepository.findByMatricula(matricula)).thenReturn(Optional.of(new Usuario()));
