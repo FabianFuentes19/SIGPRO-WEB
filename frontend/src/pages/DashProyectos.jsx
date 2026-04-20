@@ -9,7 +9,7 @@ import { Eye, LogOut, Pencil } from 'lucide-react';
 import ModalMensajes from '../components/Usuarios/ModalMensajes'
 import Pagination from '../components/Pagination';
 import '../css/Pagination.css';
-import { formatCurrencyWithSign } from '../utils/formatters';
+import { formatCurrency, formatCurrencyWithSign } from '../utils/formatters';
 
 const DashProyectos = () => {
   const navigate = useNavigate();
@@ -205,6 +205,7 @@ const fetchProjects = async (page = 0, query = "") => {
                     <th>RESTANTE</th>
                     <th>ESTADO</th>
                     <th>ACCIONES</th>
+                    <th>MIEMBROS</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -250,6 +251,7 @@ const fetchProjects = async (page = 0, query = "") => {
                                 title={p.estado === 'INACTIVO' ? "No se puede editar un proyecto inactivo" : "Editar"}
                               >
                                 <Pencil size={14} />
+
                               </div>
 
                               <div className="dropdown-item" onClick={() => { setProyectoSeleccionado(p); setMostrarModalConsultar(true); }}>
@@ -257,6 +259,11 @@ const fetchProjects = async (page = 0, query = "") => {
                               </div>
                             </div>
                           </td>
+                                  {/*Agruege esto nuevo  */}
+                                      <td className="text-right">
+                            {formatCurrency(p.totalMiembros)}  </td>
+
+
                         </tr>
                       ))
                   )}
