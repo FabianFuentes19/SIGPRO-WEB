@@ -30,7 +30,7 @@ function Login() {
     if (user.trim() === "" || password.trim() === "") {
     setMessage("Los campos matrícula y contraseña no pueden estar vacíos");
     return;
-  }
+    }
 
     try {
       const response = await fetch("http://localhost:8080/auth/login", {
@@ -56,19 +56,19 @@ function Login() {
           navigate("/dashboard");
         }
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        setMessage("Credenciales inválidas");
-      }
+  const errorData = await response.json().catch(() => ({}));
+  setMessage(errorData.error || "Credenciales inválidas");
+}
     } catch (error) {
       //console.error("Error:", error);
       setMessage("Error de conexión con el servidor");
     }
-  };
-
- const handleForgotPassword = (e) => {
-  e.preventDefault();
-  navigate("/recuperar-contraseña"); 
 };
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    navigate("/recuperar-contraseña"); 
+  };
 
 
   return (
