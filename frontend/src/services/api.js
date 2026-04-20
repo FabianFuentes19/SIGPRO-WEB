@@ -200,14 +200,36 @@ async function obtenerDatosNominas(token, matriculaLider) {
  */
 export async function obtenerMaterialesPorProyecto(proyectoId, nombre = "") {
   if (!proyectoId) return [];
-  let endpoint = `/api/materiales/proyecto/${encodeURIComponent(proyectoId)}`;
-  if (nombre) {
-    endpoint += `?nombre=${encodeURIComponent(nombre)}`;
+  const params = new URLSearchParams();
+  if (nombre != null && String(nombre).trim() !== "") {
+    params.set("nombre", String(nombre).trim());
   }
+  const qs = params.toString();
+  const endpoint = `/api/materiales/proyecto/${encodeURIComponent(proyectoId)}${qs ? `?${qs}` : ""}`;
   const response = await apiFetch(endpoint);
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || "Error al obtener materiales");
+    throw new Error(data?.mensaje || data?.error || "Error al obtener materiales");
+  }
+  return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Lista materiales (GET /api/materiales) con búsqueda opcional por nombre.
+ * @param {string} nombre - Término de búsqueda opcional
+ * @returns {Promise<Array>}
+ */
+export async function getMateriales(nombre = "") {
+  const params = new URLSearchParams();
+  if (nombre != null && String(nombre).trim() !== "") {
+    params.set("nombre", String(nombre).trim());
+  }
+  const qs = params.toString();
+  const endpoint = `/api/materiales${qs ? `?${qs}` : ""}`;
+  const response = await apiFetch(endpoint);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.mensaje || data?.error || "Error al obtener materiales");
   }
   return Array.isArray(data) ? data : [];
 }
@@ -273,7 +295,7 @@ export async function registrarMaterial(payload) {
   });
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || "Error al registrar material");
+    throw new Error(data?.mensaje || data?.error || "Error al registrar material");
   }
   return data;
 }

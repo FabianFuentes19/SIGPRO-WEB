@@ -12,34 +12,52 @@ const Materiales = ({ proyectoId, proyecto, onMaterialSuccess }) => {
     const [busqueda, setBusqueda] = useState('');
     const [cargando, setCargando] = useState(false);
     const [mensajeModal, setMensajeModal] = useState(null);
+    const [debouncedBusqueda, setDebouncedBusqueda] = useState('');
 
-    const cargarMateriales = async () => {
+    const cargarMateriales = async (nombre = '') => {
         if (!proyectoId) {
             setMateriales([]);
             return;
         }
         setCargando(true);
         try {
-            const data = await obtenerMaterialesPorProyecto(proyectoId);
+            const data = await obtenerMaterialesPorProyecto(proyectoId, nombre);
             setMateriales(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error(e);
             setMateriales([]);
+            setMensajeModal({
+                titulo: "Error",
+                mensaje: e?.message || "Error al obtener materiales",
+                tipo: "error"
+            });
         } finally {
             setCargando(false);
         }
     };
 
     useEffect(() => {
-        cargarMateriales();
+        setBusqueda('');
+        setDebouncedBusqueda('');
+        cargarMateriales('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [proyectoId]);
 
-    const materialesFiltrados = useMemo(() => {
-        const q = busqueda.trim().toLowerCase();
-        if (!q) return materiales;
-        return materiales.filter((m) => (m?.nombre || '').toLowerCase().includes(q));
-    }, [materiales, busqueda]);
+    useEffect(() => {
+        const id = setTimeout(() => {
+            setDebouncedBusqueda(busqueda);
+        }, 400); // debounce UX
+        return () => clearTimeout(id);
+    }, [busqueda]);
+
+    useEffect(() => {
+        cargarMateriales(debouncedBusqueda);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedBusqueda]);
+
+    const handleSearch = (value) => {
+        setBusqueda(value);
+    };
 
     const totalSuma = useMemo(() => {
         return materiales.reduce((acc, item) => acc + (Number(item?.costoTotal) || 0), 0);
@@ -107,7 +125,7 @@ const Materiales = ({ proyectoId, proyecto, onMaterialSuccess }) => {
                     placeholder="Buscar materiales..."
                     className="input-search-styled"
                     value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
+                    onChange={(e) => handleSearch(e.target.value)}
                 />
             </div>
 
@@ -137,7 +155,7 @@ const Materiales = ({ proyectoId, proyecto, onMaterialSuccess }) => {
                             <span>Consultando materiales</span>
                         </div>
                     </div>
-                ) : materialesFiltrados.map((m) => (
+                ) : materiales.map((m) => (
                     <div key={m.id} className="member-card-item">
                         <div className="member-data">
                             <strong>{m.nombre}</strong>
