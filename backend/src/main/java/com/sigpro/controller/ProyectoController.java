@@ -252,4 +252,11 @@ public class ProyectoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
+
+
+
+
+
+
 }

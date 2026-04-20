@@ -34,6 +34,11 @@ public class ProyectoRequestDTO {
     private String liderMatricula;
     private Long liderId;
 
+
+    // Agregue nuevo examen
+    private Long totalMiembros;
+
+
     //validación de fechas
     @AssertTrue(message = "La fecha de fin debe ser posterior a la fecha de inicio")
     public boolean isFechaFinPosterior() {

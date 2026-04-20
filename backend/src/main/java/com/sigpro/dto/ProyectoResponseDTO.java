@@ -22,4 +22,10 @@ public class ProyectoResponseDTO {
     private LocalDate fechaFin;
     private String estado;
     private List<UsuarioResponseDTO> miembros;
+
+    // Agregue nuevo examen
+    private Long totalMiembros;
+
+
+
 }

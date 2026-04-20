@@ -283,9 +283,14 @@ public class ProyectoService {
                 proyecto.getPresupuestoAutorizado() : proyecto.getPresupuestoInicial();
         
         BigDecimal restante = autorizado.subtract(gastoTotal);
+
+        //BigDecimal contador = UsuarioMapper.toResponseDto(consultarProyectoMiembro(autorizado));
+
+        BigDecimal totalMiembros = consultarProyectoMiembro(autorizado);
         
         dto.setPresupuesto(restante);
         dto.setPresupuestoAutorizado(autorizado);
+        dto.setTotalMiembros(totalMiembros.longValue());
         
         return dto;
     }
