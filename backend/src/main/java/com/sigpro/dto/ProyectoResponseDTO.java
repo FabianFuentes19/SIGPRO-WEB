@@ -23,6 +23,7 @@ public class ProyectoResponseDTO {
     private String estado;
     private List<UsuarioResponseDTO> miembros;
 
+    // agrego esto
     // Agregue nuevo examen
     private Long totalMiembros;
 

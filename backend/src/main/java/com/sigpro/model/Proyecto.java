@@ -46,6 +46,7 @@ public class Proyecto {
     @Column(name = "ESTADO", length = 50)
     private String estado;
 
+    // agrego esto
     @Column (name = "totalMiembros", nullable = false)
     private Long totalMiembros;
 }

@@ -287,7 +287,8 @@ public class ProyectoService {
         //BigDecimal contador = UsuarioMapper.toResponseDto(consultarProyectoMiembro(autorizado));
 
         BigDecimal totalMiembros = consultarProyectoMiembro(autorizado);
-        
+
+        // aagrego este comentario
         dto.setPresupuesto(restante);
         dto.setPresupuestoAutorizado(autorizado);
         dto.setTotalMiembros(totalMiembros.longValue());
